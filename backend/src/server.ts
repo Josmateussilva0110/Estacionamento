@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 import session from "express-session"
 import PgSession from "connect-pg-simple"
 import { Pool } from "pg"
+import router from "../src/routes/routes"
 
 dotenv.config()
 
@@ -47,6 +48,8 @@ app.use(
 app.get("/", (request, response) => {
   response.json({ status: "API rodando com TypeScript 🚀" })
 })
+
+app.use("/", router)
 
 const PORT = 8080
 

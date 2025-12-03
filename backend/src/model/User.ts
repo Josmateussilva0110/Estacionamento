@@ -1,7 +1,18 @@
-class User {
+import Model from "./Model"
 
-    
-
+export interface UserData {
+  id?: number
+  username: string
+  email: string
+  password: string
+  created_at?: string 
+  updated_at?: string
 }
 
-module .exports = new User()
+class User extends Model<UserData> {
+  constructor() {
+    super("users")
+  }
+}
+
+export default new User()
