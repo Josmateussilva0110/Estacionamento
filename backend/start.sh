@@ -10,10 +10,12 @@ until pg_isready -h "$DB_HOST" -p 5432 -U "$DB_USER"; do
   sleep 2
 done
 
-#echo "PostgreSQL pronto! Rodando migrations e seeds..."
+echo "PostgreSQL pronto! Rodando migrations..."
 
-#npx knex migrate:latest --knexfile src/knexfile.ts
-#npx knex seed:run --knexfile src/knexfile.ts
+npx knex migrate:latest --knexfile knexfile.ts
+
+#echo "Executando seeds..."
+#npx knex seed:run --knexfile knexfile.ts
 
 echo "Iniciando o servidor..."
 npm run dev

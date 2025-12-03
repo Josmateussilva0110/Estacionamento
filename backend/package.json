@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "dev": "ts-node-dev --respawn --watch src --ext ts,json --transpile-only src/server.ts",
+    "dev": "ts-node-dev --respawn --watch src --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.ts"
   },
@@ -32,6 +32,7 @@
     "@types/express-session": "^1.18.2",
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }
