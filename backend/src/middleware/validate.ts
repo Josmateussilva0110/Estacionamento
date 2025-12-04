@@ -5,20 +5,27 @@ export const validate =
   (schema: ZodTypeAny) =>
   (request: Request, response: Response, next: NextFunction) => {
     try {
-      schema.parse(request.body)
+      const result = schema.parse(request.body)
+
+      request.body = result 
       return next()
     } catch (err) {
       if (err instanceof ZodError) {
-        return response.status(400).json({
+        return response.status(422).json({
+          status: false,
+          message: "Erro de validação",
           errors: err.issues.map((e) => ({
-            field: e.path.join("."), 
+            field: e.path.join("."),
             message: e.message,
           })),
         })
       }
+
       console.error("Erro inesperado no validator:", err)
+
       return response.status(500).json({
-        error: "Erro interno no validador",
+        status: false,
+        message: "Erro interno no validador",
       })
     }
   }

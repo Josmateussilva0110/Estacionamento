@@ -3,10 +3,12 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Input from "../../ui/Input"
+import { requestData } from "../../../services/requestApi"
+import { type RegisterResponse } from "../../../types/api"
 
 // Schema de validação Zod
 const registerSchema = z.object({
-  name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
+  username: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
   confirmPassword: z.string()
@@ -26,9 +28,30 @@ function RegisterUser() {
     resolver: zodResolver(registerSchema)
   })
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log("Dados enviados:", data)
+
+  async function onSubmit(form: RegisterFormData) {
+    const payload = {
+      username: form.username,
+      email: form.email,
+      password: form.password,
+      confirmPassword: form.confirmPassword
+    }
+
+
+    const result = await requestData<RegisterResponse>(
+      "/register",
+      "POST",
+      payload,
+      true
+    )
+
+    if (result.success && result.data?.status) {
+      console.log(result.data.message)
+    } else {
+      console.log(result.message)
+    }
   }
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark flex items-center justify-center px-4 py-8">
@@ -60,8 +83,8 @@ function RegisterUser() {
               label="Nome Completo"
               placeholder="Digite seu nome"
               leftIcon={<User size={18} />}
-              {...register("name")}
-              error={errors.name?.message}
+              {...register("username")}
+              error={errors.username?.message}
             />
 
             {/* Email */}
@@ -113,7 +136,6 @@ function RegisterUser() {
                 </a>
               </p>
             </div>
-
           </form>
         </div>
       </div>

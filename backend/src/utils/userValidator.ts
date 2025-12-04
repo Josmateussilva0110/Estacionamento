@@ -20,9 +20,9 @@ export const UserSchema = z.object({
     .string()
     .min(6, "Senha deve ter no mínimo 6 caracteres."),
 
-  confirm_password: z.string(),
+  confirmPassword: z.string(),
 })
-.refine((data) => data.password === data.confirm_password, {
+.refine((data) => data.password === data.confirmPassword, {
   message: "Senhas precisam ser iguais.",
-  path: ["confirm_password"],
+  path: ["confirmPassword"],
 })

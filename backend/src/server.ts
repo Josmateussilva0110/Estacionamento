@@ -24,7 +24,12 @@ const pgPool = new Pool({
 
 const PostgresSession = PgSession(session)
 
-app.use(cors())
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}))
+
+
 app.use(express.json())
 
 app.use(
