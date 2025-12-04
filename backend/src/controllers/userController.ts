@@ -6,20 +6,26 @@ class UserController {
   async register(request: Request, response: Response) {
     try {
       const { username, email, password } = request.body
-       const hashedPassword = await bcrypt.hash(password, 10)
+
+      const emailExist = await User.emailExists(email)
+      if(emailExist) {
+        return response.status(422).json({status: false, message: "Email já existe"})
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10)
 
       const newUser: UserData = { username, email, password: hashedPassword }
 
       const success = await User.save(newUser)
 
       if (!success) {
-        return response.status(500).json({ error: "Erro ao cadastrar usuário" })
+        return response.status(500).json({status: false, message: "Erro ao cadastrar usuário" })
       }
 
-      return response.status(201).json({ message: "Usuário cadastrado com sucesso" })
+      return response.status(201).json({status: true, message: "Usuário cadastrado com sucesso" })
     } catch (err) {
       console.error("Erro ao cadastrar usuário: ", err)
-      return response.status(500).json({ error: "Erro interno no servidor" })
+      return response.status(500).json({status: false,  message: "Erro interno no servidor" })
     }
   }
 

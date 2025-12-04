@@ -8,7 +8,7 @@ export interface Timestamps {
 
 
 export default class Model<T extends Record<string, any>> {
-    private tableName: string
+    protected tableName: string
 
     constructor(tableName: string) {
         this.tableName = tableName
