@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Input from "../../ui/Input"
-import { requestData } from "../../../services/requestApi"
-import { type RegisterResponse } from "../../../types/api"
+import { useUser } from "../../../context/useUser"
+import { useNavigate } from "react-router-dom"
 
 // Schema de validação Zod
 const registerSchema = z.object({
@@ -28,35 +28,23 @@ function RegisterUser() {
     resolver: zodResolver(registerSchema)
   })
 
+  const { register: registerUser } = useUser()
+  const navigate = useNavigate()
 
   async function onSubmit(form: RegisterFormData) {
-    const payload = {
-      username: form.username,
-      email: form.email,
-      password: form.password,
-      confirmPassword: form.confirmPassword
-    }
+    const response = await registerUser(form)
 
-
-    const result = await requestData<RegisterResponse>(
-      "/register",
-      "POST",
-      payload,
-      true
-    )
-
-    if (result.success && result.data?.status) {
-      console.log(result.data.message)
+    if (response.success && response.data?.status) {
+      navigate("/")      
     } else {
-      console.log(result.message)
+      console.log("Erro no cadastro:", response.message)
     }
   }
-
 
   return (
     <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        
+
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
 
           {/* Header */}
@@ -78,7 +66,6 @@ function RegisterUser() {
           {/* Formulário */}
           <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-8 space-y-6">
 
-            {/* Nome */}
             <Input
               label="Nome Completo"
               placeholder="Digite seu nome"
@@ -87,7 +74,6 @@ function RegisterUser() {
               error={errors.username?.message}
             />
 
-            {/* Email */}
             <Input
               label="E-mail"
               type="email"
@@ -97,7 +83,6 @@ function RegisterUser() {
               error={errors.email?.message}
             />
 
-            {/* Senha */}
             <Input
               label="Senha"
               type="password"
@@ -108,7 +93,6 @@ function RegisterUser() {
               error={errors.password?.message}
             />
 
-            {/* Confirmar Senha */}
             <Input
               label="Confirmar Senha"
               type="password"
@@ -119,7 +103,6 @@ function RegisterUser() {
               error={errors.confirmPassword?.message}
             />
 
-            {/* Botão */}
             <button
               type="submit"
               className="w-full bg-linear-to-r from-parking-primary to-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-parking-primary focus:outline-none focus:ring-2 focus:ring-parking-primary focus:ring-offset-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
@@ -127,7 +110,6 @@ function RegisterUser() {
               Criar Conta
             </button>
 
-            {/* Link Login */}
             <div className="text-center pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-600">
                 Já tem uma conta?{" "}
