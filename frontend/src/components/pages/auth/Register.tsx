@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Input from "../../ui/Input"
 import { useUser } from "../../../context/useUser"
 import { useNavigate } from "react-router-dom"
+import useFlashMessage from "../../../hooks/useFlashMessage"
 
 // Schema de validação Zod
 const registerSchema = z.object({
@@ -30,13 +31,16 @@ function RegisterUser() {
 
   const { register: registerUser } = useUser()
   const navigate = useNavigate()
+  const { setFlashMessage } = useFlashMessage()
 
   async function onSubmit(form: RegisterFormData) {
     const response = await registerUser(form)
 
     if (response.success && response.data?.status) {
+      setFlashMessage(response.data.message, "success")
       navigate("/")      
     } else {
+      setFlashMessage(response.message, "error")
       console.log("Erro no cadastro:", response.message)
     }
   }
