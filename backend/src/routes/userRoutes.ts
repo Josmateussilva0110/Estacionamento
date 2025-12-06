@@ -1,11 +1,14 @@
 import { Router } from "express"
 import UserController from "../controllers/userController"
 import { validate } from "../middleware/validate"
-import { UserSchema } from "../utils/userValidator"
+import { RegisterSchema } from "../utils/registerValidator"
+import { LoginSchema } from "../utils/loginValidator"
+
 
 const router = Router()
 
 
-router.post("/register", validate(UserSchema), UserController.register)
+router.post("/register", validate(RegisterSchema), UserController.register)
+router.post("/login", validate(LoginSchema), UserController.login)
 
 export default router

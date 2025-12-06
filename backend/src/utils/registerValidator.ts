@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const UserSchema = z.object({
+export const RegisterSchema = z.object({
   id: z
     .number()
     .int()

@@ -29,6 +29,26 @@ class User extends Model<UserData> {
     }
   }
 
+  async findByEmail(email: string): Promise<UserData | null> {
+    try {
+      const normalizedEmail = email.trim().toLowerCase()
+
+      const user = await db(this.tableName)
+        .select("*")
+        .where({ email: normalizedEmail })
+        .first()
+
+      return user ?? null
+    } catch (err) {
+      console.error(
+        `Erro ao buscar usuário por e-mail na tabela ${this.tableName}:`,
+        err
+      )
+      return null
+    }
+  }
+
+
 }
 
 export default new User()
