@@ -3,25 +3,40 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import Input from "../../ui/Input"
+import { useUser } from "../../../context/useUser"
+import { useNavigate } from "react-router-dom"
+import useFlashMessage from "../../../hooks/useFlashMessage"
 
 // Schema de validação Zod
-const registerSchema = z.object({
+const LoginSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
 })
-type RegisterFormData = z.infer<typeof registerSchema>
+type LoginFormData = z.infer<typeof LoginSchema>
 
 function LoginUser() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema)
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(LoginSchema)
   })
 
-  const onSubmit = (data: RegisterFormData) => {
-    console.log("Dados enviados:", data)
+  const { login: loginUser } = useUser()
+  const navigate = useNavigate()
+  const { setFlashMessage } = useFlashMessage()
+
+  async function onSubmit(form: LoginFormData) {
+    const response = await loginUser(form)
+
+    if (response.success && response.data?.status) {
+      setFlashMessage(response.data.message, "success")
+      navigate("/")      
+    } else {
+      setFlashMessage(response.message, "error")
+      console.log("Erro no login:", response.message)
+    }
   }
 
   return (

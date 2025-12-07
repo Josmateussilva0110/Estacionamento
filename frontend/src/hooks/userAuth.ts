@@ -19,8 +19,14 @@ export interface RegisterFormData {
   confirmPassword: string
 }
 
+export interface LoginData {
+  email: string
+  password: string
+}
+
 export interface UseAuthReturn {
   register: (data: RegisterFormData) => Promise<ApiResponse<RegisterResponse>>
+  login: (data: LoginData) => Promise<ApiResponse<RegisterResponse>>
   localLogout: () => void
 }
 
@@ -45,7 +51,16 @@ export default function useAuth({
       true
     )
 
-    console.log(response)
+    return response
+  }
+
+  async function login(data: LoginData) {
+    const response = await requestData<RegisterResponse>(
+      "login",
+      "POST",
+      data,
+      true
+    )
 
     return response
   }
@@ -55,5 +70,5 @@ export default function useAuth({
     setUser(null)
   }
 
-  return { register, localLogout }
+  return { register, login, localLogout }
 }

@@ -16,6 +16,7 @@ interface UserContextType {
   sessionExpired: boolean
   setSessionExpired: (value: boolean) => void
   register: (data: any) => Promise<any>
+  login: (data: any) => Promise<any>
 }
 
 
@@ -29,10 +30,13 @@ interface ProviderProps {
 export function UserProvider({ children }: ProviderProps) {
   const [authenticated, setAuthenticated] = useState(false)
   const [user, setUser] = useState<User | null>(null)
-  const [loading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [sessionExpired, setSessionExpired] = useState(false)
 
-  const { register } = useAuth({ setAuthenticated, setUser })
+  const { login: authLogin, register: authRegister} = useAuth({
+    setAuthenticated,
+    setUser,
+  })
 
   useEffect(() => {
     function handleExpired() {
@@ -45,6 +49,22 @@ export function UserProvider({ children }: ProviderProps) {
     return () => window.removeEventListener("SESSION_EXPIRED", handleExpired)
   }, [])
 
+  async function login(data: any) {
+    const response = await authLogin(data)
+
+    if (response.success && response.data?.status) {
+      setAuthenticated(true)
+      setUser(response.data.user ?? null)
+    }
+
+    return response
+  }
+
+  async function register(data: any) {
+    return await authRegister(data)
+  }
+
+
   return (
     <UserContext.Provider
       value={{
@@ -54,6 +74,7 @@ export function UserProvider({ children }: ProviderProps) {
         sessionExpired,
         setSessionExpired,
         register,
+        login
       }}
     >
       {children}
