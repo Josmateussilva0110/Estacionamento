@@ -17,6 +17,7 @@ interface UserContextType {
   setSessionExpired: (value: boolean) => void
   register: (data: any) => Promise<any>
   login: (data: any) => Promise<any>
+  logout: () => void
 }
 
 
@@ -33,7 +34,7 @@ export function UserProvider({ children }: ProviderProps) {
   const [loading, setLoading] = useState(true)
   const [sessionExpired, setSessionExpired] = useState(false)
 
-  const { login: authLogin, register: authRegister} = useAuth({
+  const { login: authLogin, register: authRegister, localLogout } = useAuth({
     setAuthenticated,
     setUser,
   })
@@ -64,6 +65,9 @@ export function UserProvider({ children }: ProviderProps) {
     return await authRegister(data)
   }
 
+  function logout() {
+    localLogout()
+  }
 
   return (
     <UserContext.Provider
@@ -74,7 +78,8 @@ export function UserProvider({ children }: ProviderProps) {
         sessionExpired,
         setSessionExpired,
         register,
-        login
+        login,
+        logout
       }}
     >
       {children}
