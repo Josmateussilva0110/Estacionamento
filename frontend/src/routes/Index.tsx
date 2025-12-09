@@ -5,10 +5,12 @@ import RegisterUser from "../components/pages/auth/Register"
 import LoginUser from "../components/pages/auth/Login"
 import Profile from "../components/pages/user/Profile"
 import PrivateRoute from "./PrivateRouter"
+import PageNotFound from "../components/pages/errors/PageNotFound"
 
 export default function AppRoutes() {
   return (
     <Routes>
+
       {/* Rotas públicas */}
       <Route element={<PublicRoutes />}>
         <Route path="/" element={<Home />} />
@@ -20,6 +22,10 @@ export default function AppRoutes() {
       <Route element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
       </Route>
+
+      {/* Rota 404 */}
+      <Route path="*" element={<PageNotFound />} />
+
     </Routes>
   )
 }
