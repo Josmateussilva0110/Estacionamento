@@ -46,29 +46,29 @@ function RegisterUser() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
+      <div className="w-full max-w-md sm:max-w-lg">
 
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
 
           {/* Header */}
-          <div className="bg-linear-to-r from-parking-primary to-blue-600 px-6 py-8 text-center">
+          <div className="bg-linear-to-r from-parking-primary to-blue-600 px-5 sm:px-6 py-6 sm:py-8 text-center">
             <div className="mb-4">
-              <svg className="w-16 h-16 mx-auto text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-12 h-12 sm:w-16 sm:h-16 mx-auto text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
 
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
               Sistema de Estacionamento
             </h1>
-            <p className="text-blue-100 text-sm">
+            <p className="text-blue-100 text-sm sm:text-base">
               Crie sua conta e gerencie seu estacionamento
             </p>
           </div>
 
           {/* Formulário */}
-          <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-8 space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="px-5 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-7">
 
             <Input
               label="Nome Completo"
@@ -109,7 +109,7 @@ function RegisterUser() {
 
             <button
               type="submit"
-              className="w-full bg-linear-to-r from-parking-primary to-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-parking-primary focus:outline-none focus:ring-2 focus:ring-parking-primary focus:ring-offset-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+              className="w-full bg-linear-to-r from-parking-primary to-blue-600 text-white font-bold py-3 sm:py-3.5 px-4 rounded-lg hover:from-blue-700 hover:to-parking-primary focus:outline-none focus:ring-2 focus:ring-parking-primary focus:ring-offset-2 transform transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg text-sm sm:text-base"
             >
               Criar Conta
             </button>
