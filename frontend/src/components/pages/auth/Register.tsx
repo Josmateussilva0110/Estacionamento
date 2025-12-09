@@ -40,7 +40,7 @@ function RegisterUser() {
       setFlashMessage(response.data.message, "success")
       navigate("/")      
     } else {
-      setFlashMessage(response.message, "error")
+      setFlashMessage(response.message || "Erro ao registrar usuário", "error")
       console.log("Erro no cadastro:", response.message)
     }
   }

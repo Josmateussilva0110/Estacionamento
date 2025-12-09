@@ -1,14 +1,23 @@
 import { Link, useNavigate } from "react-router-dom"
 import { LogIn, UserPlus, User, LogOut } from "lucide-react"
 import { useUser } from "../../context/useUser"
+import useFlashMessage from "../../hooks/useFlashMessage"
 
 function NavBar() {
   const { authenticated, user, logout } = useUser()
   const navigate = useNavigate()
+  const { setFlashMessage } = useFlashMessage()
 
-  function handleLogout() {
-    logout()
-    navigate("/")
+  async function handleLogout() {
+    const response = await logout()
+
+    if (response.success && response.data?.status) {
+      setFlashMessage(response.data.message, "success")
+      navigate("/")      
+    } else {
+      setFlashMessage(response.message || "Erro ao fazer logout", "error")
+      console.log("Erro no logout:", response.message)
+    }
   }
 
   return (

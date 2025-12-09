@@ -108,9 +108,9 @@ class UserController {
 
   async session(request: Request, response: Response): Promise<Response> {
     if (request.session && request.session.user) {
-        return response.status(200).json({ success: true, user: request.session.user })
+        return response.status(200).json({ status: true, user: request.session.user })
     } else {
-        return response.status(401).json({ success: false, message: "Usuário não autenticado" })
+        return response.status(401).json({ status: false, message: "Usuário não autenticado" })
     }
   }
 
@@ -118,7 +118,7 @@ class UserController {
     if (!request.session) {
       return response
         .status(400)
-        .json({ success: false, message: "Nenhuma sessão ativa" })
+        .json({ status: false, message: "Nenhuma sessão ativa" })
     }
 
     return new Promise((resolve) => {
@@ -127,7 +127,7 @@ class UserController {
           resolve(
             response
               .status(500)
-              .json({ success: false, message: "Erro ao sair" })
+              .json({ status: false, message: "Erro ao sair" })
           )
           return
         }
@@ -136,7 +136,7 @@ class UserController {
         resolve(
           response
             .status(200)
-            .json({ success: true, message: "Logout feito com sucesso" })
+            .json({ status: true, message: "Logout feito com sucesso" })
         )
       })
     })

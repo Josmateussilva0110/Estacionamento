@@ -34,7 +34,7 @@ function LoginUser() {
       setFlashMessage(response.data.message, "success")
       navigate("/")      
     } else {
-      setFlashMessage(response.message, "error")
+      setFlashMessage(response.message || "Erro ao fazer login", "error")
       console.log("Erro no login:", response.message)
     }
   }

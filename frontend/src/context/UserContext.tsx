@@ -3,7 +3,7 @@ import useAuth from "../hooks/userAuth"
 import { requestData } from "../services/requestApi"
 import type { LoginData, RegisterFormData } from "../hooks/userAuth"
 import type { ApiResponse } from "../services/requestApi"
-import type { RegisterResponse } from "../types/api"
+import type { ResponseApi } from "../types/api"
 
 interface User {
   id: number
@@ -17,9 +17,9 @@ interface UserContextType {
   loading: boolean
   sessionExpired: boolean
   setSessionExpired: (value: boolean) => void
-  register: (data: RegisterFormData) => Promise<ApiResponse<RegisterResponse>>
-  login: (data: LoginData) => Promise<ApiResponse<RegisterResponse>>
-  logout: () => Promise<ApiResponse<RegisterResponse>>
+  register: (data: RegisterFormData) => Promise<ApiResponse<ResponseApi>>
+  login: (data: LoginData) => Promise<ApiResponse<ResponseApi>>
+  logout: () => Promise<ApiResponse<ResponseApi>>
 }
 
 export const UserContext = createContext<UserContextType | null>(null)

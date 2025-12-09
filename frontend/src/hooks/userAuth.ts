@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { requestData, type ApiResponse } from "../services/requestApi"
-import { type RegisterResponse } from "../types/api"
+import { type ResponseApi } from "../types/api"
 
 export interface AuthHookParams {
   setAuthenticated: (value: boolean) => void
@@ -26,9 +26,9 @@ export interface LoginData {
 }
 
 export interface UseAuthReturn {
-  register: (data: RegisterFormData) => Promise<ApiResponse<RegisterResponse>>
-  login: (data: LoginData) => Promise<ApiResponse<RegisterResponse>>
-  logout: () => Promise<ApiResponse<RegisterResponse>>
+  register: (data: RegisterFormData) => Promise<ApiResponse<ResponseApi>>
+  login: (data: LoginData) => Promise<ApiResponse<ResponseApi>>
+  logout: () => Promise<ApiResponse<ResponseApi>>
 }
 
 export default function useAuth({
@@ -45,7 +45,7 @@ export default function useAuth({
       confirmPassword: data.confirmPassword,
     }
 
-    const response = await requestData<RegisterResponse>(
+    const response = await requestData<ResponseApi>(
       "/register",
       "POST",
       payload,
@@ -57,7 +57,7 @@ export default function useAuth({
 
 
   const login = useCallback(async (data: LoginData) => {
-    const response = await requestData<RegisterResponse>(
+    const response = await requestData<ResponseApi>(
       "/login",
       "POST",
       data,
@@ -74,7 +74,7 @@ export default function useAuth({
 
 
   const logout = useCallback(async () => {
-    const response = await requestData<RegisterResponse>(
+    const response = await requestData<ResponseApi>(
       "/user/logout",
       "POST",
       {},
