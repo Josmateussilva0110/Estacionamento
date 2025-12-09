@@ -1,4 +1,4 @@
-import express from "express"
+import express, { Request, Response } from "express"
 import cors from "cors"
 import dotenv from "dotenv"
 import session from "express-session"
@@ -38,6 +38,8 @@ app.use(
       pool: pgPool,
       tableName: "session",
       createTableIfMissing: true,
+      ttl: 60 * 60 * 2,
+      pruneSessionInterval: 60 * 30,
     }),
     secret: process.env.SECRET || "fallback_secret",
     resave: false,
@@ -46,11 +48,12 @@ app.use(
       secure: false, 
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 2, // 2 horas
+      //maxAge: 1000 * 15, // 15 segundos
     },
   })
 )
 
-app.get("/", (request, response) => {
+app.get("/", (request: Request, response: Response) => {
   response.json({ status: "API rodando com TypeScript 🚀" })
 })
 

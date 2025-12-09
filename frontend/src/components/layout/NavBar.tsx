@@ -62,7 +62,7 @@ function NavBar() {
               <>
                 {/* Profile Button */}
                 <Link
-                  to="/perfil"
+                  to="/profile"
                   className="flex items-center space-x-2 px-4 py-2 text-parking-primary font-semibold rounded-lg hover:bg-blue-50 transition-colors"
                 >
                   <User size={18} />
