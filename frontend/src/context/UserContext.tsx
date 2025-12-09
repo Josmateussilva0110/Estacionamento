@@ -1,6 +1,9 @@
 import { createContext, useState, useEffect, type ReactNode } from "react"
 import useAuth from "../hooks/userAuth"
-
+import { requestData } from "../services/requestApi"
+import type { LoginData, RegisterFormData } from "../hooks/userAuth"
+import type { ApiResponse } from "../services/requestApi"
+import type { RegisterResponse } from "../types/api"
 
 interface User {
   id: number
@@ -8,21 +11,18 @@ interface User {
   email: string
 }
 
-
 interface UserContextType {
   authenticated: boolean
   user: User | null
   loading: boolean
   sessionExpired: boolean
   setSessionExpired: (value: boolean) => void
-  register: (data: any) => Promise<any>
-  login: (data: any) => Promise<any>
-  logout: () => void
+  register: (data: RegisterFormData) => Promise<ApiResponse<RegisterResponse>>
+  login: (data: LoginData) => Promise<ApiResponse<RegisterResponse>>
+  logout: () => Promise<ApiResponse<RegisterResponse>>
 }
 
-
 export const UserContext = createContext<UserContextType | null>(null)
-
 
 interface ProviderProps {
   children: ReactNode
@@ -34,10 +34,34 @@ export function UserProvider({ children }: ProviderProps) {
   const [loading, setLoading] = useState(true)
   const [sessionExpired, setSessionExpired] = useState(false)
 
-  const { login: authLogin, register: authRegister, localLogout } = useAuth({
+  const {
+    login: authLogin,
+    register: authRegister,
+    logout: authLogout
+  } = useAuth({
     setAuthenticated,
     setUser,
   })
+
+  useEffect(() => {
+    async function checkSession() {
+      const response = await requestData("/user/session", "GET", {}, true)
+
+      if (response.success && response.data?.user) {
+        setAuthenticated(true)
+        setUser(response.data.user)
+      } else {
+        setAuthenticated(false)
+        setUser(null)
+        setSessionExpired(true)
+      }
+
+      setLoading(false)
+    }
+
+    checkSession()
+  }, [])
+
 
   useEffect(() => {
     function handleExpired() {
@@ -50,23 +74,17 @@ export function UserProvider({ children }: ProviderProps) {
     return () => window.removeEventListener("SESSION_EXPIRED", handleExpired)
   }, [])
 
-  async function login(data: any) {
-    const response = await authLogin(data)
 
-    if (response.success && response.data?.status) {
-      setAuthenticated(true)
-      setUser(response.data.user ?? null)
-    }
-
-    return response
+  async function login(data: LoginData) {
+    return authLogin(data) 
   }
 
-  async function register(data: any) {
-    return await authRegister(data)
+  async function register(data: RegisterFormData) {
+    return authRegister(data)
   }
 
-  function logout() {
-    localLogout()
+  async function logout() {
+    return authLogout() 
   }
 
   return (

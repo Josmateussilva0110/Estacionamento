@@ -105,6 +105,43 @@ class UserController {
       return response.status(500).json({ error: "Internal server error" })
     }
   }
+
+  async session(request: Request, response: Response): Promise<Response> {
+    if (request.session && request.session.user) {
+        return response.status(200).json({ success: true, user: request.session.user })
+    } else {
+        return response.status(401).json({ success: false, message: "Usuário não autenticado" })
+    }
+  }
+
+  async logout(request: Request, response: Response): Promise<Response> {
+    if (!request.session) {
+      return response
+        .status(400)
+        .json({ success: false, message: "Nenhuma sessão ativa" })
+    }
+
+    return new Promise((resolve) => {
+      request.session.destroy(err => {
+        if (err) {
+          resolve(
+            response
+              .status(500)
+              .json({ success: false, message: "Erro ao sair" })
+          )
+          return
+        }
+
+        response.clearCookie("connect.sid")
+        resolve(
+          response
+            .status(200)
+            .json({ success: true, message: "Logout feito com sucesso" })
+        )
+      })
+    })
+  }
+
 }
 
 export default new UserController()

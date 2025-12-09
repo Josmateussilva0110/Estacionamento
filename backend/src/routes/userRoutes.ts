@@ -10,5 +10,7 @@ const router = Router()
 
 router.post("/register", validate(RegisterSchema), UserController.register)
 router.post("/login", validate(LoginSchema), UserController.login)
+router.get("/user/session", UserController.session)
+router.post("/user/logout", UserController.logout)
 
 export default router

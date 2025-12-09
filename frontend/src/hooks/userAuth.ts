@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { requestData, type ApiResponse } from "../services/requestApi"
 import { type RegisterResponse } from "../types/api"
 
@@ -27,16 +28,16 @@ export interface LoginData {
 export interface UseAuthReturn {
   register: (data: RegisterFormData) => Promise<ApiResponse<RegisterResponse>>
   login: (data: LoginData) => Promise<ApiResponse<RegisterResponse>>
-  localLogout: () => void
+  logout: () => Promise<ApiResponse<RegisterResponse>>
 }
-
 
 export default function useAuth({
   setAuthenticated,
   setUser,
 }: AuthHookParams): UseAuthReturn {
 
-  async function register(data: RegisterFormData) {
+
+  const register = useCallback(async (data: RegisterFormData) => {
     const payload = {
       username: data.username,
       email: data.email,
@@ -52,23 +53,42 @@ export default function useAuth({
     )
 
     return response
-  }
+  }, [])
 
-  async function login(data: LoginData) {
+
+  const login = useCallback(async (data: LoginData) => {
     const response = await requestData<RegisterResponse>(
-      "login",
+      "/login",
       "POST",
       data,
       true
     )
 
+    if (response.success && response.data?.status) {
+      setAuthenticated(true)
+      setUser(response.data.user ?? null)
+    }
+
     return response
-  }
+  }, [setAuthenticated, setUser])
 
-  function localLogout() {
-    setAuthenticated(false)
-    setUser(null)
-  }
 
-  return { register, login, localLogout }
+  const logout = useCallback(async () => {
+    const response = await requestData<RegisterResponse>(
+      "/user/logout",
+      "POST",
+      {},
+      true
+    )
+
+    if (response.success && response.data?.status) {
+      setAuthenticated(false)
+      setUser(null)
+    }
+
+    return response
+  }, [setAuthenticated, setUser])
+
+
+  return { register, login, logout }
 }
