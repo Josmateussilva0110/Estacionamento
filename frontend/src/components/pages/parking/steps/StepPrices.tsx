@@ -22,7 +22,7 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             placeholder="0,00"
             leftIcon={<Clock size={18} className="text-blue-600" />}
             {...register("prices.priceHour", { valueAsNumber: true })}
-            error={(errors.prices as any)?.priceHour?.message}
+            error={errors.prices?.priceHour?.message}
           />
           <Input
             label="Hora adicional"
@@ -31,7 +31,7 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             placeholder="0,00"
             leftIcon={<Clock size={18} className="text-blue-600" />}
             {...register("prices.priceExtraHour", { valueAsNumber: true })}
-            error={(errors.prices as any)?.priceExtraHour?.message}
+            error={errors.prices?.priceExtraHour?.message}
           />
           <Input
             label="Diária"
@@ -40,7 +40,7 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             placeholder="0,00"
             leftIcon={<SunMedium size={18} className="text-amber-500" />}
             {...register("prices.dailyRate", { valueAsNumber: true })}
-            error={(errors.prices as any)?.dailyRate?.message}
+            error={errors.prices?.dailyRate?.message}
           />
           <Input
             label="Mensalidade"
@@ -49,14 +49,14 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             placeholder="0,00"
             leftIcon={<CalendarRange size={18} className="text-blue-600" />}
             {...register("prices.monthlyRate", { valueAsNumber: true })}
-            error={(errors.prices as any)?.monthlyRate?.message}
+            error={errors.prices?.monthlyRate?.message}
           />
           <Input
             label="Período noturno (ex.: 20h às 08h)"
             placeholder="20h às 08h"
             leftIcon={<MoonStar size={18} className="text-indigo-600" />}
             {...register("prices.nightPeriod")}
-            error={(errors.prices as any)?.nightPeriod?.message}
+            error={errors.prices?.nightPeriod?.message}
           />
           <Input
             label="Valor período noturno"
@@ -65,7 +65,7 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             placeholder="0,00"
             leftIcon={<MoonStar size={18} className="text-indigo-600" />}
             {...register("prices.nightRate", { valueAsNumber: true })}
-            error={(errors.prices as any)?.nightRate?.message}
+            error={errors.prices?.nightRate?.message}
           />
         </div>
       </div>
@@ -83,7 +83,7 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             placeholder="0,00"
             leftIcon={<Car size={18} className="text-blue-600" />}
             {...register("prices.carPrice", { valueAsNumber: true })}
-            error={(errors.prices as any)?.carPrice?.message}
+            error={errors.prices?.carPrice?.message}
           />
           <Input
             label="Valor moto"
@@ -92,7 +92,7 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             placeholder="0,00"
             leftIcon={<Bike size={18} className="text-blue-600" />}
             {...register("prices.motoPrice", { valueAsNumber: true })}
-            error={(errors.prices as any)?.motoPrice?.message}
+            error={errors.prices?.motoPrice?.message}
           />
           <Input
             label="Valor caminhonete"
@@ -101,7 +101,7 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             placeholder="0,00"
             leftIcon={<Truck size={18} className="text-blue-600" />}
             {...register("prices.truckPrice", { valueAsNumber: true })}
-            error={(errors.prices as any)?.truckPrice?.message}
+            error={errors.prices?.truckPrice?.message}
           />
         </div>
       </div>

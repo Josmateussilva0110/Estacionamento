@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, type Path } from "react-hook-form"
 import { 
   CheckCircle, ChevronLeft, ChevronRight, MapPin, Settings, DollarSign, ClipboardCheck, Sparkles,
 } from "lucide-react"
@@ -10,7 +10,7 @@ import { StepAddressContacts } from "./steps/StepAddressContacts"
 import { StepSpots } from "./steps/StepSpots"
 import { StepPrices } from "./steps/StepPrices"
 import { StepSummary } from "./steps/StepSummary"
-import { ParkingSchema } from "../../../utils/parkingSchema"
+import { ParkingSchema } from "../../../schemas/parkingSchema"
 import { type ParkingFormData } from "../../../types/parkingTypes"
 
 const steps = [
@@ -22,10 +22,9 @@ const steps = [
 ] as const
 
 
-const defaultValues: ParkingFormData = {
+export const defaultValues: ParkingFormData = {
   parkingName: "",
   managerName: "",
-
   address: {
     street: "",
     number: "",
@@ -35,37 +34,34 @@ const defaultValues: ParkingFormData = {
     state: "",
     zipCode: "",
   },
-
   contacts: {
     phone: "",
     whatsapp: "",
     email: "",
     openingHours: "",
   },
-
   operations: {
     totalSpots: 0,
     carSpots: 0,
-    motoSpots: 0,
-    truckSpots: 0,
-    pcdSpots: 0,
-    elderlySpots: 0,
+    motoSpots: "",      
+    truckSpots: "",     
+    pcdSpots: "",       
+    elderlySpots: "",   
     hasCameras: false,
     hasWashing: false,
     areaType: "coberta",
   },
-
   prices: {
     priceHour: 0,
     priceExtraHour: 0,
-    dailyRate: undefined,
+    dailyRate: "",      
     nightPeriod: "",
-    nightRate: undefined,
-    monthlyRate: undefined,
-    carPrice: undefined,
-    motoPrice: undefined,
-    truckPrice: undefined,
-  },
+    nightRate: "",      
+    monthlyRate: "",    
+    carPrice: "",       
+    motoPrice: "",      
+    truckPrice: "",     
+  }
 }
 
 
@@ -89,7 +85,7 @@ const {
 })
 
 
-  const stepFields = useMemo<Record<number, Array<keyof ParkingFormData | string>>>(() => ({
+  const stepFields: Record<number, Path<ParkingFormData>[]> = {
     0: ["parkingName", "managerName"],
     1: [
       "address.street",
@@ -126,12 +122,12 @@ const {
       "prices.motoPrice",
       "prices.truckPrice",
     ],
-  }), [])
+  }
 
   async function handleNext() {
     const currentFields = stepFields[step]
     if (currentFields) {
-      const valid = await trigger(currentFields as any)
+      const valid = await trigger(stepFields[step])
       if (!valid) return
     }
     setStep((prev) => Math.min(prev + 1, steps.length - 1))
@@ -152,14 +148,14 @@ const {
       case 0:
         return (
         <StepIdentification
-          register={register as any}
+          register={register}
           errors={errors}
         />
         )
       case 1:
         return (
         <StepAddressContacts
-          register={register as any}
+          register={register}
           errors={errors}
         />
         )
@@ -175,7 +171,7 @@ const {
       case 3:
         return (
         <StepPrices
-          register={register as any}
+          register={register}
           errors={errors}
         />
         )

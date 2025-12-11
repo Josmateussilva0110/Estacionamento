@@ -4,8 +4,10 @@ const numberRequired = (label: string) =>
   z.coerce.number({ message: `Informe ${label}` })
     .nonnegative(`${label} deve ser zero ou maior`)
 
-const numberOptional =
-  z.coerce.number().nonnegative().optional()
+const numberOptional = z
+  .union([z.literal(""), z.coerce.number().nonnegative()])
+  .optional()
+
 
 export const ParkingSchema = z.object({
   parkingName: z.string().min(3, "Informe o nome do estacionamento"),
