@@ -1,8 +1,10 @@
-import { useState, Fragment } from "react"
+import { useState, Fragment, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { LogIn, UserPlus, User, LogOut, Menu as MenuIcon, X, PlusSquare } from "lucide-react"
+import { LogIn, UserPlus, User as UserIcon, LogOut, Menu as MenuIcon, X, PlusSquare } from "lucide-react"
 import { Menu, Transition } from "@headlessui/react"
 import { useUser } from "../../context/useUser"
+import type { User } from "../../types/user"
+import { requestData } from "../../services/requestApi"
 import useFlashMessage from "../../hooks/useFlashMessage"
 
 function NavBar() {
@@ -10,6 +12,22 @@ function NavBar() {
   const navigate = useNavigate()
   const { setFlashMessage } = useFlashMessage()
   const [open, setOpen] = useState(false)
+  const [requestUser, setRequestUser] = useState<User | null>(null)
+
+  useEffect(() => {
+    if (user?.id) {
+      async function fetchUser() {
+        const response = await requestData(`/user/${user?.id}`, "GET", {}, true)
+
+        if (response.success && response.data?.user) {
+          setRequestUser(response.data.user)
+        } else {
+          setRequestUser(null)
+        }
+      }
+      fetchUser()
+    }
+  }, [user])
 
   async function handleLogout() {
     const response = await logout()
@@ -74,8 +92,8 @@ function NavBar() {
               /* Dropdown elegante */
               <Menu as="div" className="relative inline-block text-left">
                 <Menu.Button className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-parking-primary font-semibold rounded-lg hover:bg-blue-100 transition">
-                  <User size={18} />
-                  <span>{user?.username || "Perfil"}</span>
+                  <UserIcon size={18} />
+                  <span>{requestUser?.username || "Perfil"}</span>
                 </Menu.Button>
 
                 <Transition
@@ -96,7 +114,7 @@ function NavBar() {
                           className={`flex items-center gap-3 px-4 py-2 text-sm ${active ? "bg-blue-50 text-parking-primary" : "text-gray-700"
                             }`}
                         >
-                          <User size={18} />
+                          <UserIcon size={18} />
                           Perfil
                         </Link>
                       )}
@@ -183,7 +201,7 @@ function NavBar() {
                       className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 
                          text-parking-primary font-semibold hover:bg-blue-100 active:scale-95 transition"
                     >
-                      <User size={20} />
+                      <UserIcon size={20} />
                       <span>{user?.username || "Perfil"}</span>
                     </Link>
 
@@ -210,7 +228,6 @@ function NavBar() {
                     </button>
                   </>
                 )}
-
               </div>
             </div>
           </div>

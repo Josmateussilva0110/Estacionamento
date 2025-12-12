@@ -1,17 +1,13 @@
 import { useCallback } from "react"
 import { requestData, type ApiResponse } from "../services/requestApi"
-import { type ResponseApi } from "../types/api"
-
+import type { ResponseApi } from "../types/api"
+import type { User } from "../types/user"
+ 
 export interface AuthHookParams {
   setAuthenticated: (value: boolean) => void
   setUser: (value: User | null) => void
 }
 
-export interface User {
-  id: number
-  username: string
-  email: string
-}
 
 export interface RegisterFormData {
   username: string
