@@ -62,7 +62,10 @@ export function StepSummary({ watch }: StepSummaryProps) {
             ["Telefone", data.contacts.phone],
             ["WhatsApp", data.contacts.whatsapp],
             ["E-mail", data.contacts.email],
-            ["Horário", data.contacts.openingHours],
+            [
+              "Horário",
+              `${data.contacts.openingHours.start} às ${data.contacts.openingHours.end}`
+            ]
           ]}
         />
       </div>
@@ -103,7 +106,7 @@ export function StepSummary({ watch }: StepSummaryProps) {
             ["Hora", (data.prices.priceHour as number | undefined) ?? "-"],
             ["Hora adicional", (data.prices.priceExtraHour as number | undefined) ?? "-"],
             ["Diária", (data.prices.dailyRate as number | undefined) ?? "-"],
-            ["Período noturno", data.prices.nightPeriod || "-"],
+            ["Período noturno", `${data.prices.nightPeriod.start} às ${data.prices.nightPeriod.end}` || "-"],
             ["Valor noturno", (data.prices.nightRate as number | undefined) ?? "-"],
             ["Mensalidade", (data.prices.monthlyRate as number | undefined) ?? "-"],
             ["Carro", (data.prices.carPrice as number | undefined) ?? "-"],
