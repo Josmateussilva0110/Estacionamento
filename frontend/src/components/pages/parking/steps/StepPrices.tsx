@@ -1,4 +1,6 @@
 import Input from "../../../ui/Input"
+import { TimeRangePicker } from "../../../ui/TimeRangePicker"
+import { Controller } from "react-hook-form"
 import {
   Clock, Car, Bike, Truck, CreditCard, MoonStar, CalendarRange, SunMedium
 } from "lucide-react"
@@ -6,7 +8,7 @@ import { type ParkingFormData } from "../../../../types/parkingTypes"
 import type { FormStepProps } from "../../../../types/formStep"
 
 
-export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>) {
+export function StepPrices({ register, errors, control }: FormStepProps<ParkingFormData>) {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
       <div className="space-y-4">
@@ -51,12 +53,17 @@ export function StepPrices({ register, errors }: FormStepProps<ParkingFormData>)
             {...register("prices.monthlyRate", { valueAsNumber: true })}
             error={errors.prices?.monthlyRate?.message}
           />
-          <Input
-            label="Período noturno (ex.: 20h às 08h)"
-            placeholder="20h às 08h"
-            leftIcon={<MoonStar size={18} className="text-indigo-600" />}
-            {...register("prices.nightPeriod")}
-            error={errors.prices?.nightPeriod?.message}
+          <Controller
+            name="prices.nightPeriod"
+            control={control}
+            render={({ field }) => (
+              <TimeRangePicker
+                label="* Período noturno"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.prices?.nightPeriod?.message}
+              />
+            )}
           />
           <Input
             label="Valor período noturno"

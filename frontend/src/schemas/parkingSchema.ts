@@ -27,7 +27,10 @@ export const ParkingSchema = z.object({
     phone: z.string().min(8, "Informe um telefone"),
     whatsapp: z.string().min(8, "Informe um WhatsApp"),
     email: z.string().email("E-mail inválido"),
-    openingHours: z.string().min(3, "Informe o horário (ex: 06h às 23h)"),
+    openingHours: z.object({
+      start: z.string().min(1, "Informe o horário inicial"),
+      end: z.string().min(1, "Informe o horário final"),
+    }), 
   }),
 
   operations: z.object({
@@ -46,7 +49,10 @@ export const ParkingSchema = z.object({
     priceHour: numberRequired("valor hora"),
     priceExtraHour: numberRequired("hora adicional"),
     dailyRate: numberOptional,
-    nightPeriod: z.string().optional(),
+    nightPeriod: z.object({
+      start: z.string().min(1, "Informe o horário inicial"),
+      end: z.string().min(1, "Informe o horário final"),
+    }),
     nightRate: numberOptional,
     monthlyRate: numberOptional,
     carPrice: numberOptional,

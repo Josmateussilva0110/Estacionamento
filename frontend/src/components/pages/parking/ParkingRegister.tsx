@@ -38,7 +38,10 @@ export const defaultValues: ParkingFormData = {
     phone: "",
     whatsapp: "",
     email: "",
-    openingHours: "",
+    openingHours: {
+      start: "",
+      end: "",
+    }
   },
   operations: {
     totalSpots: 0,
@@ -55,7 +58,10 @@ export const defaultValues: ParkingFormData = {
     priceHour: 0,
     priceExtraHour: 0,
     dailyRate: "",      
-    nightPeriod: "",
+    nightPeriod: {
+      start: "",
+      end: "",
+    },
     nightRate: "",      
     monthlyRate: "",    
     carPrice: "",       
@@ -77,6 +83,7 @@ const {
   trigger,
   watch,
   setValue,
+  control,
   formState: { errors },
 } = useForm<ParkingFormData>({
   resolver: zodResolver(ParkingSchema) as any,
@@ -157,6 +164,7 @@ const {
         <StepAddressContacts
           register={register}
           errors={errors}
+          control={control}
         />
         )
       case 2:
@@ -173,6 +181,7 @@ const {
         <StepPrices
           register={register}
           errors={errors}
+          control={control}
         />
         )
       case 4:

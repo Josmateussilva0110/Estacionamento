@@ -7,7 +7,7 @@ export function StepIdentification({ register, errors }: FormStepProps<ParkingFo
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
       <Input
-        label="Nome do estacionamento"
+        label="* Nome do estacionamento"
         placeholder="Ex.: Estacionamento Centro"
         leftIcon={<Building2 size={18} className="text-blue-600" />}
         {...register("parkingName")}
@@ -15,7 +15,7 @@ export function StepIdentification({ register, errors }: FormStepProps<ParkingFo
       />
 
       <Input
-        label="Responsável / gerente"
+        label="* Responsável / gerente"
         placeholder="Nome completo"
         leftIcon={<User size={18} className="text-blue-600" />}
         {...register("managerName")}
