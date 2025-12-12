@@ -195,8 +195,8 @@ const {
   const progress = ((step + 1) / steps.length) * 100
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
-      <div className="w-full max-w-5xl">
+    <div className="min-h-full py-10 flex items-center justify-center bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark">
+      <div className="w-full max-w-5xl mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
           <div className="bg-blue-600 px-5 sm:px-8 py-6 sm:py-8 text-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
