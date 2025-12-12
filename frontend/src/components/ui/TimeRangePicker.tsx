@@ -101,7 +101,6 @@ export function TimeRangePicker({ value, onChange, label, error }: TimeRangePick
 
           return (
             <>
-              {/* 👇 AQUI está igual ao Input */}
               <Popover.Button
                 ref={buttonRef}
                 className={`w-full flex items-center justify-between gap-2

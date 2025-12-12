@@ -4,12 +4,8 @@ import { requestData } from "../services/requestApi"
 import type { LoginData, RegisterFormData } from "../hooks/userAuth"
 import type { ApiResponse } from "../services/requestApi"
 import type { ResponseApi } from "../types/api"
+import type { User } from "../types/user"
 
-interface User {
-  id: number
-  username: string
-  email: string
-}
 
 interface UserContextType {
   authenticated: boolean

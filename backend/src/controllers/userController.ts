@@ -60,7 +60,7 @@ class UserController {
 
       request.session.user = {
         id: user.id,
-        name: user.username,
+        username: user.username,
       }
 
       return response.status(200).json({
@@ -68,7 +68,7 @@ class UserController {
         message: "Login realizado com sucesso",
         user: {
           id: user.id,
-          name: user.username,
+          username: user.username,
         },
       })
     } catch (err) {
@@ -86,7 +86,7 @@ class UserController {
       return response.status(200).json(users)
     } catch (err) {
       console.error("Error in UserController.list:", err)
-      return response.status(500).json({ error: "Internal server error" })
+      return response.status(500).json({status: false, message: "Internal server error" })
     }
   }
 
@@ -96,13 +96,13 @@ class UserController {
       const user = await User.findById(Number(id))
 
       if (!user) {
-        return response.status(404).json({ error: "User not found" })
+        return response.status(404).json({ status: false, message: "Usuário não encontrado" })
       }
 
-      return response.status(200).json(user)
+      return response.status(200).json({status: true, user})
     } catch (err) {
       console.error("Error in UserController.getById:", err)
-      return response.status(500).json({ error: "Internal server error" })
+      return response.status(500).json({status: false, message: "Erro interno no servidor" })
     }
   }
 
