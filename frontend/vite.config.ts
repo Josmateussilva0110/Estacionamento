@@ -7,4 +7,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+
+  server: {
+    host: true,           
+    strictPort: true,    
+    watch: {
+      ignored: ['**/node_modules/**'],
+    },
+  },
 })
