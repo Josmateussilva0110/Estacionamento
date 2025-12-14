@@ -1,19 +1,30 @@
-FROM node:20-alpine3.22
+# 1. Stage para dependências
+FROM node:20-alpine AS deps
+WORKDIR /app
 
-WORKDIR /usr/src/app
-
-COPY package*.json tsconfig.json ./
-
+COPY package*.json ./
 RUN npm install
-RUN npm install -g nodemon ts-node knex
 
-RUN apk add --no-cache postgresql-client bash
+# 2. Imagem final (dev)
+FROM node:20-alpine
+WORKDIR /app
 
-COPY wait-for-it.sh start.sh ./
-RUN chmod +x wait-for-it.sh start.sh
+# libs extras 
+RUN apk add --no-cache bash postgresql-client
 
+
+COPY --from=deps /app/node_modules ./node_modules
+
+# copia resto do projeto
 COPY . .
+
+# deixa scripts executáveis
+RUN chmod +x start.sh wait-for-it.sh
 
 EXPOSE 8080
 
-CMD ["./start.sh"]
+# ENTRYPOINT roda só uma vez, ANTES do CMD
+ENTRYPOINT ["./start.sh"]
+
+# este comando roda DEPOIS do entrypoint
+CMD ["npm", "run", "dev"]
