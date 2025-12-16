@@ -7,7 +7,7 @@ import { ParkingRegisterSchema } from "../schemas/parkingSchema"
 const router = Router()
 
 
-router.post("/register", validate(ParkingRegisterSchema), ParkingController.register)
+router.post("/parking/register", validate(ParkingRegisterSchema), ParkingController.register)
 
 
 export default router
