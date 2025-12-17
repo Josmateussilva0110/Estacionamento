@@ -30,7 +30,7 @@ export const ParkingSchema = z.object({
     openingHours: z.object({
       start: z.string().min(1, "Informe o horário inicial"),
       end: z.string().min(1, "Informe o horário final"),
-    }), 
+    }),
   }),
 
   operations: z.object({
@@ -42,7 +42,10 @@ export const ParkingSchema = z.object({
     elderlySpots: numberOptional,
     hasCameras: z.boolean().default(false),
     hasWashing: z.boolean().default(false),
-    areaType: numberRequired("Informe o tipo de área"),
+
+    areaType: z.enum(["coberta", "descoberta", "mista"], {
+      message: "Informe o tipo de área",
+    }),
   }),
 
   prices: z.object({

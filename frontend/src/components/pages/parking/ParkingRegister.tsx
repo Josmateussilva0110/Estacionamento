@@ -14,6 +14,8 @@ import { ParkingSchema } from "../../../schemas/parkingSchema"
 import { type ParkingFormData } from "../../../types/parkingTypes"
 import { requestData } from "../../../services/requestApi"
 import { type RegisterParkingResponse } from "../../../types/parkingResponses"
+import { mapAreaTypeToNumber } from "../../../utils/mapAreaType"
+
 
 const steps = [
   { id: "identificacao", title: "Identificação", icon: ClipboardCheck },
@@ -54,7 +56,7 @@ export const defaultValues: ParkingFormData = {
     elderlySpots: "",
     hasCameras: false,
     hasWashing: false,
-    areaType: 1,
+    areaType: "coberta",
   },
   prices: {
     priceHour: 0,
@@ -147,12 +149,15 @@ function ParkingRegister() {
   }
 
   async function onSubmit(data: ParkingFormData) {
-    const response = await requestData<RegisterParkingResponse>(
-      "/parking/register",
-      "POST",
-      data,
-      true
-    )
+    const payload = {
+      ...data,
+      operations: {
+        ...data.operations,
+        areaType: mapAreaTypeToNumber(data.operations.areaType),
+      },
+    }
+
+    const response = await requestData<RegisterParkingResponse>("/parking/register", "POST", payload, true)
 
     if (response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
