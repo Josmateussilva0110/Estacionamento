@@ -125,5 +125,4 @@ export const ParkingRegisterSchema = z.object({
 
         nightPeriod: HoursSchema,
     })
-
 })

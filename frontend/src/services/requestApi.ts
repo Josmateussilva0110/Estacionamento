@@ -1,12 +1,8 @@
 import api from "./api"
 import { type AxiosRequestConfig, type Method } from "axios"
+import { type ApiResponse } from "../types/api"
 
-export interface ApiResponse<T = any> {
-    success: boolean
-    status: number
-    data?: T
-    message?: string
-}
+
 
 export async function requestData<T = any>(
     endpoint: string,

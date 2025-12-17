@@ -1,87 +1,96 @@
 import db from "../database/connection/connection"
 
-
 export interface Timestamps {
-    created_at?: string 
-    updated_at?: string
+  created_at?: string
+  updated_at?: string
 }
 
-
 export default class Model<T extends Record<string, any>> {
-    protected tableName: string
+  protected tableName: string
 
-    constructor(tableName: string) {
-        this.tableName = tableName
+  constructor(tableName: string) {
+    this.tableName = tableName
+  }
+
+  protected getTimestamps(): Timestamps {
+    const now = new Date().toISOString()
+    return { created_at: now, updated_at: now }
+  }
+
+  async save(
+    data: T,
+    options?: {
+      withTimestamps?: boolean
+      trx?: any
+      returningField?: string
     }
+  ): Promise<number> {
+    const {
+      withTimestamps = true,
+      trx,
+      returningField = "id",
+    } = options || {}
 
-    private getTimestamps(): Timestamps {
-        const now = new Date().toISOString() // UTC ISO string
-        return { created_at: now, updated_at: now }
+    const insertData = withTimestamps
+      ? { ...data, ...this.getTimestamps() }
+      : data
+
+    const query = trx ?? db
+
+    const result = await query(this.tableName)
+      .insert(insertData)
+      .returning(returningField)
+
+    return result[0][returningField]
+  }
+
+
+  async findAll(): Promise<(T & Timestamps)[]> {
+    return db(this.tableName).select("*")
+  }
+
+  async findById(
+    id: number | string,
+    idField = "id"
+  ): Promise<(T & Timestamps) | null> {
+    return db(this.tableName).where(idField, id).first() ?? null
+  }
+
+  async update(
+    id: number | string,
+    data: Partial<T>,
+    options?: {
+      idField?: string
+      withTimestamps?: boolean
+      trx?: any
     }
+  ): Promise<void> {
+    const {
+      idField = "id",
+      withTimestamps = true,
+      trx,
+    } = options || {}
 
-    async save(data: T, withTimestamps = true): Promise<boolean> {
-        try {
-            const insertData = withTimestamps
-                ? { ...data, ...this.getTimestamps() }
-                : data
+    const updateData = withTimestamps
+      ? { ...data, updated_at: new Date().toISOString() }
+      : data
 
-            await db(this.tableName).insert(insertData as Record<string, any>)
-            return true
-        } catch (err) {
-            console.error(`Erro ao inserir na tabela ${this.tableName}:`, err)
-            return false
-        }
-    }
+    const query = trx ?? db
 
-    async findAll(): Promise<(T & Timestamps)[]> {
-        try {
-            const rows = await db(this.tableName).select("*")
-            return rows as (T & Timestamps)[]
-        } catch (err) {
-            console.error(`Erro ao buscar todos registros de ${this.tableName}:`, err)
-            return []
-        }
-    }
+    await query(this.tableName)
+      .where(idField, id)
+      .update(updateData)
+  }
 
-    async findById(id: number | string, idField = "id"): Promise<(T & Timestamps) | null> {
-        try {
-            const result = await db(this.tableName).where(idField, id).first()
-            return result as (T & Timestamps) | null
-        } catch (err) {
-            console.error(`Erro ao buscar registro em ${this.tableName}:`, err)
-            return null
-        }
-    }
+  async delete(
+    id: number | string,
+    idField = "id",
+    trx?: any
+  ): Promise<void> {
+    const query = trx ?? db
 
-    async update(
-        id: number | string,
-        data: Partial<T>,
-        idField = "id",
-        withTimestamps = true
-    ): Promise<boolean> {
-        try {
-            const updateData: Partial<T & Timestamps> = withTimestamps
-                ? { ...data, updated_at: new Date().toISOString() }
-                : data
-
-            await db(this.tableName)
-                .where(idField, id)
-                .update(updateData as Record<string, any>)
-
-            return true
-        } catch (err) {
-            console.error(`Erro ao atualizar registro em ${this.tableName}:`, err)
-            return false
-        }
-    }
-
-    async delete(id: number | string, idField = "id"): Promise<boolean> {
-        try {
-            await db(this.tableName).where(idField, id).delete()
-            return true
-        } catch (err) {
-            console.error(`Erro ao deletar registro em ${this.tableName}:`, err)
-            return false
-        }
-    }
+    await query(this.tableName)
+      .where(idField, id)
+      .delete()
+  }
 }

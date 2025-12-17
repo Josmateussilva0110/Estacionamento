@@ -42,7 +42,7 @@ export const ParkingSchema = z.object({
     elderlySpots: numberOptional,
     hasCameras: z.boolean().default(false),
     hasWashing: z.boolean().default(false),
-    areaType: z.enum(["coberta", "descoberta", "mista"]),
+    areaType: numberRequired("Informe o tipo de área"),
   }),
 
   prices: z.object({

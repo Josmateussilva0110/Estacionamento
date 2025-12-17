@@ -1,10 +1,23 @@
-import { createContext, useState, useEffect, type ReactNode } from "react"
+import {
+  createContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react"
+
 import useAuth from "../hooks/userAuth"
 import { requestData } from "../services/requestApi"
+
 import type { LoginData, RegisterFormData } from "../hooks/userAuth"
-import type { ApiResponse } from "../services/requestApi"
-import type { ResponseApi } from "../types/api"
+import type { ApiResponse } from "../types/api"
+import type {
+  RegisterResponse,
+  LoginResponse,
+  LogoutResponse,
+} from "../types/authResponses"
 import type { User } from "../types/user"
+import type { ApiPayload } from "../types/api"
+
 
 
 interface UserContextType {
@@ -13,12 +26,21 @@ interface UserContextType {
   loading: boolean
   sessionExpired: boolean
   setSessionExpired: (value: boolean) => void
-  register: (data: RegisterFormData) => Promise<ApiResponse<ResponseApi>>
-  login: (data: LoginData) => Promise<ApiResponse<ResponseApi>>
-  logout: () => Promise<ApiResponse<ResponseApi>>
+
+  register: (
+    data: RegisterFormData
+  ) => Promise<ApiResponse<RegisterResponse>>
+
+  login: (
+    data: LoginData
+  ) => Promise<ApiResponse<LoginResponse>>
+
+  logout: () => Promise<ApiResponse<LogoutResponse>>
 }
 
 export const UserContext = createContext<UserContextType | null>(null)
+
+
 
 interface ProviderProps {
   children: ReactNode
@@ -33,19 +55,26 @@ export function UserProvider({ children }: ProviderProps) {
   const {
     login: authLogin,
     register: authRegister,
-    logout: authLogout
+    logout: authLogout,
   } = useAuth({
     setAuthenticated,
     setUser,
   })
 
+
+
   useEffect(() => {
     async function checkSession() {
-      const response = await requestData("/user/session", "GET", {}, true)
+      const response = await requestData<ApiPayload<User>>(
+        "/user/session",
+        "GET",
+        {},
+        true
+      )
 
-      if (response.success && response.data?.user) {
+      if (response.success && response.data?.status) {
         setAuthenticated(true)
-        setUser(response.data.user)
+        setUser(response.data.user ?? null)
       } else {
         setAuthenticated(false)
         setUser(null)
@@ -58,7 +87,7 @@ export function UserProvider({ children }: ProviderProps) {
     checkSession()
   }, [])
 
-
+ 
   useEffect(() => {
     function handleExpired() {
       setSessionExpired(true)
@@ -67,12 +96,14 @@ export function UserProvider({ children }: ProviderProps) {
     }
 
     window.addEventListener("SESSION_EXPIRED", handleExpired)
-    return () => window.removeEventListener("SESSION_EXPIRED", handleExpired)
+    return () => {
+      window.removeEventListener("SESSION_EXPIRED", handleExpired)
+    }
   }, [])
 
 
   async function login(data: LoginData) {
-    return authLogin(data) 
+    return authLogin(data)
   }
 
   async function register(data: RegisterFormData) {
@@ -80,9 +111,10 @@ export function UserProvider({ children }: ProviderProps) {
   }
 
   async function logout() {
-    return authLogout() 
+    return authLogout()
   }
 
+  
   return (
     <UserContext.Provider
       value={{
@@ -93,7 +125,7 @@ export function UserProvider({ children }: ProviderProps) {
         setSessionExpired,
         register,
         login,
-        logout
+        logout,
       }}
     >
       {children}
