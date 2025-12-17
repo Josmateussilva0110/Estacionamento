@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type Path } from "react-hook-form"
-import { 
+import {
   CheckCircle, ChevronLeft, ChevronRight, MapPin, Settings, DollarSign, ClipboardCheck, Sparkles,
 } from "lucide-react"
 import useFlashMessage from "../../../hooks/useFlashMessage"
@@ -12,6 +12,10 @@ import { StepPrices } from "./steps/StepPrices"
 import { StepSummary } from "./steps/StepSummary"
 import { ParkingSchema } from "../../../schemas/parkingSchema"
 import { type ParkingFormData } from "../../../types/parkingTypes"
+import { requestData } from "../../../services/requestApi"
+import { type RegisterParkingResponse } from "../../../types/parkingResponses"
+import { mapAreaTypeToNumber } from "../../../utils/mapAreaType"
+
 
 const steps = [
   { id: "identificacao", title: "Identificação", icon: ClipboardCheck },
@@ -46,10 +50,10 @@ export const defaultValues: ParkingFormData = {
   operations: {
     totalSpots: 0,
     carSpots: 0,
-    motoSpots: "",      
-    truckSpots: "",     
-    pcdSpots: "",       
-    elderlySpots: "",   
+    motoSpots: "",
+    truckSpots: "",
+    pcdSpots: "",
+    elderlySpots: "",
     hasCameras: false,
     hasWashing: false,
     areaType: "coberta",
@@ -57,16 +61,16 @@ export const defaultValues: ParkingFormData = {
   prices: {
     priceHour: 0,
     priceExtraHour: 0,
-    dailyRate: "",      
+    dailyRate: "",
     nightPeriod: {
       start: "",
       end: "",
     },
-    nightRate: "",      
-    monthlyRate: "",    
-    carPrice: "",       
-    motoPrice: "",      
-    truckPrice: "",     
+    nightRate: "",
+    monthlyRate: "",
+    carPrice: "",
+    motoPrice: "",
+    truckPrice: "",
   }
 }
 
@@ -77,19 +81,19 @@ function ParkingRegister() {
   const { setFlashMessage } = useFlashMessage()
   const [step, setStep] = useState(0)
 
-const {
-  register,
-  handleSubmit,
-  trigger,
-  watch,
-  setValue,
-  control,
-  formState: { errors },
-} = useForm<ParkingFormData>({
-  resolver: zodResolver(ParkingSchema) as any,
-  mode: "onBlur",
-  defaultValues,
-})
+  const {
+    register,
+    handleSubmit,
+    trigger,
+    watch,
+    setValue,
+    control,
+    formState: { errors },
+  } = useForm<ParkingFormData>({
+    resolver: zodResolver(ParkingSchema) as any,
+    mode: "onBlur",
+    defaultValues,
+  })
 
 
   const stepFields: Record<number, Path<ParkingFormData>[]> = {
@@ -144,45 +148,61 @@ const {
     setStep((prev) => Math.max(prev - 1, 0))
   }
 
-  function onSubmit(data: ParkingFormData) {
-    // Aqui futuramente podemos enviar para a API
-    console.log("Cadastro de estacionamento:", data)
-    setFlashMessage("Cadastro salvo com sucesso!", "success")
+  async function onSubmit(data: ParkingFormData) {
+    const payload = {
+      ...data,
+      operations: {
+        ...data.operations,
+        areaType: mapAreaTypeToNumber(data.operations.areaType),
+      },
+    }
+
+    const response = await requestData<RegisterParkingResponse>("/parking/register", "POST", payload, true)
+
+    if (response.success && response.data?.status) {
+      setFlashMessage(response.data.message, "success")
+    } else {
+      setFlashMessage(
+        response.data?.message ?? "Erro ao cadastrar estacionamento",
+        "error"
+      )
+    }
   }
+
 
   function renderStepContent() {
     switch (step) {
       case 0:
         return (
-        <StepIdentification
-          register={register}
-          errors={errors}
-        />
+          <StepIdentification
+            register={register}
+            errors={errors}
+          />
         )
       case 1:
         return (
-        <StepAddressContacts
-          register={register}
-          errors={errors}
-          control={control}
-        />
+          <StepAddressContacts
+            register={register}
+            errors={errors}
+            control={control}
+          />
         )
       case 2:
         return (
-        <StepSpots
-          register={register}
-          errors={errors}
-          watch={watch}
-          setValue={setValue}
-        />
+          <StepSpots
+            register={register}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+          />
         )
       case 3:
         return (
-        <StepPrices
-          register={register}
-          errors={errors}
-          control={control}
-        />
+          <StepPrices
+            register={register}
+            errors={errors}
+            control={control}
+          />
         )
       case 4:
         return <StepSummary watch={watch} />
@@ -222,8 +242,8 @@ const {
                 </div>
               </div>
               <div className="w-full sm:w-56 h-3 rounded-full bg-white/20 overflow-hidden shadow-inner">
-                <div 
-                  className="h-full bg-white rounded-full transition-all duration-500 ease-out shadow-md" 
+                <div
+                  className="h-full bg-white rounded-full transition-all duration-500 ease-out shadow-md"
                   style={{ width: `${progress}%` }}
                 />
               </div>

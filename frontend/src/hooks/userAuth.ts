@@ -1,7 +1,12 @@
 import { useCallback } from "react"
-import { requestData, type ApiResponse } from "../services/requestApi"
-import type { ResponseApi } from "../types/api"
+import { requestData } from "../services/requestApi"
+import type { ApiResponse } from "../types/api"
 import type { User } from "../types/user"
+import type {
+  RegisterResponse,
+  LoginResponse,
+  LogoutResponse,
+} from "../types/authResponses"
  
 export interface AuthHookParams {
   setAuthenticated: (value: boolean) => void
@@ -22,10 +27,11 @@ export interface LoginData {
 }
 
 export interface UseAuthReturn {
-  register: (data: RegisterFormData) => Promise<ApiResponse<ResponseApi>>
-  login: (data: LoginData) => Promise<ApiResponse<ResponseApi>>
-  logout: () => Promise<ApiResponse<ResponseApi>>
+  register: (data: RegisterFormData) => Promise<ApiResponse<RegisterResponse>>
+  login: (data: LoginData) => Promise<ApiResponse<LoginResponse>>
+  logout: () => Promise<ApiResponse<LogoutResponse>>
 }
+
 
 export default function useAuth({
   setAuthenticated,
@@ -41,7 +47,7 @@ export default function useAuth({
       confirmPassword: data.confirmPassword,
     }
 
-    const response = await requestData<ResponseApi>(
+    const response = await requestData<RegisterResponse>(
       "/register",
       "POST",
       payload,
@@ -52,8 +58,9 @@ export default function useAuth({
   }, [])
 
 
+
   const login = useCallback(async (data: LoginData) => {
-    const response = await requestData<ResponseApi>(
+    const response = await requestData<LoginResponse>(
       "/login",
       "POST",
       data,
@@ -69,8 +76,9 @@ export default function useAuth({
   }, [setAuthenticated, setUser])
 
 
+
   const logout = useCallback(async () => {
-    const response = await requestData<ResponseApi>(
+    const response = await requestData<LogoutResponse>(
       "/user/logout",
       "POST",
       {},
@@ -84,6 +92,7 @@ export default function useAuth({
 
     return response
   }, [setAuthenticated, setUser])
+
 
 
   return { register, login, logout }
