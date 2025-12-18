@@ -4,6 +4,7 @@ import Model from "./Model"
 
 export interface OperationsData {
   id?: number
+  parking_id: number
   total_spots: number
   car_spots: number
   moto_spots: number

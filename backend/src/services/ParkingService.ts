@@ -1,6 +1,7 @@
 import db from "../database/connection/connection"
 import Parking from "../model/Parking"
 import Contact from "../model/Contact"
+import Address from "../model/Address"
 import { ParkingRegisterDTO } from "../dtos/ParkingRegisterDTO"
 import { normalizeKeys, Normalized } from "../utils/normalizeKeys"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
@@ -15,14 +16,25 @@ class ParkingService {
       const parkingId = await db.transaction(async (trx) => {
         const normalized = normalizeKeys(data) as Record<string, Normalized>
 
-        console.log("nomr: ", normalized)
-
         const parkingId = await Parking.save(
           {
             parking_name: normalized.parking_name as string,
             manager_name: normalized.manager_name as string,
             created_by: userId,
           },
+          { trx }
+        )
+
+        await Address.save({
+          parking_id: parkingId,
+          street: data.address.street,
+          number: data.address.number,
+          complement: data.address.complement,
+          district: data.address.district,
+          city: data.address.city,
+          state: data.address.state,
+          zip_code: data.address.zipCode
+        },
           { trx }
         )
 
@@ -39,6 +51,7 @@ class ParkingService {
           },
           { trx }
         )
+
 
         return parkingId
       })
