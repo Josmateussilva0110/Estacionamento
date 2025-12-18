@@ -5,10 +5,11 @@ import OpeningHours from "../types/hour/hour"
 
 export interface ContactData {
   id?: number
+  parking_id: number
   phone: string
   whatsapp: string
   email: string
-  opening_hours: OpeningHours
+  open_hours: OpeningHours
   created_at?: string 
   updated_at?: string
 }

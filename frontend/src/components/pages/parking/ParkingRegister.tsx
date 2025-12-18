@@ -149,6 +149,7 @@ function ParkingRegister() {
   }
 
   async function onSubmit(data: ParkingFormData) {
+    if (step !== steps.length - 1) return
     const payload = {
       ...data,
       operations: {
@@ -158,6 +159,7 @@ function ParkingRegister() {
     }
 
     const response = await requestData<RegisterParkingResponse>("/parking/register", "POST", payload, true)
+    console.log(response)
 
     if (response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
@@ -250,7 +252,11 @@ function ParkingRegister() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="px-5 sm:px-8 py-6 sm:py-8 space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)} onKeyDown={(e) => {
+            if (e.key === "Enter" && step < steps.length - 1) {
+              e.preventDefault()
+            }
+          }} className="px-5 sm:px-8 py-6 sm:py-8 space-y-8">
             <div className="min-h-[400px]">
               {renderStepContent()}
             </div>
