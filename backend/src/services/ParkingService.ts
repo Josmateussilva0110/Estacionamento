@@ -6,6 +6,7 @@ import Operations from "../model/Operations"
 import Prices from "../model/Prices"
 import { ParkingRegisterDTO } from "../dtos/ParkingRegisterDTO"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
+import { ParkingErrorCode } from "../types/code/parkingCode"
 
 
 class ParkingService {
@@ -16,7 +17,7 @@ class ParkingService {
     try {
       const parkingId = await db.transaction(async (trx) => {
 
-        const parkingId = await Parking.save(
+        const createdParkingId = await Parking.save(
           {
             parking_name: data.parkingName,
             manager_name: data.managerName,
@@ -26,7 +27,7 @@ class ParkingService {
         )
 
         await Address.save({
-          parking_id: parkingId,
+          parking_id: createdParkingId,
           street: data.address.street,
           number: data.address.number,
           complement: data.address.complement,
@@ -40,7 +41,7 @@ class ParkingService {
 
         await Contact.save(
           {
-            parking_id: parkingId,
+            parking_id: createdParkingId,
             phone: data.contacts.phone,
             whatsapp: data.contacts.whatsapp,
             email: data.contacts.email,
@@ -53,7 +54,7 @@ class ParkingService {
         )
 
         await Operations.save({
-          parking_id: parkingId,
+          parking_id: createdParkingId,
           total_spots: data.operations.totalSpots,
           car_spots: data.operations.carSpots,
           moto_spots: data.operations.motoSpots,
@@ -68,7 +69,7 @@ class ParkingService {
         )
 
         await Prices.save({
-          parking_id: parkingId,
+          parking_id: createdParkingId,
           price_hour: data.prices.priceHour,
           price_extra_hour: data.prices.priceExtraHour,
           daily_rate: data.prices.dailyRate,
@@ -84,7 +85,7 @@ class ParkingService {
         },
           { trx }
         )
-        return parkingId
+        return createdParkingId
       })
 
       return {
@@ -97,7 +98,7 @@ class ParkingService {
       return {
         status: false,
         error: {
-          code: "PARKING_CREATE_FAILED",
+          code: ParkingErrorCode.PARKING_CREATE_FAILED,
           message: "Erro ao criar estacionamento",
         },
       }
