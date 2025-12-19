@@ -2,6 +2,7 @@ import db from "../database/connection/connection"
 import Parking from "../model/Parking"
 import Contact from "../model/Contact"
 import Address from "../model/Address"
+import Operations from "../model/Operations"
 import { ParkingRegisterDTO } from "../dtos/ParkingRegisterDTO"
 import { normalizeKeys, Normalized } from "../utils/normalizeKeys"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
@@ -52,7 +53,20 @@ class ParkingService {
           { trx }
         )
 
-
+        await Operations.save({
+          parking_id: parkingId,
+          total_spots: data.operations.totalSpots,
+          car_spots: data.operations.carSpots,
+          moto_spots: data.operations.motoSpots,
+          truck_spots: data.operations.truckSpots,
+          pcd_spots: data.operations.pcdSpots,
+          elderly_spots: data.operations.elderlySpots,
+          has_cameras: data.operations.hasCameras,
+          has_washing: data.operations.hasWashing,
+          area_type: data.operations.areaType
+        },
+        { trx }
+      )
         return parkingId
       })
 

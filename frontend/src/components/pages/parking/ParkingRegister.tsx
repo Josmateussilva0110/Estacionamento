@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type Path } from "react-hook-form"
 import {
@@ -80,6 +81,7 @@ export const defaultValues: ParkingFormData = {
 function ParkingRegister() {
   const { setFlashMessage } = useFlashMessage()
   const [step, setStep] = useState(0)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -149,9 +151,6 @@ function ParkingRegister() {
   }
 
   async function onSubmit(data: ParkingFormData) {
-    console.log('entrou')
-    console.log('step: ', step)
-    console.log('step length: ', steps.length - 1)
     if (step !== steps.length - 1) {
       return;
     }
@@ -173,6 +172,7 @@ function ParkingRegister() {
 
     if (response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
+      navigate("/")
     } else {
       setFlashMessage(
         response.data?.message ?? "Erro ao cadastrar estacionamento",
