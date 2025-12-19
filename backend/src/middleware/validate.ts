@@ -1,13 +1,15 @@
 import { ZodTypeAny, ZodError } from "zod"
 import { Request, Response, NextFunction } from "express"
 
+type ValidateTarget = "body" | "params" | "query"
+
 export const validate =
-  (schema: ZodTypeAny) =>
+  (schema: ZodTypeAny, target: ValidateTarget = "body") =>
   (request: Request, response: Response, next: NextFunction) => {
     try {
-      const result = schema.parse(request.body)
+      const result = schema.parse(request[target])
 
-      request.body = result 
+      request[target] = result
       return next()
     } catch (err) {
       if (err instanceof ZodError) {

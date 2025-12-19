@@ -3,8 +3,8 @@ import Parking from "../model/Parking"
 import Contact from "../model/Contact"
 import Address from "../model/Address"
 import Operations from "../model/Operations"
+import Prices from "../model/Prices"
 import { ParkingRegisterDTO } from "../dtos/ParkingRegisterDTO"
-import { normalizeKeys, Normalized } from "../utils/normalizeKeys"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
 
 
@@ -15,12 +15,11 @@ class ParkingService {
   ): Promise<ServiceResult<{ parkingId: number }>> {
     try {
       const parkingId = await db.transaction(async (trx) => {
-        const normalized = normalizeKeys(data) as Record<string, Normalized>
 
         const parkingId = await Parking.save(
           {
-            parking_name: normalized.parking_name as string,
-            manager_name: normalized.manager_name as string,
+            parking_name: data.parkingName,
+            manager_name: data.managerName,
             created_by: userId,
           },
           { trx }
@@ -42,9 +41,9 @@ class ParkingService {
         await Contact.save(
           {
             parking_id: parkingId,
-            phone: data.contacts.phone as string,
-            whatsapp: data.contacts.whatsapp as string,
-            email: data.contacts.email as string,
+            phone: data.contacts.phone,
+            whatsapp: data.contacts.whatsapp,
+            email: data.contacts.email,
             open_hours: {
               start: data.contacts.openingHours.start,
               end: data.contacts.openingHours.end,
@@ -65,8 +64,26 @@ class ParkingService {
           has_washing: data.operations.hasWashing,
           area_type: data.operations.areaType
         },
-        { trx }
-      )
+          { trx }
+        )
+
+        await Prices.save({
+          parking_id: parkingId,
+          price_hour: data.prices.priceHour,
+          price_extra_hour: data.prices.priceExtraHour,
+          daily_rate: data.prices.dailyRate,
+          night_period: {
+            start: data.prices.nightPeriod.start,
+            end: data.prices.nightPeriod.end,
+          },
+          night_rate: data.prices.nightRate,
+          monthly_rate: data.prices.monthlyRate,
+          car_price: data.prices.carPrice,
+          moto_price: data.prices.motoPrice,
+          truck_price: data.prices.truckPrice
+        },
+          { trx }
+        )
         return parkingId
       })
 

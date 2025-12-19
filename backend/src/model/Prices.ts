@@ -7,6 +7,7 @@ import OpeningHours from "../types/hour/hour"
 
 export interface ContactData {
   id?: number
+  parking_id: number
   price_hour: number
   price_extra_hour: number
   daily_rate: number
