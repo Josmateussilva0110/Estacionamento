@@ -149,7 +149,13 @@ function ParkingRegister() {
   }
 
   async function onSubmit(data: ParkingFormData) {
-    if (step !== steps.length - 1) return
+    console.log('entrou')
+    console.log('step: ', step)
+    console.log('step length: ', steps.length - 1)
+    if (step !== steps.length - 1) {
+      return;
+    }
+
     const payload = {
       ...data,
       operations: {
@@ -158,8 +164,12 @@ function ParkingRegister() {
       },
     }
 
-    const response = await requestData<RegisterParkingResponse>("/parking/register", "POST", payload, true)
-    console.log(response)
+    const response = await requestData<RegisterParkingResponse>(
+      "/parking/register",
+      "POST",
+      payload,
+      true
+    )
 
     if (response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
@@ -170,6 +180,7 @@ function ParkingRegister() {
       )
     }
   }
+
 
 
   function renderStepContent() {
@@ -251,12 +262,10 @@ function ParkingRegister() {
               </div>
             </div>
           </div>
+          <form
+              className="px-5 sm:px-8 py-6 sm:py-8 space-y-8"
+            >
 
-          <form onSubmit={handleSubmit(onSubmit)} onKeyDown={(e) => {
-            if (e.key === "Enter" && step < steps.length - 1) {
-              e.preventDefault()
-            }
-          }} className="px-5 sm:px-8 py-6 sm:py-8 space-y-8">
             <div className="min-h-[400px]">
               {renderStepContent()}
             </div>
@@ -283,8 +292,9 @@ function ParkingRegister() {
                 </button>
               ) : (
                 <button
-                  type="submit"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
+                  type="button"
+                  onClick={handleSubmit(onSubmit)}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600"
                 >
                   <CheckCircle size={18} />
                   Finalizar cadastro
