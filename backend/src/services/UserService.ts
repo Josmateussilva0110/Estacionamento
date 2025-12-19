@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import User, { UserData } from "../model/User"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
+import { UserErrorCode } from "../types/code/userCode"
 
 class UserService {
     async register(data: {
@@ -14,7 +15,7 @@ class UserService {
             return {
                 status: false,
                 error: {
-                    code: "EMAIL_ALREADY_EXISTS",
+                    code: UserErrorCode.EMAIL_ALREADY_EXISTS,
                     message: "Email já existe",
                 },
             }
@@ -34,7 +35,7 @@ class UserService {
             return {
                 status: false,
                 error: {
-                    code: "USER_CREATE_FAILED",
+                    code: UserErrorCode.USER_CREATE_FAILED,
                     message: "Erro ao cadastrar usuário",
                 },
             }
@@ -49,7 +50,7 @@ class UserService {
             return {
                 status: false,
                 error: {
-                    code: "USER_NOT_FOUND",
+                    code: UserErrorCode.USER_NOT_FOUND,
                     message: "Email não encontrado",
                 },
             }
@@ -60,7 +61,7 @@ class UserService {
             return {
                 status: false,
                 error: {
-                    code: "INVALID_PASSWORD",
+                    code: UserErrorCode.INVALID_PASSWORD,
                     message: "Senha incorreta",
                 },
             }
@@ -81,7 +82,7 @@ class UserService {
             return {
                 status: false,
                 error: {
-                    code: "USER_NOT_FOUND",
+                    code: UserErrorCode.USER_NOT_FOUND,
                     message: "Usuário não encontrado",
                 },
             }

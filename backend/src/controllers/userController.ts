@@ -1,12 +1,19 @@
 import { Request, Response } from "express"
 import UserService from "../services/UserService"
+import { userErrorHttpStatusMap } from "../utils/errorHttpMapper"
+import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
 class UserController {
   async register(request: Request, response: Response): Promise<Response> {
     const result = await UserService.register(request.body)
 
     if (!result.status) {
-      return response.status(422).json({
+      const httpStatus = getHttpStatusFromError(
+        result.error!.code,
+        userErrorHttpStatusMap
+      )
+
+      return response.status(httpStatus).json({
         status: false,
         message: result.error?.message,
       })
@@ -22,7 +29,11 @@ class UserController {
     const { email, password } = request.body
     const result = await UserService.login(email, password)
     if(!result.status) {
-      return response.status(422).json({
+      const httpStatus = getHttpStatusFromError(
+        result.error!.code,
+        userErrorHttpStatusMap
+      )
+      return response.status(httpStatus).json({
         status: false,
         message: result.error?.message,
       })
@@ -52,7 +63,11 @@ class UserController {
     const { id } = request.params
     const result = await UserService.findById(id)
     if(!result.status) {
-      return response.status(422).json({status: false, message: result.error?.message})
+      const httpStatus = getHttpStatusFromError(
+        result.error!.code,
+        userErrorHttpStatusMap
+      )
+      return response.status(httpStatus).json({status: false, message: result.error?.message})
     }
 
     return response.status(200).json({status: true, user: result.data})
