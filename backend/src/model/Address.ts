@@ -3,9 +3,10 @@ import Model from "./Model"
 
 export interface AddressData {
   id?: number
+  parking_id: number
   street: string
   number: string
-  complement: string
+  complement?: string
   district: string
   city: string
   state: string
