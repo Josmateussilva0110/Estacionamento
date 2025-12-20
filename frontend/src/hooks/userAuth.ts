@@ -54,6 +54,11 @@ export default function useAuth({
       true
     )
 
+    if (response.success && response.data?.status) {
+      setAuthenticated(true)
+      setUser(response.data.user ?? null)
+    }
+
     return response
   }, [])
 

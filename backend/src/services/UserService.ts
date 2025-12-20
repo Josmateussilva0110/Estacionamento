@@ -8,7 +8,7 @@ class UserService {
         username: string
         email: string
         password: string
-    }): Promise<ServiceResult<null>> {
+    }): Promise<ServiceResult<{ id: number; username: string }>> {
         try {
             const emailExists = await User.emailExists(data.email)
             if (emailExists) {
@@ -40,7 +40,10 @@ class UserService {
                 }
             }
 
-            return { status: true }
+            return { status: true, data: {
+                id: success,
+                username: newUser.username
+            }}
         } catch (error) {
             console.error("UserService.register error:", error)
 
