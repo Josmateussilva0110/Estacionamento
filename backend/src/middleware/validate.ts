@@ -1,14 +1,14 @@
 import { ZodTypeAny, ZodError } from "zod"
 import { Request, Response, NextFunction } from "express"
+import { HttpResponse } from "../types/http/HttpResponse"
 
 type ValidateTarget = "body" | "params" | "query"
 
 export const validate =
   (schema: ZodTypeAny, target: ValidateTarget = "body") =>
-  (request: Request, response: Response, next: NextFunction) => {
+  (request: Request, response: Response<HttpResponse>, next: NextFunction) => {
     try {
       const result = schema.parse(request[target])
-
       request[target] = result
       return next()
     } catch (err) {
@@ -27,7 +27,7 @@ export const validate =
 
       return response.status(500).json({
         status: false,
-        message: "Erro interno no validador",
+        message: "Erro interno no servidor",
       })
     }
   }

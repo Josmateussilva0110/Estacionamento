@@ -5,4 +5,6 @@ export const userErrorHttpStatusMap: Record<UserErrorCode, number> = {
   [UserErrorCode.USER_NOT_FOUND]: 404,       // Not Found
   [UserErrorCode.INVALID_PASSWORD]: 422,     // Unprocessable Entity
   [UserErrorCode.USER_CREATE_FAILED]: 500,   // Internal Server Error
+  [UserErrorCode.LOGIN_FAILED]: 500,
+  [UserErrorCode.USER_FETCH_FAILED]: 500,
 }

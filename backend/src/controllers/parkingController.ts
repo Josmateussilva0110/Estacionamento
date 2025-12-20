@@ -1,11 +1,11 @@
 import { Request, Response } from "express"
 import { ParkingRegisterDTO } from "../dtos/ParkingRegisterDTO"
 import ParkingService from "../services/ParkingService"
-
+import { ParkingErrorHttpStatusMap } from "../utils/parkingErrorHttpMapper"
+import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
 class ParkingController {
   async register(request: Request, response: Response): Promise<Response> {
-    try {
       const data: ParkingRegisterDTO = request.body
 
       const userId = request.session.user?.id
@@ -19,9 +19,13 @@ class ParkingController {
       const result = await ParkingService.register(data, userId)
 
       if (!result.status) {
-        return response.status(400).json({
+          const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            ParkingErrorHttpStatusMap
+          )
+        return response.status(httpStatus).json({
           status: false,
-          message: result.error?.message ?? "Erro ao processar requisição",
+          message: result.error!.message ?? "Erro ao processar requisição",
         })
       }
 
@@ -29,15 +33,6 @@ class ParkingController {
         status: true,
         message: "Estacionamento cadastrado com sucesso"
       })
-
-    } catch (error) {
-      console.error("Erro ao cadastrar estacionamento:", error)
-
-      return response.status(500).json({
-        status: false,
-        message: "Erro interno no servidor",
-      })
-    }
   }
 }
 
