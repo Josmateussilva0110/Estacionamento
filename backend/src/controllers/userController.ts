@@ -47,6 +47,7 @@ class UserController {
     return response.status(200).json({
       status: true,
       message: "Login Realizado com sucesso",
+      user: result.data,
     })
   }
 
