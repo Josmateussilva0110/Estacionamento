@@ -16,6 +16,7 @@ import { type ParkingFormData } from "../../../types/parkingTypes"
 import { requestData } from "../../../services/requestApi"
 import { type RegisterParkingResponse } from "../../../types/parkingResponses"
 import { mapAreaTypeToNumber } from "../../../utils/mapAreaType"
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
 const steps = [
@@ -170,12 +171,14 @@ function ParkingRegister() {
       true
     )
 
+    //console.log(response)
+
     if (response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
       navigate("/")
     } else {
       setFlashMessage(
-        response.data?.message ?? "Erro ao cadastrar estacionamento",
+        getApiErrorMessage(response),
         "error"
       )
     }

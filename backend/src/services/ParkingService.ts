@@ -14,6 +14,17 @@ class ParkingService {
     data: ParkingRegisterDTO,
     userId: number
   ): Promise<ServiceResult<{ parkingId: number }>> {
+
+    const emailExist = await Contact.emailExist(data.contacts.email)
+    if(emailExist) {
+      return {
+        status: false,
+        error: {
+          code: ParkingErrorCode.EMAIL_ALREADY_EXISTS,
+          message: "Email de contato já existe"
+        }
+      }
+    }
     try {
       const parkingId = await db.transaction(async (trx) => {
 

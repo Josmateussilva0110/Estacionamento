@@ -25,7 +25,7 @@ class ParkingController {
           )
         return response.status(httpStatus).json({
           status: false,
-          message: result.error?.message ?? "Erro ao processar requisição",
+          message: result.error!.message ?? "Erro ao processar requisição",
         })
       }
 
