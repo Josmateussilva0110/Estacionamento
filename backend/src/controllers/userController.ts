@@ -19,9 +19,12 @@ class UserController {
       })
     }
 
+    request.session.user = result.data!
+
     return response.status(201).json({
       status: true,
       message: "Usuário cadastrado com sucesso",
+      user: result.data,
     })
   }
 

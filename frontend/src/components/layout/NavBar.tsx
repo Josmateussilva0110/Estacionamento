@@ -6,6 +6,7 @@ import { useUser } from "../../context/useUser"
 import type { User } from "../../types/user"
 import { requestData } from "../../services/requestApi"
 import useFlashMessage from "../../hooks/useFlashMessage"
+import { type ApiPayload } from "../../types/api"
 
 function NavBar() {
   const { authenticated, user, logout } = useUser()
@@ -17,7 +18,7 @@ function NavBar() {
   useEffect(() => {
     if (user?.id) {
       async function fetchUser() {
-        const response = await requestData(`/user/${user?.id}`, "GET", {}, true)
+        const response = await requestData<ApiPayload<User>>(`/user/${user?.id}`, "GET", {}, true)
         console.log(response)
 
         if (response.success && response.data?.user) {
