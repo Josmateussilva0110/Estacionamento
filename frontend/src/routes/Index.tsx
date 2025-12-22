@@ -6,8 +6,7 @@ import LoginUser from "../components/pages/auth/Login"
 import Profile from "../components/pages/user/Profile"
 import PrivateRoute from "./PrivateRouter"
 import PageNotFound from "../components/pages/errors/PageNotFound"
-import ParkingRegister from "../components/pages/parking/ParkingRegister"
-import ParkingList from "../components/pages/parking/ParkingList"
+import ParkingRoutes from "./PakingRoutes"
 
 export default function AppRoutes() {
   return (
@@ -23,8 +22,7 @@ export default function AppRoutes() {
       {/* Rotas privadas */}
       <Route element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
-        <Route path="/parking/register" element={<ParkingRegister />} />
-        <Route path="/parking/list" element={<ParkingList />} />
+        <Route path="/parking/*" element={<ParkingRoutes />} />
       </Route>
 
       {/* Rota 404 */}
