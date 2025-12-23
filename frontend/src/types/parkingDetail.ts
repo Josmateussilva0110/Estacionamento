@@ -1,21 +1,26 @@
-export interface ParkingDetailsRow {
+export interface ParkingDetails {
   id: number
   parkingName: string
   managerName: string
-
-  address_street: string
-  address_number: string
-  address_district: string
-  address_city: string
-  address_state: string
-
-  contact_phone: string
-  openingHours: string
-
-  ops_total: number
-  ops_car: number
-  ops_moto: number
-  ops_cameras: number | boolean
-
-  price_hour: number
+  address: {
+    street: string
+    number: string
+    district: string
+    city: string
+    state: string
+  }
+  contacts: {
+    phone: string
+    openingHours: { start: string, end: string } | null
+  }
+  
+  operations: {
+    totalSpots: number
+    carSpots: number
+    motoSpots: number
+    hasCameras: boolean
+  }
+  prices: {
+    priceHour: number
+  }
 }

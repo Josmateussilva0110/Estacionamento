@@ -15,72 +15,42 @@ import {
     DollarSign,
     MoreVertical,
 } from "lucide-react"
+import { type ListParkingData } from "../../../types/listParking"
+import { type ParkingDetails } from "../../../types/parkingDetail"
+import { requestData } from "../../../services/requestApi"
+import { useUser } from "../../../context/useUser"
 
-// Mock data - substituir pela API
-const mockParkings = [
-    {
-        id: 1,
-        parkingName: "Estacionamento Central",
-        managerName: "João Silva",
-        address: {
-            street: "Rua das Flores",
-            number: "123",
-            district: "Centro",
-            city: "São Paulo",
-            state: "SP",
-        },
-        contacts: {
-            phone: "(11) 99999-9999",
-            openingHours: { start: "06:00", end: "22:00" },
-        },
-        operations: {
-            totalSpots: 150,
-            carSpots: 100,
-            motoSpots: 30,
-            hasCameras: true,
-        },
-        prices: {
-            priceHour: 15,
-        },
-    },
-    {
-        id: 2,
-        parkingName: "Park Shopping",
-        managerName: "Maria Santos",
-        address: {
-            street: "Av. Paulista",
-            number: "1500",
-            district: "Bela Vista",
-            city: "São Paulo",
-            state: "SP",
-        },
-        contacts: {
-            phone: "(11) 88888-8888",
-            openingHours: { start: "00:00", end: "23:59" },
-        },
-        operations: {
-            totalSpots: 500,
-            carSpots: 400,
-            motoSpots: 80,
-            hasCameras: true,
-        },
-        prices: {
-            priceHour: 20,
-        },
-    },
-]
 
 function ParkingList() {
     const navigate = useNavigate()
     const [searchTerm, setSearchTerm] = useState("")
+    const [isLoading, setIsLoading] = useState(true)
     const [openMenuId, setOpenMenuId] = useState<number | null>(null)
-    const [parking, setParking] = useState({})
+    const { user } = useUser()
+    const [parkings, setParkings] = useState<ParkingDetails[]>([])
 
-    const filteredParkings = mockParkings.filter(
-        (parking) =>
-            parking.parkingName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            parking.address.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            parking.address.district.toLowerCase().includes(searchTerm.toLowerCase())
+    useEffect(() => {
+        if(user?.id) {
+            async function fetchParking() {
+                setIsLoading(true)
+                const response = await requestData<ListParkingData>(`/parking/list/${user?.id}`, "GET", {}, true)
+                if (response.success && response.data?.parking) {
+                    setParkings(response.data.parking)
+                } else {
+                    setParkings([])
+                }
+                setIsLoading(false)
+            }
+
+            fetchParking()
+        }
+    }, [user])
+
+    const filteredParkings = parkings.filter(
+        (p) =>
+            p.parkingName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.address.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.address.district.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
     const ITEMS_PER_PAGE = 1
@@ -138,7 +108,28 @@ function ParkingList() {
 
                     {/* List */}
                     <div className="px-8 py-6 space-y-6">
-                        {filteredParkings.map((parking) => (
+                        {/* Loading */}
+                        {isLoading && (
+                            <div className="flex justify-center py-16">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                            </div>
+                        )}
+
+                        {/* Nenhum estacionamento */}
+                        {!isLoading && filteredParkings.length === 0 && (
+                            <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500">
+                            <Building2 className="w-12 h-12 mb-4 text-gray-400" />
+                            <p className="text-lg font-semibold">
+                                Nenhum estacionamento cadastrado
+                            </p>
+                            <p className="text-sm">
+                                Clique em <strong>“Novo Estacionamento”</strong> para começar
+                            </p>
+                            </div>
+                        )}
+
+
+                        {!isLoading && filteredParkings.map((parking) => (
                             <div
                                 key={parking.id}
                                 className="
@@ -209,11 +200,13 @@ function ParkingList() {
                                                 <Phone className="text-blue-600 w-4 h-4" />
                                                 {parking.contacts.phone}
                                             </div>
+
                                             <div className="flex gap-2">
                                                 <Clock className="text-blue-600 w-4 h-4" />
-                                                {parking.contacts.openingHours.start} -{" "}
-                                                {parking.contacts.openingHours.end}
+                                                {parking.contacts.openingHours?.start} -{" "}
+                                                {parking.contacts.openingHours?.end}
                                             </div>
+
                                             <div className="flex gap-2">
                                                 <DollarSign className="text-blue-600 w-4 h-4" />
                                                 R$ {parking.prices.priceHour.toFixed(2)}/hora

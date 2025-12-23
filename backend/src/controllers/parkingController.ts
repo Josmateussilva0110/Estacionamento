@@ -35,7 +35,7 @@ class ParkingController {
       })
   }
 
-  async list(request: Request, response: Response) {
+  async list(request: Request, response: Response): Promise<Response> {
     const { id } = request.params
     const result = await ParkingService.list(id)
 
@@ -46,7 +46,7 @@ class ParkingController {
           )
         return response.status(httpStatus).json({
           status: false,
-          message: result.error?.message ?? "Nenhum estacionamento encontrado",
+          message: result.error?.message,
         })
       }
 

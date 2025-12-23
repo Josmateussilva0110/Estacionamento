@@ -19,7 +19,6 @@ function NavBar() {
     if (user?.id) {
       async function fetchUser() {
         const response = await requestData<ApiPayload<User>>(`/user/${user?.id}`, "GET", {}, true)
-        console.log(response)
 
         if (response.success && response.data?.user) {
           setRequestUser(response.data.user)
