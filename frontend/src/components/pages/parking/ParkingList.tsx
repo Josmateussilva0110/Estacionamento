@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import {
     Car,
@@ -74,6 +74,7 @@ function ParkingList() {
     const navigate = useNavigate()
     const [searchTerm, setSearchTerm] = useState("")
     const [openMenuId, setOpenMenuId] = useState<number | null>(null)
+    const [parking, setParking] = useState({})
 
     const filteredParkings = mockParkings.filter(
         (parking) =>
