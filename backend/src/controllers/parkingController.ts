@@ -34,6 +34,29 @@ class ParkingController {
         message: "Estacionamento cadastrado com sucesso"
       })
   }
+
+  async list(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params
+    const page = Number(request.query.page ?? 1)
+    const limit = Number(request.query.limit ?? 3)
+    const result = await ParkingService.list(id, page, limit)
+
+      if (!result.status) {
+          const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            ParkingErrorHttpStatusMap
+          )
+        return response.status(httpStatus).json({
+          status: false,
+          message: result.error?.message,
+        })
+      }
+
+      return response.status(200).json({
+        status: true,
+        parking: result.data
+      })
+  }
 }
 
 
