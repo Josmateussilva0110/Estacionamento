@@ -27,24 +27,40 @@ function ParkingList() {
     const [isLoading, setIsLoading] = useState(true)
     const [openMenuId, setOpenMenuId] = useState<number | null>(null)
     const { user } = useUser()
+    const [page, setPage] = useState(1)
+    const limit = 3
+    const [total, setTotal] = useState(0)
+
     const [parkings, setParkings] = useState<ParkingDetails[]>([])
 
     useEffect(() => {
-        if(user?.id) {
-            async function fetchParking() {
-                setIsLoading(true)
-                const response = await requestData<ListParkingData>(`/parking/list/${user?.id}`, "GET", {}, true)
-                if (response.success && response.data?.parking) {
-                    setParkings(response.data.parking)
-                } else {
-                    setParkings([])
-                }
-                setIsLoading(false)
+        if (!user?.id) return
+
+        async function fetchParking() {
+            setIsLoading(true)
+
+            const response = await requestData<ListParkingData>(
+            `/parking/list/${user?.id}`,
+            "GET",
+            { page, limit },
+            true
+            )
+
+            if (response.success && response.data?.parking) {
+                setParkings(response.data.parking.rows)
+                setTotal(response.data.parking.total)
+            } else {
+                setParkings([])
+                setTotal(0)
             }
 
-            fetchParking()
+            setIsLoading(false)
         }
-    }, [user])
+
+        fetchParking()
+        }, [user?.id, page])
+
+
 
     const filteredParkings = parkings.filter(
         (p) =>
@@ -53,14 +69,9 @@ function ParkingList() {
             p.address.district.toLowerCase().includes(searchTerm.toLowerCase())
     )
 
-    const ITEMS_PER_PAGE = 1
-    const [currentPage, setCurrentPage] = useState(1)
-
-    const totalPages = Math.ceil(filteredParkings.length / ITEMS_PER_PAGE)
-
-    const canGoPrev = currentPage > 1
-    const canGoNext = currentPage < totalPages
-
+    const totalPages = Math.ceil(total / limit)
+    const canGoPrev = page > 1
+    const canGoNext = page < totalPages
 
     return (
         <div className="min-h-screen bg-linear-to-br from-blue-600 via-blue-700 to-blue-900 px-4 py-8">
@@ -293,7 +304,7 @@ function ParkingList() {
                             <div className="flex items-center justify-center gap-2">
                                 {/* Anterior */}
                                 <button
-                                    onClick={() => setCurrentPage((prev) => prev - 1)}
+                                    onClick={() => setPage((p) => p - 1)}
                                     disabled={!canGoPrev}
                                     className="
                                         flex items-center gap-1
@@ -317,12 +328,12 @@ function ParkingList() {
                                     rounded-lg text-sm font-semibold
                                     min-w-10 text-center
                                     ">
-                                    {currentPage}
+                                    {page}
                                 </span>
 
                                 {/* Próximo */}
                                 <button
-                                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                                    onClick={() => setPage((p) => p + 1)}
                                     disabled={!canGoNext}
                                     className="
                                         flex items-center gap-1

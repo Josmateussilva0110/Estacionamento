@@ -1,5 +1,5 @@
-import type { ParkingDetails } from "./parkingDetail"
+import type { PaginatedParkingResult } from "./PaginatedParkingResult" 
 
 export interface ListParkingData {
-  parking: ParkingDetails[]
+  parking: PaginatedParkingResult
 }

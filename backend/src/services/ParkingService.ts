@@ -7,7 +7,7 @@ import Prices from "../model/Prices"
 import { ParkingRegisterDTO } from "../dtos/ParkingRegisterDTO"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { ParkingErrorCode } from "../types/code/parkingCode"
-import { ParkingDetailsDTO } from "../dtos/ParkingDetailsDTO"
+import { type PaginatedParkingResult } from "../types/parking/PaginatedParkingResult"
 
 
 class ParkingService {
@@ -117,10 +117,10 @@ class ParkingService {
     }
   }
 
-  async list(id: string): Promise<ServiceResult<ParkingDetailsDTO[] | null>> {
+  async list(id: string, page: number, limit: number): Promise<ServiceResult<PaginatedParkingResult | null>> {
     try {
-      const parking = await Parking.findByIdUser(id)
-      if (parking?.length === 0) {
+      const parking = await Parking.findByIdUser(id, page, limit)
+      if (parking?.total === 0) {
           return {
               status: false,
               error: {

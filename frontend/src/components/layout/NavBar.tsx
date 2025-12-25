@@ -124,12 +124,12 @@ function NavBar() {
                     <Menu.Item>
                       {({ active }) => (
                         <Link
-                          to="/parking/register"
+                          to="/parking/list"
                           className={`flex items-center gap-3 px-4 py-2 text-sm ${active ? "bg-blue-50 text-parking-primary" : "text-gray-700"
                             }`}
                         >
                           <PlusSquare size={18} />
-                          Cadastrar Estacionamento
+                          Estacionamentos
                         </Link>
                       )}
                     </Menu.Item>
@@ -207,13 +207,13 @@ function NavBar() {
                     </Link>
 
                     <Link
-                      to="/parking/register"
+                      to="/parking/list"
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 
                          text-parking-primary font-semibold hover:bg-blue-100 active:scale-95 transition"
                     >
                       <PlusSquare size={20} />
-                      <span>Cadastrar Estacionamento</span>
+                      <span>Estacionamentos</span>
                     </Link>
 
                     <button

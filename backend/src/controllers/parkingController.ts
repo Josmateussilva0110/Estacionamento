@@ -37,7 +37,9 @@ class ParkingController {
 
   async list(request: Request, response: Response): Promise<Response> {
     const { id } = request.params
-    const result = await ParkingService.list(id)
+    const page = Number(request.query.page ?? 1)
+    const limit = Number(request.query.limit ?? 3)
+    const result = await ParkingService.list(id, page, limit)
 
       if (!result.status) {
           const httpStatus = getHttpStatusFromError(

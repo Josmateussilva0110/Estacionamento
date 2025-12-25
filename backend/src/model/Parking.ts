@@ -1,6 +1,7 @@
 import Model from "./Model"
 import db from "../database/connection/connection"
 import { ParkingDetailsDTO } from "../dtos/ParkingDetailsDTO"
+import { type PaginatedParkingResult } from "../types/parking/PaginatedParkingResult"
 import { type ParkingDetailsRow } from "../types/parking/ParkingDetailsRow"
 import { type PgRawResult } from "../types/database/BdResult"
 import { parseOpeningHours } from "../utils/parseOpeningHours"
@@ -19,7 +20,8 @@ class Parking extends Model<ParkingData> {
     super("parking")
   }
 
-  async findByIdUser(id: string): Promise<ParkingDetailsDTO[] | null> {
+  async findByIdUser(id: string, page: number, limit: number): Promise<PaginatedParkingResult | null> {
+    const offset = (page - 1) * limit
     try {
       const result = await db.raw<PgRawResult<ParkingDetailsRow>>(
         `
@@ -49,9 +51,23 @@ class Parking extends Model<ParkingData> {
         inner join parking_operations po on po.parking_id = p.id
         inner join parking_prices pp on pp.parking_id = p.id
         where p.created_by = ?
+        order by p.created_at desc
+        limit ?
+        offset ?
+        `,
+        [id, limit, offset]
+      )
+
+      const countResult = await db.raw<PgRawResult<{ total: string }>>(
+        `
+        select count(*) as total
+        from parking
+        where created_by = ?
         `,
         [id]
       )
+
+      const total = Number(countResult.rows[0].total)
 
       const rows = result.rows
       const mapped: ParkingDetailsDTO[] = rows.map((row) => ({
@@ -84,7 +100,11 @@ class Parking extends Model<ParkingData> {
         },
       }))
 
-      return mapped
+      return {
+        rows: mapped,
+        total,
+      }
+
     } catch (err) {
       console.error(
         `Erro ao buscar estacionamentos tabela: ${this.tableName}`,
