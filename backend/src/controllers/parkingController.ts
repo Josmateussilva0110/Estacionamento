@@ -58,7 +58,7 @@ class ParkingController {
       })
   }
 
-  async remove(request: Request, response: Response) {
+  async remove(request: Request, response: Response): Promise<Response> {
     const { id } = request.params
     const result = await ParkingService.delete(id)
     if(!result.status) {
@@ -74,7 +74,8 @@ class ParkingController {
     
     return response.status(200).json({
       status: true,
-      message: "Estacionamento removido com sucesso"
+      message: "Estacionamento removido com sucesso",
+      parkingId: result.data?.id
     })
   }
 }

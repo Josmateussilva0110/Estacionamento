@@ -147,7 +147,7 @@ class ParkingService {
     }
   }
 
-  async delete(id: string) {
+  async delete(id: string): Promise<ServiceResult<{id: string }>> {
     try {
       const parkingExist = await Parking.findById(id) 
       if(!parkingExist) {
@@ -171,7 +171,7 @@ class ParkingService {
         }
       }
 
-      return { status: true}
+      return { status: true, data: {id}}
 
     } catch (error) {
         console.error("ParkingService.delete error:", error)
