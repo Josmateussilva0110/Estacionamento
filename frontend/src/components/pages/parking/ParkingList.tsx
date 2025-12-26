@@ -17,12 +17,16 @@ import {
 } from "lucide-react"
 import { type ListParkingData } from "../../../types/listParking"
 import { type ParkingDetails } from "../../../types/parkingDetail"
+import { type RemoveParkingResponse } from "../../../types/parkingResponses"
 import { requestData } from "../../../services/requestApi"
 import { useUser } from "../../../context/useUser"
+import useFlashMessage from "../../../hooks/useFlashMessage"
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
 function ParkingList() {
     const navigate = useNavigate()
+    const { setFlashMessage } = useFlashMessage()
     const [searchTerm, setSearchTerm] = useState("")
     const [isLoading, setIsLoading] = useState(true)
     const [openMenuId, setOpenMenuId] = useState<number | null>(null)
@@ -59,6 +63,21 @@ function ParkingList() {
 
         fetchParking()
     }, [user?.id, page])
+
+    async function remove(id: number): Promise<void> {
+        const response = await requestData<RemoveParkingResponse>(`/parking/${id}`, "DELETE", {}, true)
+        if (response.success && response.data?.status) {
+            setFlashMessage(response.data.message, "success")
+
+            setParkings((prev) => prev.filter((p) => p.id !== id))
+            setTotal((prev) => Math.max(prev - 1, 0))
+            if (parkings.length === 1 && page > 1) {
+                setPage((p) => p - 1)
+            }
+        } else {
+            setFlashMessage(getApiErrorMessage(response), "error")
+        }
+    }
 
     const filteredParkings = parkings.filter(
         (p) =>
@@ -188,7 +207,7 @@ function ParkingList() {
                                                         >
                                                             <Edit size={16} /> Editar
                                                         </button>
-                                                        <button className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 w-full">
+                                                        <button onClick={() => remove(parking.id)} className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 w-full">
                                                             <Trash2 size={16} /> Excluir
                                                         </button>
                                                     </div>
@@ -266,6 +285,7 @@ function ParkingList() {
 
                                         {/* Excluir */}
                                         <button
+                                            onClick={() => remove(parking.id)}
                                             className="
                                                 flex items-center gap-2
                                                 h-12 px-6
