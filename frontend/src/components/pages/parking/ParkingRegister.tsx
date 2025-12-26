@@ -175,7 +175,7 @@ function ParkingRegister() {
 
     if (response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
-      navigate("/")
+      navigate("/parking/list")
     } else {
       setFlashMessage(
         getApiErrorMessage(response),
