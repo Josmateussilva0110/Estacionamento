@@ -146,6 +146,45 @@ class ParkingService {
         }
     }
   }
+
+  async delete(id: string): Promise<ServiceResult<{id: string }>> {
+    try {
+      const parkingExist = await Parking.findById(id) 
+      if(!parkingExist) {
+        return {
+            status: false,
+            error: {
+                code: ParkingErrorCode.PARKING_NOT_FOUND,
+                message: "Estacionamento não encontrado",
+            },
+        }
+      }
+
+      const deleted = await Parking.delete(id) 
+      if (!deleted) {
+        return {
+          status: false,
+          error: {
+            code: ParkingErrorCode.PARKING_REMOVE_FAILED,
+            message: "Erro ao remover estacionamento"
+          }
+        }
+      }
+
+      return { status: true, data: {id}}
+
+    } catch (error) {
+        console.error("ParkingService.delete error:", error)
+
+        return {
+            status: false,
+            error: {
+                code: ParkingErrorCode.PARKING_REMOVE_FAILED,
+                message: "Erro interno ao deletar estacionamento",
+            },
+        }
+    }
+  }
 }
 
 export default new ParkingService()

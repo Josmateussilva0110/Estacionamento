@@ -53,7 +53,9 @@ export default class Model<T extends Record<string, any>> {
     id: number | string,
     idField = "id"
   ): Promise<(T & Timestamps) | null> {
-    return db(this.tableName).where(idField, id).first() ?? null
+    const result = await db(this.tableName).where(idField, id).first()
+    return result ?? null
+
   }
 
   async update(
@@ -86,11 +88,13 @@ export default class Model<T extends Record<string, any>> {
     id: number | string,
     idField = "id",
     trx?: any
-  ): Promise<void> {
+  ): Promise<boolean> {
     const query = trx ?? db
 
-    await query(this.tableName)
+    const rowsDeleted = await query(this.tableName)
       .where(idField, id)
       .delete()
+
+    return rowsDeleted > 0
   }
 }
