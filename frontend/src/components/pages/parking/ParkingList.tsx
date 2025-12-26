@@ -58,9 +58,7 @@ function ParkingList() {
         }
 
         fetchParking()
-        }, [user?.id, page])
-
-
+    }, [user?.id, page])
 
     const filteredParkings = parkings.filter(
         (p) =>
