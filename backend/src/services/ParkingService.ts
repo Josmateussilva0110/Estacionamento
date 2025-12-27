@@ -8,6 +8,7 @@ import { ParkingRegisterDTO } from "../dtos/ParkingRegisterDTO"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { ParkingErrorCode } from "../types/code/parkingCode"
 import { type PaginatedParkingResult } from "../types/parking/PaginatedParkingResult"
+import { ParkingEditDTO } from "../dtos/ParkingEditDTO"
 
 
 class ParkingService {
@@ -181,6 +182,34 @@ class ParkingService {
             error: {
                 code: ParkingErrorCode.PARKING_REMOVE_FAILED,
                 message: "Erro interno ao deletar estacionamento",
+            },
+        }
+    }
+  }
+
+  async getById(id: string): Promise<ServiceResult<ParkingEditDTO | null>> {
+    try {
+      const parking = await Parking.getParkingById(id)
+      if (!parking) {
+        return {
+          status: false,
+          error: {
+            code: ParkingErrorCode.PARKING_NOT_FOUND,
+            message: "Estacionamento não encontrado"
+          }
+        }
+      }
+
+      return { status: true, data: parking}
+
+    } catch (error) {
+        console.error("ParkingService.getById error:", error)
+
+        return {
+            status: false,
+            error: {
+                code: ParkingErrorCode.PARKING_INTERNAL_SERVER_ERROR,
+                message: "Erro interno ao buscar estacionamento",
             },
         }
     }

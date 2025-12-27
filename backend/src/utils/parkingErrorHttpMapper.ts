@@ -6,4 +6,5 @@ export const ParkingErrorHttpStatusMap: Record<ParkingErrorCode , number> = {
   [ParkingErrorCode.PARKING_NOT_FOUND]: 404,
   [ParkingErrorCode.PARKING_FETCH_FAILED]: 500,
   [ParkingErrorCode.PARKING_REMOVE_FAILED]: 500,
+  [ParkingErrorCode.PARKING_INTERNAL_SERVER_ERROR]: 500,
 }

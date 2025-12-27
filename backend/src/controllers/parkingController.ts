@@ -78,6 +78,25 @@ class ParkingController {
       parkingId: result.data?.id
     })
   }
+
+  async getParking(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params
+    const result = await ParkingService.getById(id)
+    if(!result.status) {
+      const httpStatus = getHttpStatusFromError(
+        result.error!.code,
+        ParkingErrorHttpStatusMap
+      )
+      return response.status(httpStatus).json({
+        status: false,
+        message: result.error?.message,
+      })
+    }
+    return response.status(200).json({
+      status: true,
+      parking: result.data
+    })
+  }
 }
 
 
