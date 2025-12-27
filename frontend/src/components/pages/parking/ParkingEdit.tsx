@@ -2,9 +2,9 @@ import {
   MapPin, Phone, Settings, DollarSign,
   Building2
 } from "lucide-react"
-import type { ParkingFormData } from "../../../../types/parkingTypes"
-import type { FormStepProps } from "../../../../types/formStep"
-import { SummaryCard } from "../../../layout/SumaryCard"
+import type { ParkingFormData } from "../../../types/parkingTypes"
+import type { FormStepProps } from "../../../types/formStep"
+import { SummaryCard } from "../../layout/SumaryCard"
 
 type StepSummaryProps = Pick<
   FormStepProps<ParkingFormData>,
@@ -12,8 +12,7 @@ type StepSummaryProps = Pick<
 >
 
 
-
-export function StepSummary({ watch }: StepSummaryProps) {
+export function ParkingEdit({ watch }: StepSummaryProps) {
   const data = watch?.()
 
   if (!data) return null
