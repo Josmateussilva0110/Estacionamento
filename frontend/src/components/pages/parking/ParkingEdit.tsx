@@ -1,93 +1,224 @@
+import { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
 import {
-  MapPin, Phone, Settings, DollarSign,
-  Building2
+  MapPin,
+  Phone,
+  Settings,
+  DollarSign,
+  Building2,
+  CheckCircle2,
 } from "lucide-react"
-import type { ParkingFormData } from "../../../types/parkingTypes"
-import type { FormStepProps } from "../../../types/formStep"
+
 import { SummaryCard } from "../../layout/SumaryCard"
+import { requestData } from "../../../services/requestApi"
+import type { ParkingData } from "../../../types/parkingEditResponse"
+import type { ParkingEdit as ParkingEditType } from "../../../types/parkingEdit"
 
-type StepSummaryProps = Pick<
-  FormStepProps<ParkingFormData>,
-  "watch"
->
+/* Helpers */
+const formatPeriod = (
+  period?: { start: string; end: string } | null
+) => (period ? `${period.start} às ${period.end}` : "-")
 
+const formatPrice = (value?: number) =>
+  value != null ? `R$ ${value.toFixed(2)}` : "-"
 
-export function ParkingEdit({ watch }: StepSummaryProps) {
-  const data = watch?.()
+export function ParkingEdit() {
+  const { parkingId } = useParams()
+  const [isLoading, setIsLoading] = useState(true)
+  const [parking, setParking] = useState<ParkingEditType | null>(null)
 
-  if (!data) return null
+  useEffect(() => {
+    async function fetchParking() {
+      setIsLoading(true)
+
+      const response = await requestData<ParkingData>(
+        `/parking/${parkingId}`,
+        "GET",
+        {},
+        true
+      )
+
+      if (response.success && response.data?.parking) {
+        setParking(response.data.parking)
+      } else {
+        setParking(null)
+      }
+
+      setIsLoading(false)
+    }
+
+    fetchParking()
+  }, [parkingId])
+
+  /* Loading */
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+      </div>
+    )
+  }
+
+  /* Not found */
+  if (!parking) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-gray-500">
+        <Building2 className="w-12 h-12 mb-4 text-gray-400" />
+        <p className="text-lg font-semibold">
+          Estacionamento não encontrado
+        </p>
+      </div>
+    )
+  }
+
   return (
-    <div className="space-y-6 text-sm sm:text-base animate-in fade-in slide-in-from-right-4 duration-300">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <SummaryCard
-          title="Identificação"
-          icon={<Building2 className="w-5 h-5" />}
-          items={[
-            ["Estacionamento", data.parkingName],
-            ["Responsável", data.managerName],
-          ]}
-        />
+      <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark py-10">
+    
+    {/* CONTAINER CENTRAL */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-        <SummaryCard
-          title="Contato"
-          icon={<Phone className="w-5 h-5" />}
-          items={[
-            ["Telefone", data.contacts.phone],
-            ["WhatsApp", data.contacts.whatsapp],
-            ["E-mail", data.contacts.email],
-            [
-              "Horário",
-              `${data.contacts.openingHours.start} às ${data.contacts.openingHours.end}`
-            ]
-          ]}
-        />
+      {/* CARD PRINCIPAL */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+
+        {/* HEADER AZUL */}
+        <div className="bg-linear-to-r from-blue-600 to-blue-500 px-6 py-6 text-white">
+          <div className="flex items-center gap-3">
+            <div className="bg-white/20 rounded-lg p-2">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+
+            <div>
+              <h1 className="text-xl font-semibold">
+                Estacionamento
+              </h1>
+              <p className="text-sm text-blue-100">
+                Visualização e revisão dos dados cadastrados
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* CONTEÚDO */}
+        <div className="p-6 space-y-6 bg-slate-50">
+
+          {/* Identificação + Contato */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SummaryCard
+              title="Identificação"
+              icon={<Building2 className="w-5 h-5" />}
+              items={[
+                ["Estacionamento", parking.parkingName],
+                ["Responsável", parking.managerName],
+              ]}
+            />
+
+            <SummaryCard
+              title="Contato"
+              icon={<Phone className="w-5 h-5" />}
+              items={[
+                ["Telefone", parking.contacts.phone],
+                ["WhatsApp", parking.contacts.whatsapp],
+                ["E-mail", parking.contacts.email],
+                [
+                  "Horário",
+                  formatPeriod(parking.contacts.openingHours),
+                ],
+              ]}
+            />
+          </div>
+
+          {/* Endereço */}
+          <SummaryCard
+            title="Endereço"
+            icon={<MapPin className="w-5 h-5" />}
+            items={[
+              [
+                "Endereço",
+                `${parking.address.street}, ${parking.address.number}`,
+              ],
+              [
+                "Complemento",
+                parking.address.complement || "-",
+              ],
+              ["Bairro", parking.address.district],
+              [
+                "Cidade/UF",
+                `${parking.address.city} - ${parking.address.state}`,
+              ],
+              ["CEP", parking.address.zipCode],
+            ]}
+          />
+
+          {/* Operação + Preços */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SummaryCard
+              title="Operação e estrutura"
+              icon={<Settings className="w-5 h-5" />}
+              items={[
+                ["Total de vagas", parking.operations.totalSpots],
+                ["Carro", parking.operations.carSpots],
+                ["Moto", parking.operations.motoSpots],
+                ["Caminhonete", parking.operations.truckSpots],
+                ["PCD", parking.operations.pcdSpots],
+                ["Idoso", parking.operations.elderlySpots],
+                [
+                  "Câmeras",
+                  parking.operations.hasCameras
+                    ? "Sim"
+                    : "Não",
+                ],
+                [
+                  "Lavagem",
+                  parking.operations.hasWashing
+                    ? "Sim"
+                    : "Não",
+                ],
+                ["Área", parking.operations.areaType],
+              ]}
+            />
+
+            <SummaryCard
+              title="Preços"
+              icon={<DollarSign className="w-5 h-5" />}
+              items={[
+                ["Hora", formatPrice(parking.prices.priceHour)],
+                [
+                  "Hora adicional",
+                  formatPrice(
+                    parking.prices.priceExtraHour
+                  ),
+                ],
+                ["Diária", formatPrice(parking.prices.dailyRate)],
+                [
+                  "Período noturno",
+                  formatPeriod(parking.prices.nightPeriod),
+                ],
+                [
+                  "Valor noturno",
+                  formatPrice(parking.prices.nightRate),
+                ],
+                [
+                  "Mensalidade",
+                  formatPrice(parking.prices.monthlyRate),
+                ],
+                [
+                  "Carro",
+                  formatPrice(parking.prices.carPrice),
+                ],
+                [
+                  "Moto",
+                  formatPrice(parking.prices.motoPrice),
+                ],
+                [
+                  "Caminhonete",
+                  formatPrice(parking.prices.truckPrice),
+                ],
+              ]}
+            />
+          </div>
+        </div>
       </div>
-
-      <SummaryCard
-        title="Endereço"
-        icon={<MapPin className="w-5 h-5" />}
-        items={[
-          ["Endereço", `${data.address.street}, ${data.address.number}`],
-          ["Complemento", data.address.complement || "-"],
-          ["Bairro", data.address.district],
-          ["Cidade/UF", `${data.address.city} - ${data.address.state}`],
-          ["CEP", data.address.zipCode],
-        ]}
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <SummaryCard
-          title="Operação e estrutura"
-          icon={<Settings className="w-5 h-5" />}
-          items={[
-            ["Total de vagas", (data.operations.totalSpots as number | undefined) ?? "-"],
-            ["Carro", (data.operations.carSpots as number | undefined) ?? "-"],
-            ["Moto", (data.operations.motoSpots as number | undefined) ?? "-"],
-            ["Caminhonete", (data.operations.truckSpots as number | undefined) ?? "-"],
-            ["PCD", (data.operations.pcdSpots as number | undefined) ?? "-"],
-            ["Idoso", (data.operations.elderlySpots as number | undefined) ?? "-"],
-            ["Câmeras", data.operations.hasCameras ? "Sim" : "Não"],
-            ["Lavagem", data.operations.hasWashing ? "Sim" : "Não"],
-            ["Área", data.operations.areaType],
-          ]}
-        />
-
-        <SummaryCard
-          title="Preços"
-          icon={<DollarSign className="w-5 h-5" />}
-          items={[
-            ["Hora", (data.prices.priceHour as number | undefined) ?? "-"],
-            ["Hora adicional", (data.prices.priceExtraHour as number | undefined) ?? "-"],
-            ["Diária", (data.prices.dailyRate as number | undefined) ?? "-"],
-            ["Período noturno", `${data.prices.nightPeriod.start} às ${data.prices.nightPeriod.end}` || "-"],
-            ["Valor noturno", (data.prices.nightRate as number | undefined) ?? "-"],
-            ["Mensalidade", (data.prices.monthlyRate as number | undefined) ?? "-"],
-            ["Carro", (data.prices.carPrice as number | undefined) ?? "-"],
-            ["Moto", (data.prices.motoPrice as number | undefined) ?? "-"],
-            ["Caminhonete", (data.prices.truckPrice as number | undefined) ?? "-"],
-          ]}
-        />
-      </div>
+    </div>
     </div>
   )
 }
