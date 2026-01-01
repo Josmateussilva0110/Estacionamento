@@ -45,6 +45,7 @@ class Parking extends Model<ParkingData> {
           po.car_spots as ops_car,
           po.moto_spots as ops_moto,
           po.has_cameras as ops_cameras,
+          po.has_washing as ops_washing,
 
           pp.price_hour as price_hour
         from parking p
@@ -95,6 +96,7 @@ class Parking extends Model<ParkingData> {
           carSpots: row.ops_car,
           motoSpots: row.ops_moto,
           hasCameras: Boolean(row.ops_cameras),
+          hasWashing: Boolean(row.ops_washing),
         },
 
         prices: {

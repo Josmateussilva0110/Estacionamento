@@ -19,6 +19,7 @@ export interface ParkingDetails {
     carSpots: number
     motoSpots: number
     hasCameras: boolean
+    hasWashing: boolean
   }
   prices: {
     priceHour: number

@@ -214,6 +214,106 @@ class ParkingService {
         }
     }
   }
+
+  async update(
+  data: ParkingRegisterDTO,
+  userId: number,
+  id: string
+): Promise<ServiceResult<{ parkingId: number }>> {
+
+  const emailExist = await Contact.emailExist(
+    data.contacts.email, id
+  )
+
+  if (emailExist) {
+    return {
+      status: false,
+      error: {
+        code: ParkingErrorCode.EMAIL_ALREADY_EXISTS,
+        message: "Email de contato já existe",
+      },
+    }
+  }
+
+  try {
+    await db.transaction(async (trx) => {
+
+      await Parking.update(
+        id,
+        {
+          parking_name: data.parkingName,
+          manager_name: data.managerName,
+          created_by: userId,
+        },
+        { trx }
+      )
+
+      await Address.update(
+      id,
+      {
+        street: data.address.street,
+        number: data.address.number,
+        complement: data.address.complement,
+        district: data.address.district,
+        city: data.address.city,
+        state: data.address.state,
+        zip_code: data.address.zipCode,
+      },
+        {
+          idField: "parking_id",
+          trx,
+        }
+      )
+
+      await Contact.update(id, {
+        phone: data.contacts.phone,
+        whatsapp: data.contacts.whatsapp,
+        email: data.contacts.email,
+        open_hours: data.contacts.openingHours ?? null,
+      }, { idField: "parking_id", trx })
+
+      await Operations.update(id, {
+        total_spots: data.operations.totalSpots,
+        car_spots: data.operations.carSpots,
+        moto_spots: data.operations.motoSpots,
+        truck_spots: data.operations.truckSpots,
+        pcd_spots: data.operations.pcdSpots,
+        elderly_spots: data.operations.elderlySpots,
+        has_cameras: data.operations.hasCameras,
+        has_washing: data.operations.hasWashing,
+        area_type: data.operations.areaType,
+      }, { idField: "parking_id", trx })
+
+      await Prices.update(id, {
+        price_hour: data.prices.priceHour,
+        price_extra_hour: data.prices.priceExtraHour,
+        daily_rate: data.prices.dailyRate,
+        night_period: data.prices.nightPeriod ?? null,
+        night_rate: data.prices.nightRate,
+        monthly_rate: data.prices.monthlyRate,
+        car_price: data.prices.carPrice,
+        moto_price: data.prices.motoPrice,
+        truck_price: data.prices.truckPrice,
+      }, { idField: "parking_id", trx })
+    })
+
+    return {
+      status: true,
+      data: { parkingId: Number(id) },
+    }
+
+  } catch (error) {
+    console.error("ParkingService.update:", error)
+
+    return {
+      status: false,
+      error: {
+        code: ParkingErrorCode.PARKING_UPDATE_FAILED,
+        message: "Erro ao editar estacionamento",
+      },
+    }
+  }
+}
 }
 
 export default new ParkingService()

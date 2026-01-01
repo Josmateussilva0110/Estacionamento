@@ -19,20 +19,24 @@ class ParkingContact extends Model<ContactData> {
     super("parking_contact")
   }
 
-  async emailExist(email: string): Promise<boolean> {
+  async emailExist(email: string, parkingId?: string): Promise<boolean> {
     try {
-      const result = await db(this.tableName)
-      .select("id")
-      .where({ email })
-      .first()
-      return !!result
-    } catch(err) {
-      console.error(`Erro ao verificar e-mail na tabela ${this.tableName}:`, err)
+      const query = db(this.tableName)
+        .where("email", email)
+
+      if (parkingId) {
+        query.andWhere("parking_id", "!=", parkingId)
+      }
+
+      return !!(await query.first())
+    } catch (err) {
+      console.error(
+        `Erro ao verificar e-mail na tabela ${this.tableName}:`,
+        err
+      )
       return false
     }
   }
-
-
 }
 
 export default new ParkingContact()

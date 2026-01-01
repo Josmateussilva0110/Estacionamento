@@ -12,6 +12,6 @@ router.post("/parking/register", validate(ParkingRegisterSchema), ParkingControl
 router.get("/parking/list/:id", validate(IdParamSchema, "params"), ParkingController.list)
 router.delete("/parking/:id", validate(IdParamSchema, "params"), ParkingController.remove)
 router.get("/parking/:id", validate(IdParamSchema, "params"), ParkingController.getParking)
-
+router.put("/parking/:id", validate(IdParamSchema, "params"), ParkingController.edit)
 
 export default router

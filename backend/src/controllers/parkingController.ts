@@ -97,6 +97,37 @@ class ParkingController {
       parking: result.data
     })
   }
+
+  async edit(request: Request, response: Response): Promise<Response> {
+    const data: ParkingRegisterDTO = request.body
+    const { id } = request.params
+
+    const userId = request.session.user?.id
+    if (!userId) {
+      return response.status(401).json({
+        status: false,
+        message: "Usuário não autenticado",
+      })
+    }
+
+    const result = await ParkingService.update(data, userId, id)
+
+    if (!result.status) {
+        const httpStatus = getHttpStatusFromError(
+          result.error!.code,
+          ParkingErrorHttpStatusMap
+        )
+      return response.status(httpStatus).json({
+        status: false,
+        message: result.error!.message ?? "Erro ao processar requisição",
+      })
+    }
+
+    return response.status(201).json({
+      status: true,
+      message: "Estacionamento editado com sucesso"
+    })
+  }
 }
 
 

@@ -15,7 +15,8 @@ export interface ParkingDetailsRow {
   ops_total: number
   ops_car: number
   ops_moto: number
-  ops_cameras: number | boolean
+  ops_cameras: boolean
+  ops_washing: boolean
 
   price_hour: number
 }
