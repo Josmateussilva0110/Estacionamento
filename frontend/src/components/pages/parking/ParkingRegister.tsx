@@ -1,9 +1,10 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type Path } from "react-hook-form"
 import {
-  CheckCircle, ChevronLeft, ChevronRight, MapPin, Settings, DollarSign, ClipboardCheck, Sparkles,
+  CheckCircle, ChevronLeft, ChevronRight, MapPin, Settings, 
+  DollarSign, ClipboardCheck, Sparkles,
 } from "lucide-react"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { StepIdentification } from "./steps/StepIdentification"
@@ -15,9 +16,9 @@ import { ParkingSchema } from "../../../schemas/parkingSchema"
 import { type ParkingFormData } from "../../../types/parkingTypes"
 import { requestData } from "../../../services/requestApi"
 import { type RegisterParkingResponse } from "../../../types/parkingResponses"
-import { mapAreaTypeToNumber } from "../../../utils/mapAreaType"
+import type { ParkingData } from "../../../types/parkingEditResponse"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
-
+import { transformApiToForm, transformFormToApi } from "../../../utils/transformParkingData"
 
 const steps = [
   { id: "identificacao", title: "Identificação", icon: ClipboardCheck },
@@ -26,7 +27,6 @@ const steps = [
   { id: "precos", title: "Tabela de Preços", icon: DollarSign },
   { id: "revisao", title: "Revisão", icon: CheckCircle },
 ] as const
-
 
 export const defaultValues: ParkingFormData = {
   parkingName: "",
@@ -76,12 +76,15 @@ export const defaultValues: ParkingFormData = {
   }
 }
 
+interface ParkingFormProps {
+  mode: 'create' | 'edit'
+}
 
-
-
-function ParkingRegister() {
+function ParkingForm({ mode }: ParkingFormProps) {
+  const { parkingId } = useParams()
   const { setFlashMessage } = useFlashMessage()
   const [step, setStep] = useState(0)
+  const [isLoading, setIsLoading] = useState(mode === 'edit')
   const navigate = useNavigate()
 
   const {
@@ -91,6 +94,7 @@ function ParkingRegister() {
     watch,
     setValue,
     control,
+    reset,
     formState: { errors },
   } = useForm<ParkingFormData>({
     resolver: zodResolver(ParkingSchema) as any,
@@ -98,6 +102,34 @@ function ParkingRegister() {
     defaultValues,
   })
 
+  // Carregar dados em modo de edição
+  useEffect(() => {
+    if (mode === 'edit' && parkingId) {
+      async function loadParking() {
+        setIsLoading(true)
+        
+        const response = await requestData<ParkingData>(
+          `/parking/${parkingId}`,
+          "GET",
+          {},
+          true
+        )
+
+        if (response.success && response.data?.parking) {
+          // TRANSFORMAR OS DADOS DA API PARA O FORMATO DO FORMULÁRIO
+          const formData = transformApiToForm(response.data.parking)
+          reset(formData)
+        } else {
+          setFlashMessage("Estacionamento não encontrado", "error")
+          navigate("/parking/list")
+        }
+        
+        setIsLoading(false)
+      }
+      
+      loadParking()
+    }
+  }, [mode, parkingId, reset, navigate, setFlashMessage])
 
   const stepFields: Record<number, Path<ParkingFormData>[]> = {
     0: ["parkingName", "managerName"],
@@ -153,28 +185,32 @@ function ParkingRegister() {
 
   async function onSubmit(data: ParkingFormData) {
     if (step !== steps.length - 1) {
-      return;
+      return
     }
 
-    const payload = {
-      ...data,
-      operations: {
-        ...data.operations,
-        areaType: mapAreaTypeToNumber(data.operations.areaType),
-      },
-    }
+    // TRANSFORMAR OS DADOS DO FORMULÁRIO PARA O FORMATO DA API
+    const payload = transformFormToApi(data)
+
+    const endpoint = mode === 'edit' 
+      ? `/parking/${parkingId}` 
+      : "/parking/register"
+    
+    const method = mode === 'edit' ? "PUT" : "POST"
 
     const response = await requestData<RegisterParkingResponse>(
-      "/parking/register",
-      "POST",
+      endpoint,
+      method,
       payload,
       true
     )
 
-    //console.log(response)
-
     if (response.success && response.data?.status) {
-      setFlashMessage(response.data.message, "success")
+      setFlashMessage(
+        mode === 'edit' 
+          ? "Estacionamento atualizado com sucesso!" 
+          : response.data.message,
+        "success"
+      )
       navigate("/parking/list")
     } else {
       setFlashMessage(
@@ -183,8 +219,6 @@ function ParkingRegister() {
       )
     }
   }
-
-
 
   function renderStepContent() {
     switch (step) {
@@ -227,6 +261,18 @@ function ParkingRegister() {
     }
   }
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto mb-4" />
+          <p className="text-white text-lg font-semibold">Carregando dados...</p>
+        </div>
+      </div>
+    )
+  }
+
   const currentStep = steps[step]
   const progress = ((step + 1) / steps.length) * 100
 
@@ -242,7 +288,7 @@ function ParkingRegister() {
                 </div>
                 <div className="space-y-1">
                   <h1 className="text-2xl sm:text-3xl font-bold leading-tight flex items-center gap-2">
-                    Cadastrar estacionamento
+                    {mode === 'edit' ? 'Editar' : 'Cadastrar'} estacionamento
                     <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wide">
                       <Sparkles className="w-3.5 h-3.5" />
                       Etapa {step + 1}
@@ -265,10 +311,8 @@ function ParkingRegister() {
               </div>
             </div>
           </div>
-          <form
-              className="px-5 sm:px-8 py-6 sm:py-8 space-y-8"
-            >
-
+          
+          <form className="px-5 sm:px-8 py-6 sm:py-8 space-y-8">
             <div className="min-h-[400px]">
               {renderStepContent()}
             </div>
@@ -297,10 +341,10 @@ function ParkingRegister() {
                 <button
                   type="button"
                   onClick={handleSubmit(onSubmit)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl"
                 >
                   <CheckCircle size={18} />
-                  Finalizar cadastro
+                  {mode === 'edit' ? 'Salvar alterações' : 'Finalizar cadastro'}
                 </button>
               )}
             </div>
@@ -311,5 +355,4 @@ function ParkingRegister() {
   )
 }
 
-export default ParkingRegister
-
+export default ParkingForm
