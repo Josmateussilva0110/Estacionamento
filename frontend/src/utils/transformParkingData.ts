@@ -1,9 +1,7 @@
 import type { ParkingEdit } from "../types/parkingEdit"
 import type { ParkingFormData } from "../types/parkingTypes"
 
-/**
- * Mapeia número para tipo de área (string)
- */
+
 export function mapNumberToAreaType(num: number): "coberta" | "descoberta" | "mista" {
   const map: Record<number, "coberta" | "descoberta" | "mista"> = {
     1: "coberta",
@@ -13,9 +11,7 @@ export function mapNumberToAreaType(num: number): "coberta" | "descoberta" | "mi
   return map[num] || "coberta"
 }
 
-/**
- * Mapeia tipo de área (string) para número
- */
+
 export function mapAreaTypeToNumber(areaType: string): number {
   const map: Record<string, number> = {
     coberta: 1,
@@ -25,9 +21,8 @@ export function mapAreaTypeToNumber(areaType: string): number {
   return map[areaType] || 1
 }
 
-/**
- * Transforma dados da API (ParkingEdit) para o formato do formulário (ParkingFormData)
- */
+
+
 export function transformApiToForm(apiData: ParkingEdit): ParkingFormData {
   return {
     parkingName: apiData.parkingName,
@@ -56,7 +51,6 @@ export function transformApiToForm(apiData: ParkingEdit): ParkingFormData {
       elderlySpots: apiData.operations.elderlySpots,
       hasCameras: apiData.operations.hasCameras,
       hasWashing: apiData.operations.hasWashing,
-      // AQUI É A TRANSFORMAÇÃO IMPORTANTE
       areaType: mapNumberToAreaType(apiData.operations.areaType),
     },
     prices: {
@@ -73,15 +67,12 @@ export function transformApiToForm(apiData: ParkingEdit): ParkingFormData {
   }
 }
 
-/**
- * Transforma dados do formulário (ParkingFormData) para enviar à API
- */
+
 export function transformFormToApi(formData: ParkingFormData): any {
   return {
     ...formData,
     operations: {
       ...formData.operations,
-      // Converte de volta para número ao enviar
       areaType: mapAreaTypeToNumber(formData.operations.areaType),
     },
   }
