@@ -24,7 +24,7 @@ RUN chmod +x start.sh wait-for-it.sh
 EXPOSE 8080
 
 # ENTRYPOINT roda só uma vez, ANTES do CMD
-ENTRYPOINT ["./start.sh"]
+ENTRYPOINT ["sh", "./start.sh"]
 
 # este comando roda DEPOIS do entrypoint
-CMD ["npm", "run", "dev"]
+CMD []
