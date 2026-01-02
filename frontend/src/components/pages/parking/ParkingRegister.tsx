@@ -119,7 +119,10 @@ function ParkingForm({ mode }: ParkingFormProps) {
           const formData = transformApiToForm(response.data.parking)
           reset(formData)
         } else {
-          setFlashMessage("Estacionamento não encontrado", "error")
+          setFlashMessage(
+            getApiErrorMessage(response),
+            "error"
+          )
           navigate("/parking/list")
         }
         
