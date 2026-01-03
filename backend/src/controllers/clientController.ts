@@ -21,7 +21,7 @@ class ClientController {
 
         return response.status(201).json({
             status: true,
-            message: "Usuário cadastrado com sucesso",
+            message: "Cliente cadastrado com sucesso",
             user: result.data,
         })
     }
