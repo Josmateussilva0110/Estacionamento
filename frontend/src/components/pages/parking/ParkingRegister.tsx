@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type Path } from "react-hook-form"
 import {
   CheckCircle, ChevronLeft, ChevronRight, MapPin, Settings, 
-  DollarSign, ClipboardCheck, Sparkles,
+  DollarSign, ClipboardCheck,
 } from "lucide-react"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { StepIdentification } from "./steps/StepIdentification"
@@ -275,41 +275,85 @@ function ParkingForm({ mode }: ParkingFormProps) {
   }
 
   const currentStep = steps[step]
-  const progress = ((step + 1) / steps.length) * 100
 
   return (
     <div className="min-h-full py-10 flex items-center justify-center bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark">
       <div className="w-full max-w-5xl mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
           <div className="bg-blue-600 px-5 sm:px-8 py-6 sm:py-8 text-white">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="space-y-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
                   <currentStep.icon className="w-6 h-6 sm:w-8 sm:h-8 animate-pulse" />
                 </div>
-                <div className="space-y-1">
-                  <h1 className="text-2xl sm:text-3xl font-bold leading-tight flex items-center gap-2">
-                    {mode === 'edit' ? 'Editar' : 'Cadastrar'} estacionamento
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/20 text-xs font-semibold uppercase tracking-wide">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      Etapa {step + 1}
-                    </span>
-                  </h1>
-                  <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base text-blue-100">
-                    <span className="inline-flex items-center gap-2 bg-white/15 px-3 py-1 rounded-lg backdrop-blur">
-                      <currentStep.icon className="w-4 h-4" />
-                      <span className="font-semibold text-white">{currentStep.title}</span>
-                    </span>
-                    <span className="text-white/80">Passo {step + 1} de {steps.length}</span>
-                  </div>
+                <h1 className="text-2xl sm:text-3xl font-bold leading-tight flex items-center gap-2">
+                  {mode === 'edit' ? 'Editar' : 'Cadastrar'} estacionamento
+                </h1>
+              </div>
+
+              {/* Progress Steps */}
+              <div className="w-full overflow-x-auto scrollbar-hide">
+                <div className="flex items-center gap-3 sm:gap-6 justify-start sm:justify-center px-2 min-w-max sm:min-w-0">
+
+                  {steps.map((stepItem, index) => {
+                    const isActive = step === index
+                    const isCompleted = step > index
+
+                    return (
+                      <div key={stepItem.id} className="flex items-center">
+
+                        {/* Step */}
+                        <div className="flex flex-col items-center gap-1 sm:gap-2 min-w-12">
+                          <div
+                            className={`
+                              flex items-center justify-center rounded-full font-bold transition-all
+                              w-8 h-8 text-xs
+                              sm:w-10 sm:h-10 sm:text-sm
+                              ${isActive && "bg-white text-blue-600 scale-110 shadow-lg"}
+                              ${isCompleted && "bg-green-400 text-white"}
+                              ${!isActive && !isCompleted && "bg-white/30 text-white"}
+                            `}
+                          >
+                            {isCompleted ? (
+                              <CheckCircle size={14} className="sm:w-5 sm:h-5" />
+                            ) : (
+                              index + 1
+                            )}
+                          </div>
+
+                          {/* Label (some no mobile) */}
+                          <span
+                            className={`
+                              hidden sm:block text-xs font-medium text-center whitespace-nowrap
+                              ${isActive ? "text-white font-bold" : "text-blue-100"}
+                            `}
+                          >
+                            {stepItem.title}
+                          </span>
+                        </div>
+
+                        {/* Divider */}
+                        {index < steps.length - 1 && (
+                          <div
+                            className={`
+                              h-0.5 sm:h-1
+                              w-6 sm:w-12 lg:w-16
+                              mx-2 rounded transition-all
+                              ${isCompleted ? "bg-green-400" : "bg-white/30"}
+                            `}
+                          />
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
-              <div className="w-full sm:w-56 h-3 rounded-full bg-white/20 overflow-hidden shadow-inner">
-                <div
-                  className="h-full bg-white rounded-full transition-all duration-500 ease-out shadow-md"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
+
+              <p className="text-center text-xs sm:hidden text-blue-100 mt-2">
+                {currentStep.title}
+              </p>
+
+
             </div>
           </div>
           
