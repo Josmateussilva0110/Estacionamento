@@ -136,6 +136,19 @@ function NavBar() {
 
                     <Menu.Item>
                       {({ active }) => (
+                        <Link
+                          to="/client/register"
+                          className={`flex items-center gap-3 px-4 py-2 text-sm ${active ? "bg-blue-50 text-parking-primary" : "text-gray-700"
+                            }`}
+                        >
+                          <UserPlus size={18} />
+                          Adicionar Clientes
+                        </Link>
+                      )}
+                    </Menu.Item>
+
+                    <Menu.Item>
+                      {({ active }) => (
                         <button
                           onClick={handleLogout}
                           className={`flex w-full items-center gap-3 px-4 py-2 text-sm ${active ? "bg-red-50 text-red-600" : "text-gray-700"
@@ -214,6 +227,16 @@ function NavBar() {
                     >
                       <PlusSquare size={20} />
                       <span>Estacionamentos</span>
+                    </Link>
+
+                    <Link
+                      to="/client/register"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 
+                         text-parking-primary font-semibold hover:bg-blue-100 active:scale-95 transition"
+                    >
+                      <UserPlus size={20} />
+                      <span>Adicionar Clientes</span>
                     </Link>
 
                     <button
