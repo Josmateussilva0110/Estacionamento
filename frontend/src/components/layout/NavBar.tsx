@@ -1,6 +1,6 @@
 import { useState, Fragment, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { LogIn, UserPlus, User as UserIcon, LogOut, Menu as MenuIcon, X, PlusSquare } from "lucide-react"
+import { LogIn, UserPlus, User as UserIcon, LogOut, Menu as MenuIcon, X, PlusSquare, Car} from "lucide-react"
 import { Menu, Transition } from "@headlessui/react"
 import { useUser } from "../../context/useUser"
 import type { User } from "../../types/user"
@@ -136,6 +136,32 @@ function NavBar() {
 
                     <Menu.Item>
                       {({ active }) => (
+                        <Link
+                          to="/client/register"
+                          className={`flex items-center gap-3 px-4 py-2 text-sm ${active ? "bg-blue-50 text-parking-primary" : "text-gray-700"
+                            }`}
+                        >
+                          <UserPlus size={18} />
+                          Adicionar Clientes
+                        </Link>
+                      )}
+                    </Menu.Item>
+
+                    <Menu.Item>
+                      {({ active }) => (
+                        <Link
+                          to="/client/vehicle/register"
+                          className={`flex items-center gap-3 px-4 py-2 text-sm ${active ? "bg-blue-50 text-parking-primary" : "text-gray-700"
+                            }`}
+                        >
+                          <Car size={18} />
+                          Adicionar Veiculo
+                        </Link>
+                      )}
+                    </Menu.Item>
+
+                    <Menu.Item>
+                      {({ active }) => (
                         <button
                           onClick={handleLogout}
                           className={`flex w-full items-center gap-3 px-4 py-2 text-sm ${active ? "bg-red-50 text-red-600" : "text-gray-700"
@@ -214,6 +240,26 @@ function NavBar() {
                     >
                       <PlusSquare size={20} />
                       <span>Estacionamentos</span>
+                    </Link>
+
+                    <Link
+                      to="/client/register"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 
+                         text-parking-primary font-semibold hover:bg-blue-100 active:scale-95 transition"
+                    >
+                      <UserPlus size={20} />
+                      <span>Adicionar Clientes</span>
+                    </Link>
+
+                    <Link
+                      to="/client/vehicle/register"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-blue-50 
+                         text-parking-primary font-semibold hover:bg-blue-100 active:scale-95 transition"
+                    >
+                      <Car size={20} />
+                      <span>Adicionar Veiculo</span>
                     </Link>
 
                     <button

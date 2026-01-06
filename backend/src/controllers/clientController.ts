@@ -25,6 +25,10 @@ class ClientController {
             user: result.data,
         })
     }
+
+    async registerVehicle(request: Request, response: Response) {
+        
+    }
 }
 
 
