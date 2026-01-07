@@ -1,4 +1,5 @@
 import Client from "../model/Client"
+import User from "../model/User"
 import Vehicle from "../model/Vehicle"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { UserErrorCode } from "../types/code/userCode"
@@ -20,6 +21,39 @@ class ClientService {
                     error: {
                         code: UserErrorCode.EMAIL_ALREADY_EXISTS,
                         message: "Email já existe",
+                    },
+                }
+            }
+
+            const emailUserExists = await User.emailExists(data.email)
+            if(emailUserExists) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.EMAIL_ALREADY_EXISTS,
+                        message: "Email já criado",
+                    }
+                }
+            }
+
+            const cpfExists = await Client.cpfExists(data.cpf)
+            if (cpfExists) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.CPF_ALREADY_EXISTS,
+                        message: "CPF já existe",
+                    },
+                }
+            }
+
+            const phoneExists = await Client.phoneExists(data.phone)
+            if (phoneExists) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.PHONE_ALREADY_EXISTS,
+                        message: "Telefone já existe",
                     },
                 }
             }

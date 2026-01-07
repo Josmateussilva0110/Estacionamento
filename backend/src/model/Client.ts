@@ -29,6 +29,34 @@ class Client extends Model<ClientData> {
             return false
         }
     }
+
+    async cpfExists(cpf: string): Promise<boolean> {
+        try {
+            const result = await db(this.tableName)
+            .select("id")
+            .where({ cpf })
+            .first()
+
+            return !!result
+        } catch (err) {
+            console.error(`Erro ao verificar cpf na tabela ${this.tableName}:`, err)
+            return false
+        }
+    }
+
+    async phoneExists(phone: string): Promise<boolean> {
+        try {
+            const result = await db(this.tableName)
+            .select("id")
+            .where({ phone })
+            .first()
+
+            return !!result
+        } catch (err) {
+            console.error(`Erro ao verificar telefone na tabela ${this.tableName}:`, err)
+            return false
+        }
+    }
 }
 
 export default new Client()
