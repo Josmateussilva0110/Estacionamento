@@ -1,4 +1,6 @@
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Car, FileText, CarFront } from "lucide-react"
 
@@ -11,24 +13,44 @@ import { VEHICLE_TYPES, type VehicleType } from "../../../types/vehicleTypes"
 import { VEHICLE_TYPE_LABEL } from "../../../utils/mapVehicleType"
 
 import { RegisterVehicleSchema } from "../../../schemas/VehicleSchema"
-import { type RegisterVehicleFormData } from "../../../types/ClientTypes"
+import { type RegisterVehicleFormData } from "../../../types/client/ClientTypes"
+import { type ClientDetails } from "../../../types/client/clientDetail"
+import { type ListClientsData } from "../../../types/client/listClientsData"
+import { requestData } from "../../../services/requestApi"
+import { useUser } from "../../../context/useUser"
+import useFlashMessage from "../../../hooks/useFlashMessage"
+import { type RegisterVehicleResponse } from "../../../types/client/clientResponse"
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
-// MOCK DE CLIENTES - Remover quando a API estiver pronta
-const MOCK_CLIENTS = [
-  { id: "1", name: "João Silva", cpf: "123.456.789-00" },
-  { id: "2", name: "Maria Santos", cpf: "987.654.321-00" },
-  { id: "3", name: "Pedro Oliveira", cpf: "456.789.123-00" },
-  { id: "4", name: "Ana Costa", cpf: "789.123.456-00" },
-  { id: "5", name: "Carlos Ferreira", cpf: "321.654.987-00" },
-  { id: "6", name: "Juliana Alves", cpf: "147.258.369-00" },
-  { id: "7", name: "Roberto Lima", cpf: "963.852.741-00" },
-  { id: "8", name: "Fernanda Souza", cpf: "258.147.963-00" },
-  { id: "9", name: "Lucas Martins", cpf: "369.258.147-00" },
-  { id: "10", name: "Camila Rodrigues", cpf: "741.852.963-00" },
-]
+
 
 function RegisterVehicle() {
-  const clients = MOCK_CLIENTS
+  const navigate = useNavigate()
+  const { setFlashMessage } = useFlashMessage()
+  const [isLoading, setIsLoading] = useState(true)
+  const { user } = useUser()
+  const [clients, setClients] = useState<ClientDetails[]>([])
+
+  useEffect(() => {
+    if (!user) {
+      setFlashMessage("Usuário não autenticado", "error")
+      return
+    }
+
+    async function fetchClients() {
+      setIsLoading(true)
+      const response = await requestData<ListClientsData>(`/clients/${user?.id}`, "GET", {}, true)
+      if(response.success && response.data?.clients) {
+        setClients(response.data.clients)
+      }
+      else {
+        setClients([])
+      }
+      setIsLoading(false)
+    }
+    fetchClients()
+  },[user, setFlashMessage])
+
 
   const {
     register,
@@ -42,18 +64,23 @@ function RegisterVehicle() {
       plate: "",
       brand: "",
       color: "",
-      vehicleType: undefined,
-      clientId: "",
+      vehicle_type: undefined,
+      client_id: null,
     },
   })
 
-  const vehicleType = watch("vehicleType")
-  const clientId = watch("clientId")
+  const vehicleType = watch("vehicle_type")
+  const clientId = watch("client_id")
 
-  function onSubmit(data: RegisterVehicleFormData) {
-    console.log("Dados do veículo:", data)
-    console.log("ID do cliente selecionado:", data.clientId)
-    alert("Veículo cadastrado com sucesso!")
+  async function onSubmit(data: RegisterVehicleFormData) {
+    const response = await requestData<RegisterVehicleResponse>("/client/vehicle/register", "POST", data, true)
+    if(response.success && response.data?.status) {
+      setFlashMessage(response.data.message, "success")
+      navigate("/")
+    }
+    else {
+      setFlashMessage(getApiErrorMessage(response), "error")
+    }
   }
 
   return (
@@ -86,14 +113,18 @@ function RegisterVehicle() {
             <ClientSearch
               clients={clients}
               value={clientId}
-              onChange={(id) => setValue("clientId", id, { shouldValidate: true })}
+              onChange={(id) =>
+                setValue("client_id", id, { shouldValidate: true })
+              }
               label="Cliente *"
-              error={errors.clientId?.message}
+              error={errors.client_id?.message}
+              isLoading={isLoading}
             />
+
 
             <Input
               label="Placa *"
-              placeholder="ABC1234 ou ABC1D23"
+              placeholder="ABC1D23"
               leftIcon={<FileText size={18} />}
               {...register("plate")}
               error={errors.plate?.message}
@@ -104,12 +135,12 @@ function RegisterVehicle() {
               value={vehicleType ?? ""}
               onChange={(e) =>
                 setValue(
-                  "vehicleType",
+                  "vehicle_type",
                   Number(e.target.value) as VehicleType,
                   { shouldValidate: true }
                 )
               }
-              error={errors.vehicleType?.message}
+              error={errors.vehicle_type?.message}
             >
               <option value="">Selecione o tipo</option>
 

@@ -17,5 +17,11 @@ export const RegisterClientSchema = z.object({
   email: z
     .string()
     .email("Email inválido."),
+
+  user_id: z
+    .coerce
+    .number()
+    .int("Coordenador invalido")
+    .positive("Id Coordenador invalido"),
 })
 

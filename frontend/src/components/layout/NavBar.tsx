@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { LogIn, UserPlus, User as UserIcon, LogOut, Menu as MenuIcon, X, PlusSquare, Car} from "lucide-react"
 import { Menu, Transition } from "@headlessui/react"
 import { useUser } from "../../context/useUser"
-import type { User } from "../../types/user"
+import type { User } from "../../types/client/user"
 import { requestData } from "../../services/requestApi"
 import useFlashMessage from "../../hooks/useFlashMessage"
 import { type ApiPayload } from "../../types/api"
@@ -38,7 +38,6 @@ function NavBar() {
       navigate("/")
     } else {
       setFlashMessage(response.message || "Erro ao fazer logout", "error")
-      console.log("Erro no logout:", response.message)
     }
   }
 

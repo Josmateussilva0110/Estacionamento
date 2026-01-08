@@ -26,7 +26,11 @@ export const RegisterVehicleSchema = z.object({
         .int("O tipo de veículo deve ser um número inteiro")
         .positive("O tipo de veículo deve ser maior que zero"),
     
-    client_id: z.string().min(1, "Selecione um cliente"),
+    client_id: z   
+        .coerce
+        .number()
+        .int("Coordenador invalido")
+        .positive("Id Coordenador invalido"),
 })
 
 

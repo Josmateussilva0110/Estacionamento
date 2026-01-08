@@ -6,7 +6,7 @@ import {
   Hash
 
 } from "lucide-react"
-import { type ParkingFormData } from "../../../../types/parkingTypes"
+import { type ParkingFormData } from "../../../../types/parking/parkingTypes"
 import type { FormStepProps } from "../../../../types/formStep"
 
 

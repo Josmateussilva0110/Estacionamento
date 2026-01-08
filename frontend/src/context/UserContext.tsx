@@ -15,7 +15,7 @@ import type {
   LoginResponse,
   LogoutResponse,
 } from "../types/authResponses"
-import type { User } from "../types/user"
+import type { User } from "../types/client/user"
 import type { ApiPayload } from "../types/api"
 
 

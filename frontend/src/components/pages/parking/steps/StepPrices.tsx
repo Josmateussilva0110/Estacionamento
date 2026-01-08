@@ -4,7 +4,7 @@ import { Controller } from "react-hook-form"
 import {
   Clock, Car, Bike, Truck, CreditCard, MoonStar, CalendarRange, SunMedium
 } from "lucide-react"
-import { type ParkingFormData } from "../../../../types/parkingTypes"
+import { type ParkingFormData } from "../../../../types/parking/parkingTypes"
 import type { FormStepProps } from "../../../../types/formStep"
 
 

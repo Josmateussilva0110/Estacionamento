@@ -1,9 +1,9 @@
 import type { Knex } from "knex"
 
 export async function up(knex: Knex): Promise<void> {
-  return knex.schema.alterTable("parking", (table) => {
+  return knex.schema.alterTable("clients", (table) => {
     table
-      .integer("created_by")
+      .integer("user_id")
       .unsigned()
       .notNullable()
       .references("id")
@@ -14,7 +14,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  return knex.schema.alterTable("parking", (table) => {
-    table.dropColumn("created_by")
+  return knex.schema.alterTable("clients", (table) => {
+    table.dropColumn("user_id")
   })
 }

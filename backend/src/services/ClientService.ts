@@ -4,6 +4,7 @@ import Vehicle from "../model/Vehicle"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { UserErrorCode } from "../types/code/userCode"
 import { VehicleErrorCode } from "../types/code/vehicleCode"
+import { type ClientResponse } from "../mappers/client.mapper"
 
 
 class ClientService {
@@ -12,6 +13,7 @@ class ClientService {
         email: string
         cpf: string
         phone: string
+        user_id: number
     }): Promise<ServiceResult<{ id: number; username: string }>> {
         try {
             const emailExists = await Client.emailExists(data.email)
@@ -132,6 +134,35 @@ class ClientService {
             }
         }
     } 
+
+    async findClientsByIdUser(user_id: string): Promise<ServiceResult<ClientResponse[]>> {
+        try {
+            const clients = await Client.getClientsByUser(user_id)
+            if (clients.length === 0) {
+                return {
+                    status: false,
+                    error: {
+                    code: UserErrorCode.USER_NOT_FOUND,
+                    message: "Clientes não encontrados",
+                    },
+                }
+            }
+
+
+            return {status: true, data: clients}
+
+        } catch(error) {
+            console.error("ClientService.findClientsByIdUser error:", error)
+
+            return {
+                status: false,
+                error: {
+                    code: UserErrorCode.USER_FETCH_FAILED,
+                    message: "Erro ao buscar clientes",
+                },
+            }
+        }
+    }
 }
 
 export default new ClientService()

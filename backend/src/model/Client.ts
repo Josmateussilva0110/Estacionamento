@@ -1,17 +1,12 @@
 import Model from "./Model"
 import db from "../database/connection/connection"
+import { PgRawResult } from "../types/database/BdResult"
+import { type ClientRow } from "../types/clients/client"
+import { type ClientResponse } from "../mappers/client.mapper"
+import { mapClientRowList } from "../mappers/client.mapper"
 
-export interface ClientData {
-  id?: number
-  username: string
-  cpf: string
-  phone: string
-  email: string
-  created_at?: string 
-  updated_at?: string
-}
 
-class Client extends Model<ClientData> {
+class Client extends Model<ClientRow> {
     constructor() {
         super("clients")
     }
@@ -57,6 +52,41 @@ class Client extends Model<ClientData> {
             return false
         }
     }
+
+    async getClientsByUser(user_id: string): Promise<ClientResponse[]> {
+        try {
+            const result = await db.raw<PgRawResult<ClientRow>>(
+            `
+            select 
+                c.id as client_id, 
+                c.username,
+                c.cpf,
+                c.phone,
+                c.email,
+                c.status,
+                c.updated_at
+            from clients c
+            where c.user_id = ?
+            `,
+            [user_id]
+            )
+
+            if (!result.rows.length) {
+            return []
+            }
+
+            return mapClientRowList(result.rows)
+
+        } catch (err) {
+            console.error(
+            `Erro ao buscar clientes da tabela: ${this.tableName}`,
+            err
+            )
+            return []
+        }
+    }
+
 }
+
 
 export default new Client()

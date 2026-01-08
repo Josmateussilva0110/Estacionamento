@@ -35,7 +35,6 @@ function LoginUser() {
       navigate("/")      
     } else {
       setFlashMessage(response.message || "Erro ao fazer login", "error")
-      console.log("Erro no login:", response.message)
     }
   }
 

@@ -2,7 +2,7 @@ import Input from "../../../ui/Input"
 import {
   Settings, Car, Bike, Truck, Camera, Home, Package, Accessibility, HeartPulse, ShowerHead
 } from "lucide-react"
-import { type ParkingFormData } from "../../../../types/parkingTypes"
+import { type ParkingFormData } from "../../../../types/parking/parkingTypes"
 import type { FormStepProps } from "../../../../types/formStep"
 
 
