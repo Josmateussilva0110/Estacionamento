@@ -93,7 +93,7 @@ function RegisterVehicle() {
 
             <Input
               label="Placa *"
-              placeholder="ABC1234 ou ABC1D23"
+              placeholder="ABC1D23"
               leftIcon={<FileText size={18} />}
               {...register("plate")}
               error={errors.plate?.message}

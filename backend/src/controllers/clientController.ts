@@ -47,6 +47,10 @@ class ClientController {
             plate: result.data
         })
     }
+
+    async getClients(request: Request, response: Response) {
+        
+    }
 }
 
 

@@ -12,6 +12,7 @@ class ClientService {
         email: string
         cpf: string
         phone: string
+        user_id: number
     }): Promise<ServiceResult<{ id: number; username: string }>> {
         try {
             const emailExists = await Client.emailExists(data.email)

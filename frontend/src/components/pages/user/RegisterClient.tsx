@@ -8,41 +8,58 @@ import {
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-
-import { type RegisterClientFormData } from "../../../types/ClientTypes"
+import { type RegisterClientFormInput } from "../../../types/ClientTypes"
+import { type RegisterClientFormOutput } from "../../../types/ClientTypes"
 import { RegisterClientSchema } from "../../../schemas/RegisterClientSchema"
 import Input from "../../ui/Input"
 import { requestData } from "../../../services/requestApi"
 import { type RegisterResponse } from "../../../types/authResponses"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
+import { useUser } from "../../../context/useUser"
 
 
 
 function RegisterClient() {
+  const { user } = useUser()
   const navigate = useNavigate()
   const { setFlashMessage } = useFlashMessage()
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterClientFormData>({
+  } = useForm<RegisterClientFormInput>({
     resolver: zodResolver(RegisterClientSchema),
   })
 
-  async function onSubmit(form: RegisterClientFormData) {
-    const response = await requestData<RegisterResponse>("/client/register", "POST", form, true)
+  
+  async function onSubmit(form: RegisterClientFormInput) {
+    if (!user) {
+      setFlashMessage("Usuário não autenticado", "error")
+      return
+    }
+
+    const payload: RegisterClientFormOutput = {
+      ...form,
+      user_id: user.id, 
+    }
+
+    const response = await requestData<RegisterResponse>(
+      "/client/register",
+      "POST",
+      payload,
+      true
+    )
+
     if (response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
       navigate("/")
-    }
-    else {
-      setFlashMessage(
-        getApiErrorMessage(response),
-        "error"
-      )
+    } else {
+      setFlashMessage(getApiErrorMessage(response), "error")
     }
   }
+
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark flex items-center justify-center px-4 py-10">
