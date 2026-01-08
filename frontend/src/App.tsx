@@ -1,6 +1,6 @@
 import AppRoutes from "./routes/Index";
 import FlashMessage from "./components/ui/Message";
-import NavBar from "./components/layout/NavBar";
+import NavBar from "./components/layout/navbar/NavBar";
 import Footer from "./components/layout/Footer";
 //import { LayoutContainer } from "./components/layout/Container";
 
