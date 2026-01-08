@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
+import { useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Car, FileText, CarFront } from "lucide-react"
 
@@ -18,10 +19,13 @@ import { type ListClientsData } from "../../../types/client/listClientsData"
 import { requestData } from "../../../services/requestApi"
 import { useUser } from "../../../context/useUser"
 import useFlashMessage from "../../../hooks/useFlashMessage"
+import { type RegisterVehicleResponse } from "../../../types/client/clientResponse"
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
 
 function RegisterVehicle() {
+  const navigate = useNavigate()
   const { setFlashMessage } = useFlashMessage()
   const [isLoading, setIsLoading] = useState(true)
   const { user } = useUser()
@@ -60,18 +64,23 @@ function RegisterVehicle() {
       plate: "",
       brand: "",
       color: "",
-      vehicleType: undefined,
-      clientId: null,
+      vehicle_type: undefined,
+      client_id: null,
     },
   })
 
-  const vehicleType = watch("vehicleType")
-  const clientId = watch("clientId")
+  const vehicleType = watch("vehicle_type")
+  const clientId = watch("client_id")
 
-  function onSubmit(data: RegisterVehicleFormData) {
-    console.log("Dados do veículo:", data)
-    console.log("ID do cliente selecionado:", data.clientId)
-    alert("Veículo cadastrado com sucesso!")
+  async function onSubmit(data: RegisterVehicleFormData) {
+    const response = await requestData<RegisterVehicleResponse>("/client/vehicle/register", "POST", data, true)
+    if(response.success && response.data?.status) {
+      setFlashMessage(response.data.message, "success")
+      navigate("/")
+    }
+    else {
+      setFlashMessage(getApiErrorMessage(response), "error")
+    }
   }
 
   return (
@@ -105,10 +114,10 @@ function RegisterVehicle() {
               clients={clients}
               value={clientId}
               onChange={(id) =>
-                setValue("clientId", id, { shouldValidate: true })
+                setValue("client_id", id, { shouldValidate: true })
               }
               label="Cliente *"
-              error={errors.clientId?.message}
+              error={errors.client_id?.message}
               isLoading={isLoading}
             />
 
@@ -126,12 +135,12 @@ function RegisterVehicle() {
               value={vehicleType ?? ""}
               onChange={(e) =>
                 setValue(
-                  "vehicleType",
+                  "vehicle_type",
                   Number(e.target.value) as VehicleType,
                   { shouldValidate: true }
                 )
               }
-              error={errors.vehicleType?.message}
+              error={errors.vehicle_type?.message}
             >
               <option value="">Selecione o tipo</option>
 
