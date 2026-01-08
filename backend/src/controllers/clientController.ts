@@ -48,8 +48,22 @@ class ClientController {
         })
     }
 
-    async getClients(request: Request, response: Response) {
-        
+    async getClients(request: Request, response: Response): Promise<Response> {
+        const { user_id } = request.params
+        const result = await ClientService.findClientsByIdUser(user_id)
+        if (!result.status) {
+            const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            userErrorHttpStatusMap
+            )
+
+            return response.status(httpStatus).json({
+            status: false,
+            message: result.error?.message,
+            })
+        }
+
+        return response.status(200).json({status: true, clients: result.data})   
     }
 }
 
