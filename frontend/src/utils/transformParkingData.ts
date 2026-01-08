@@ -1,5 +1,5 @@
-import type { ParkingEdit } from "../types/parkingEdit"
-import type { ParkingFormData } from "../types/parkingTypes"
+import type { ParkingEdit } from "../types/parking/parkingEdit"
+import type { ParkingFormData } from "../types/parking/parkingTypes"
 
 
 export function mapNumberToAreaType(num: number): "coberta" | "descoberta" | "mista" {

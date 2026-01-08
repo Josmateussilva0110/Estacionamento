@@ -1,45 +1,50 @@
 import { useState, useRef, useEffect } from "react"
 import { X, User } from "lucide-react"
-
-interface Client {
-  id: string
-  name: string
-  cpf: string
-}
+import { type ClientDetails } from "../../types/client/clientDetail"
 
 interface ClientSearchProps {
-  clients: Client[]
-  value: string
-  onChange: (clientId: string) => void
+  clients: ClientDetails[]
+  value: number | null
+  onChange: (clientId: number | null) => void
   label?: string
   error?: string
+  isLoading?: boolean
 }
 
-export function ClientSearch({ 
-  clients, 
-  value, 
-  onChange, 
+export function ClientSearch({
+  clients,
+  value,
+  onChange,
   label,
-  error 
+  error,
+  isLoading = false,
 }: ClientSearchProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+  const [selectedClient, setSelectedClient] =
+    useState<ClientDetails | null>(null)
+
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const hasClients = clients.length > 0
 
 
   useEffect(() => {
-    const client = clients.find(c => c.id === value)
-    setSelectedClient(client || null)
+    const client = clients.find((c) => c.id === value) || null
+    setSelectedClient(client)
+
     if (client) {
-      setSearchTerm(client.name)
+      setSearchTerm(client.username)
     }
   }, [value, clients])
 
-
+  // Fecha dropdown ao clicar fora
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false)
       }
     }
@@ -48,15 +53,15 @@ export function ClientSearch({
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.cpf.includes(searchTerm)
+  const filteredClients = clients.filter(
+    (client) =>
+      client.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      client.cpf.includes(searchTerm)
   )
 
-  function handleSelect(client: Client) {
+  function handleSelect(client: ClientDetails) {
     setSelectedClient(client)
-    setSearchTerm(client.name)
+    setSearchTerm(client.username)
     onChange(client.id)
     setIsOpen(false)
   }
@@ -64,17 +69,20 @@ export function ClientSearch({
   function handleClear() {
     setSelectedClient(null)
     setSearchTerm("")
-    onChange("")
+    onChange(null)
     setIsOpen(false)
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setSearchTerm(e.target.value)
-    setIsOpen(true)
-    if (!e.target.value) {
-      onChange("")
+    const value = e.target.value
+    setSearchTerm(value)
+
+    if (!value) {
+      onChange(null)
       setSelectedClient(null)
     }
+
+    setIsOpen(true)
   }
 
   return (
@@ -93,20 +101,28 @@ export function ClientSearch({
 
           <input
             type="text"
+            disabled={isLoading || !hasClients}
             value={searchTerm}
             onChange={handleInputChange}
-            onFocus={() => setIsOpen(true)}
-            placeholder="Buscar cliente por nome ou CPF..."
+            onFocus={() => hasClients && setIsOpen(true)}
+            placeholder={
+              isLoading
+                ? "Carregando clientes..."
+                : !hasClients
+                ? "Nenhum cliente cadastrado"
+                : "Buscar cliente por nome ou CPF..."
+            }
             className={`
               w-full pl-10 pr-10 py-2.5 
               border rounded-lg
               focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${error ? 'border-red-500' : 'border-gray-300'}
-              ${selectedClient ? 'bg-blue-50' : 'bg-white'}
+              ${error ? "border-red-500" : "border-gray-300"}
+              ${selectedClient ? "bg-blue-50" : "bg-white"}
+              ${!hasClients ? "bg-gray-100 cursor-not-allowed" : ""}
             `}
           />
 
-          {searchTerm && (
+          {searchTerm && hasClients && (
             <button
               type="button"
               onClick={handleClear}
@@ -118,43 +134,62 @@ export function ClientSearch({
         </div>
 
         {/* Dropdown */}
-        {isOpen && filteredClients.length > 0 && (
+        {isOpen && hasClients && (
           <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-            {filteredClients.map((client) => (
-              <button
-                key={client.id}
-                type="button"
-                onClick={() => handleSelect(client)}
-                className={`
-                  w-full px-4 py-3 text-left hover:bg-blue-50
-                  border-b border-gray-100 last:border-b-0
-                  transition-colors
-                  ${selectedClient?.id === client.id ? 'bg-blue-100' : ''}
-                `}
-              >
-                <div className="font-medium text-gray-900">{client.name}</div>
-                <div className="text-sm text-gray-500">CPF: {client.cpf}</div>
-              </button>
-            ))}
-          </div>
-        )}
+            {isLoading && (
+              <div className="p-4 text-center text-gray-500">
+                Carregando clientes...
+              </div>
+            )}
 
-        {/* Nenhum resultado */}
-        {isOpen && searchTerm && filteredClients.length === 0 && (
-          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg p-4 text-center text-gray-500">
-            Nenhum cliente encontrado
+            {!isLoading && filteredClients.length > 0 && (
+              filteredClients.map((client) => (
+                <button
+                  key={client.id}
+                  type="button"
+                  onClick={() => handleSelect(client)}
+                  className={`
+                    w-full px-4 py-3 text-left hover:bg-blue-50
+                    border-b border-gray-100 last:border-b-0
+                    transition-colors
+                    ${
+                      selectedClient?.id === client.id
+                        ? "bg-blue-100"
+                        : ""
+                    }
+                  `}
+                >
+                  <div className="font-medium text-gray-900">
+                    {client.username}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    CPF: {client.cpf}
+                  </div>
+                </button>
+              ))
+            )}
+
+            {!isLoading && filteredClients.length === 0 && (
+              <div className="p-4 text-center text-gray-500">
+                Nenhum cliente encontrado
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
+      {!isLoading && !hasClients && (
+        <p className="text-sm text-gray-500">
+          Não há clientes cadastrados
+        </p>
       )}
+
+      {error && <p className="text-sm text-red-600">{error}</p>}
 
       {selectedClient && (
         <div className="text-sm text-green-600 flex items-center gap-1">
           <span>✓</span>
-          <span>Cliente selecionado: {selectedClient.name}</span>
+          <span>Cliente selecionado: {selectedClient.username}</span>
         </div>
       )}
     </div>

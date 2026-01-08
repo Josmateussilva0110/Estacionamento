@@ -14,8 +14,8 @@ import {
 
 import { SummaryCard } from "../../layout/SumaryCard"
 import { requestData } from "../../../services/requestApi"
-import type { ParkingData } from "../../../types/parkingEditResponse"
-import type { ParkingEdit as ParkingEditType } from "../../../types/parkingEdit"
+import type { ParkingData } from "../../../types/parking/parkingEditResponse"
+import type { ParkingEdit as ParkingEditType } from "../../../types/parking/parkingEdit"
 
 /* Helpers */
 const formatPeriod = (

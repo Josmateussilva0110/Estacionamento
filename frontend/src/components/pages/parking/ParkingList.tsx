@@ -18,9 +18,9 @@ import {
     Camera,
     Bike
 } from "lucide-react"
-import { type ListParkingData } from "../../../types/listParking"
-import { type ParkingDetails } from "../../../types/parkingDetail"
-import { type RemoveParkingResponse } from "../../../types/parkingResponses"
+import { type ListParkingData } from "../../../types/parking/listParking"
+import { type ParkingDetails } from "../../../types/parking/parkingDetail"
+import { type RemoveParkingResponse } from "../../../types/parking/parkingResponses"
 import { requestData } from "../../../services/requestApi"
 import { useUser } from "../../../context/useUser"
 import useFlashMessage from "../../../hooks/useFlashMessage"

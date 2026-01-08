@@ -26,6 +26,9 @@ export const RegisterVehicleSchema = z.object({
         .int("O tipo de veículo deve ser um número inteiro")
         .positive("O tipo de veículo deve ser maior que zero"),
     
-    clientId: z.string().min(1, "Selecione um cliente"),
+    clientId: z.number().nullable().refine(
+        (val) => val !== null,
+        { message: "Cliente é obrigatório" }
+    ),
 })
 

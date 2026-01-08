@@ -1,4 +1,4 @@
-import type { User } from "./user"
+import type { User } from "./client/user"
 import type { ApiPayload } from "./api"
 
 export type RegisterResponse = ApiPayload

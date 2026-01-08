@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { requestData } from "../services/requestApi"
 import type { ApiResponse } from "../types/api"
-import type { User } from "../types/user"
+import type { User } from "../types/client/user"
 import type {
   RegisterResponse,
   LoginResponse,

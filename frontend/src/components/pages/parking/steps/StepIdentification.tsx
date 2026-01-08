@@ -1,6 +1,6 @@
 import Input from "../../../ui/Input"
 import { Building2, User } from "lucide-react"
-import { type ParkingFormData } from "../../../../types/parkingTypes"
+import { type ParkingFormData } from "../../../../types/parking/parkingTypes"
 import type { FormStepProps } from "../../../../types/formStep"
 
 export function StepIdentification({ register, errors }: FormStepProps<ParkingFormData>) {
