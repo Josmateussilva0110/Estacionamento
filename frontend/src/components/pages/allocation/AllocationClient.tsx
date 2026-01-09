@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   Car,
@@ -19,6 +19,14 @@ import {
   UserPlus
 } from "lucide-react"
 
+import { useUser } from "../../../context/useUser"
+import { type ClientVehicle } from "../../../types/client/clientVehicle"
+import { requestData } from "../../../services/requestApi"
+import useFlashMessage from "../../../hooks/useFlashMessage"
+import { type ListClientsVehicleData } from "../../../types/client/listClientVehicle"
+
+
+
 // Mock data - substituir por dados reais da API
 const mockParkingSpots = [
   { id: 1, number: "A-01", type: "car", status: "available", floor: "Térreo" },
@@ -31,34 +39,54 @@ const mockParkingSpots = [
   { id: 8, number: "C-02", type: "truck", status: "occupied", floor: "1º Andar" },
 ]
 
-const mockClients = [
-  { id: 1, name: "João Silva", phone: "(85) 98765-4321", plate: "ABC-1234", vehicle: "Fiat Uno Branco" },
-  { id: 2, name: "Maria Santos", phone: "(85) 99876-5432", plate: "XYZ-5678", vehicle: "Honda CG 160 Preta" },
-  { id: 3, name: "Pedro Oliveira", phone: "(85) 97654-3210", plate: "DEF-9012", vehicle: "Toyota Hilux Prata" },
-]
 
 type VehicleType = "car" | "moto" | "truck"
 //type SpotStatus = "available" | "occupied" | "reserved"
 
 function ParkingAllocation() {
+  const { user } = useUser()
+  const { setFlashMessage } = useFlashMessage()
+  const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
   const [step, setStep] = useState<"search" | "select-spot" | "confirm">("search")
-  
+  const [clients, setClients] = useState<ClientVehicle[]>([])
+
+  useEffect(() => {
+    if (!user) {
+      setFlashMessage("Usuário não autenticado", "error")
+      return
+    }
+    async function fetchClientVehicle() {
+      setIsLoading(true)
+      const response = await requestData<ListClientsVehicleData>(`/clients/vehicle/${user?.id}`, "GET", {}, true)
+      console.log(response)
+      if (response.success && response.data?.clients) {
+        setClients(response.data.clients)
+      }
+      else {
+        setClients([])
+      }
+      setIsLoading(false)
+    }
+    fetchClientVehicle()
+  }, [user, setFlashMessage])
+
+
   // Cliente
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedClient, setSelectedClient] = useState<typeof mockClients[0] | null>(null)
+  const [selectedClient, setSelectedClient] = useState<typeof clients[0] | null>(null)
   const [vehicleType, setVehicleType] = useState<VehicleType>("car")
-  
+
   // Vaga
   const [selectedSpot, setSelectedSpot] = useState<typeof mockParkingSpots[0] | null>(null)
   const [filterType, setFilterType] = useState<VehicleType | "all">("all")
   const [filterFloor, setFilterFloor] = useState<string>("all")
-  
+
   // Entrada
   const [entryDate, setEntryDate] = useState(new Date().toISOString().slice(0, 16))
   const [observations, setObservations] = useState("")
 
-  const filteredClients = mockClients.filter(client =>
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.phone.includes(searchTerm)
@@ -107,7 +135,7 @@ function ParkingAllocation() {
     }
   }
 
-  function handleClientSelect(client: typeof mockClients[0]) {
+  function handleClientSelect(client: typeof clients[0]) {
     setSelectedClient(client)
     setStep("select-spot")
   }
@@ -174,10 +202,9 @@ function ParkingAllocation() {
             <div className="flex items-center justify-between max-w-2xl mx-auto">
               {/* Step 1 */}
               <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                  step === "search" ? "bg-blue-600 text-white scale-110" : 
-                  selectedClient ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"
-                }`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step === "search" ? "bg-blue-600 text-white scale-110" :
+                    selectedClient ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"
+                  }`}>
                   {selectedClient ? <CheckCircle2 size={20} /> : "1"}
                 </div>
                 <span className={`text-sm font-medium ${step === "search" ? "text-blue-600" : "text-gray-500"}`}>
@@ -189,10 +216,9 @@ function ParkingAllocation() {
 
               {/* Step 2 */}
               <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                  step === "select-spot" ? "bg-blue-600 text-white scale-110" : 
-                  selectedSpot ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"
-                }`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step === "select-spot" ? "bg-blue-600 text-white scale-110" :
+                    selectedSpot ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"
+                  }`}>
                   {selectedSpot ? <CheckCircle2 size={20} /> : "2"}
                 </div>
                 <span className={`text-sm font-medium ${step === "select-spot" ? "text-blue-600" : "text-gray-500"}`}>
@@ -204,9 +230,8 @@ function ParkingAllocation() {
 
               {/* Step 3 */}
               <div className="flex flex-col items-center gap-2 flex-1">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-                  step === "confirm" ? "bg-blue-600 text-white scale-110" : "bg-gray-200 text-gray-500"
-                }`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${step === "confirm" ? "bg-blue-600 text-white scale-110" : "bg-gray-200 text-gray-500"
+                  }`}>
                   3
                 </div>
                 <span className={`text-sm font-medium ${step === "confirm" ? "text-blue-600" : "text-gray-500"}`}>
@@ -240,14 +265,16 @@ function ParkingAllocation() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Digite nome, telefone ou placa..."
-                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg"
+                    disabled={isLoading}
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg disabled:opacity-60"
                   />
                 </div>
 
                 {/* New Client Button */}
                 <button
                   onClick={() => navigate("/client/register")}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-linear-to-r from-emerald-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg"
+                  disabled={isLoading}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-linear-to-r from-emerald-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-60"
                 >
                   <UserPlus size={20} />
                   Cadastrar Novo Cliente
@@ -255,12 +282,37 @@ function ParkingAllocation() {
 
                 {/* Client List */}
                 <div className="space-y-3">
-                  {filteredClients.length === 0 ? (
+                  {/* LOADING */}
+                  {isLoading && (
+                    <>
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        <div
+                          key={index}
+                          className="w-full p-5 bg-slate-100 border-2 border-slate-200 rounded-xl animate-pulse"
+                        >
+                          <div className="flex gap-4">
+                            <div className="w-12 h-12 bg-slate-300 rounded-full" />
+                            <div className="flex-1 space-y-2">
+                              <div className="h-4 bg-slate-300 rounded w-1/2" />
+                              <div className="h-3 bg-slate-300 rounded w-1/3" />
+                              <div className="h-3 bg-slate-300 rounded w-1/4" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+
+                  {/* EMPTY STATE */}
+                  {!isLoading && filteredClients.length === 0 && (
                     <div className="text-center py-12 text-gray-500">
                       <User className="w-12 h-12 mx-auto mb-3 text-gray-400" />
                       <p>Nenhum cliente encontrado</p>
                     </div>
-                  ) : (
+                  )}
+
+                  {/* LIST */}
+                  {!isLoading &&
                     filteredClients.map((client) => (
                       <button
                         key={client.id}
@@ -272,19 +324,23 @@ function ParkingAllocation() {
                             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors">
                               <User className="w-6 h-6 text-blue-600" />
                             </div>
+
                             <div className="flex-1 min-w-0">
                               <h3 className="text-lg font-bold text-gray-800 mb-1">
                                 {client.name}
                               </h3>
+
                               <div className="space-y-1 text-sm text-gray-600">
                                 <div className="flex items-center gap-2">
                                   <Phone className="w-4 h-4" />
                                   {client.phone}
                                 </div>
+
                                 <div className="flex items-center gap-2">
                                   <CreditCard className="w-4 h-4" />
                                   {client.plate}
                                 </div>
+
                                 <div className="flex items-center gap-2">
                                   <Car className="w-4 h-4" />
                                   {client.vehicle}
@@ -292,14 +348,15 @@ function ParkingAllocation() {
                               </div>
                             </div>
                           </div>
+
                           <ChevronDown className="w-5 h-5 text-gray-400 transform -rotate-90 group-hover:text-blue-600" />
                         </div>
                       </button>
-                    ))
-                  )}
+                    ))}
                 </div>
               </div>
             )}
+
 
             {/* STEP 2: Selecionar Vaga */}
             {step === "select-spot" && (
@@ -348,11 +405,10 @@ function ParkingAllocation() {
                           setVehicleType(type)
                           setFilterType(type)
                         }}
-                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-                          vehicleType === type
+                        className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${vehicleType === type
                             ? "bg-blue-50 border-blue-500 text-blue-700"
                             : "bg-slate-50 border-slate-200 text-gray-600 hover:border-slate-300"
-                        }`}
+                          }`}
                       >
                         {getVehicleIcon(type)}
                         <span className="font-semibold text-sm">{getVehicleLabel(type)}</span>
@@ -389,24 +445,21 @@ function ParkingAllocation() {
                         key={spot.id}
                         onClick={() => handleSpotSelect(spot)}
                         disabled={spot.status !== "available"}
-                        className={`p-5 rounded-xl border-2 transition-all ${
-                          spot.status === "available"
+                        className={`p-5 rounded-xl border-2 transition-all ${spot.status === "available"
                             ? "bg-green-50 border-green-300 hover:bg-green-100 hover:border-green-400 hover:shadow-lg transform hover:-translate-y-1"
                             : getStatusColor(spot.status)
-                        } disabled:cursor-not-allowed disabled:hover:transform-none`}
+                          } disabled:cursor-not-allowed disabled:hover:transform-none`}
                       >
                         <div className="flex flex-col items-center gap-2">
-                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                            spot.status === "available" ? "bg-green-200" : "bg-gray-200"
-                          }`}>
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${spot.status === "available" ? "bg-green-200" : "bg-gray-200"
+                            }`}>
                             {getVehicleIcon(spot.type as VehicleType)}
                           </div>
                           <div className="text-center">
                             <p className="font-bold text-lg">{spot.number}</p>
                             <p className="text-xs text-gray-600">{spot.floor}</p>
-                            <span className={`text-xs font-semibold mt-1 inline-block px-2 py-1 rounded ${
-                              spot.status === "available" ? "bg-green-200 text-green-800" : ""
-                            }`}>
+                            <span className={`text-xs font-semibold mt-1 inline-block px-2 py-1 rounded ${spot.status === "available" ? "bg-green-200 text-green-800" : ""
+                              }`}>
                               {getStatusLabel(spot.status)}
                             </span>
                           </div>
