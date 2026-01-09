@@ -5,6 +5,7 @@ import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { UserErrorCode } from "../types/code/userCode"
 import { VehicleErrorCode } from "../types/code/vehicleCode"
 import { type ClientResponse } from "../mappers/client.mapper"
+import { type ClientVehicleResponse } from "../mappers/clientVehicle.mapper"
 
 
 class ClientService {
@@ -158,8 +159,34 @@ class ClientService {
                 status: false,
                 error: {
                     code: UserErrorCode.USER_FETCH_FAILED,
-                    message: "Erro ao buscar clientes",
+                    message: "Erro interno ao buscar clientes",
                 },
+            }
+        }
+    }
+
+    async findClientsAndVehicle(user_id: string): Promise<ServiceResult<ClientVehicleResponse[]>> {
+        try {
+            const clients = await Client.clientAndVehicle(user_id)
+            if(clients.length === 0) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.USER_NOT_FOUND,
+                        message: "Clientes não encontrados"
+                    }
+                }
+            }
+
+            return { status: true, data: clients}
+        } catch(error) {
+            console.error("ClientService.findClientsAndVehicle error:", error)
+            return {
+                status: false,
+                error: {
+                    code: UserErrorCode.USER_FETCH_FAILED,
+                    message: "Erro interno ao buscar clientes"
+                }
             }
         }
     }

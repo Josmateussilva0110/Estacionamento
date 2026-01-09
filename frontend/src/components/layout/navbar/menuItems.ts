@@ -3,6 +3,7 @@ import {
   UserPlus,
   Car,
   ParkingSquare,
+  MapPinPlus
 } from "lucide-react"
 
 export const MENU_ITEMS = [
@@ -25,5 +26,10 @@ export const MENU_ITEMS = [
     label: "Adicionar Veículo",
     to: "/client/vehicle/register",
     icon: Car,
+  },
+  {
+    label: "Alocar cliente",
+    to: "/parking/allocation",
+    icon: MapPinPlus,
   },
 ]
