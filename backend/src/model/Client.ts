@@ -100,6 +100,7 @@ class Client extends Model<ClientRow> {
                     inner join vehicles v 
                         on v.client_id = c.id
                     where c.user_id = ?
+                    order by c.updated_at desc
                 `
                 ,[user_id]
             )
