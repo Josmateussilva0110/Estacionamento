@@ -1,5 +1,19 @@
 import { User, MapPin, Calendar, CheckCircle2 } from "lucide-react"
 import { getVehicleLabel } from "../utils/vehicleUtils"
+import { type ClientVehicle } from "../../../../types/client/clientVehicle"
+import { type ParkingSpot } from "../types"
+
+interface ConfirmStepProps {
+  selectedClient: ClientVehicle | null
+  selectedSpot: ParkingSpot | null
+  entryDate: string
+  setEntryDate: (date: string) => void
+  observations: string
+  setObservations: (obs: string) => void
+  onConfirm: () => void
+  onCancel: () => void
+  onBack: () => void
+}
 
 function ConfirmStep({
   selectedClient,
@@ -11,7 +25,7 @@ function ConfirmStep({
   onConfirm,
   onCancel,
   onBack
-}) {
+}: ConfirmStepProps) {
   return (
     <div className="space-y-6">
       <div>
@@ -51,7 +65,7 @@ function ConfirmStep({
           </div>
           <div className="space-y-2 text-sm">
             <p><span className="font-semibold">Número:</span> {selectedSpot?.number}</p>
-            <p><span className="font-semibold">Tipo:</span> {getVehicleLabel(selectedSpot?.type)}</p>
+            <p><span className="font-semibold">Tipo:</span> {selectedSpot && getVehicleLabel(selectedSpot.type)}</p>
             <p><span className="font-semibold">Andar:</span> {selectedSpot?.floor}</p>
             <p><span className="font-semibold">Status:</span> Disponível</p>
           </div>
@@ -103,7 +117,7 @@ function ConfirmStep({
         </button>
         <button
           onClick={onConfirm}
-          className="flex-1 px-6 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg flex items-center justify-center gap-2"
+          className="flex-1 px-6 py-4 bg-linear-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg flex items-center justify-center gap-2"
         >
           <CheckCircle2 size={20} />
           Confirmar Alocação

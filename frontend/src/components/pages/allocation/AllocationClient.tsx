@@ -1,41 +1,65 @@
-import { useState } from "react"
-import Header from "../../components/ParkingAllocation/Header"
-import ProgressSteps from "../../components/ParkingAllocation/ProgressSteps"
-import SearchClientStep from "../../components/ParkingAllocation/steps/SearchClientStep"
-import SelectSpotStep from "../../components/ParkingAllocation/steps/SelectSpotStep"
-import ConfirmStep from "../../components/ParkingAllocation/steps/ConfirmStep"
+import { useState, useEffect } from "react"
+import Header from "../allocation/Header"
+import ProgressSteps from "../allocation/ProgressSteps"
+import SearchClientStep from "../allocation/steps/StepSearchClient"
+import SelectSpotStep from "../allocation/steps/StepSelectSpot"
+import ConfirmStep from "../allocation/steps/StepConfirmAllocation"
+import { type VehicleType } from "../allocation/utils/vehicleUtils"
+import { type ParkingSpot, type Step } from "../allocation/types/index"
+import { useUser } from "../../../context/useUser"
+import { type ClientVehicle } from "../../../types/client/clientVehicle"
+import { requestData } from "../../../services/requestApi"
+import useFlashMessage from "../../../hooks/useFlashMessage"
+import { type ListClientsVehicleData } from "../../../types/client/listClientVehicle"
 
-const mockClients = [
-  { id: 1, name: "João Silva", phone: "(11) 98765-4321", plate: "ABC-1234", vehicle: "Honda Civic 2020" },
-  { id: 2, name: "Maria Santos", phone: "(11) 97654-3210", plate: "XYZ-5678", vehicle: "Toyota Corolla 2021" },
-  { id: 3, name: "Pedro Costa", phone: "(11) 96543-2109", plate: "DEF-9012", vehicle: "Yamaha Fazer 250" },
-]
 
 function ParkingAllocation() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [step, setStep] = useState("search")
-  const [clients] = useState(mockClients)
+  const { user } = useUser()
+  const { setFlashMessage } = useFlashMessage()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [step, setStep] = useState<Step>("search")
+  const [clients, setClients] = useState<ClientVehicle[]>([])
+
+  useEffect(() => {
+    if (!user) {
+      setFlashMessage("Usuário não autenticado", "error")
+      return
+    }
+    async function fetchClientVehicle() {
+      setIsLoading(true)
+      const response = await requestData<ListClientsVehicleData>(`/clients/vehicle/${user?.id}`, "GET", {}, true)
+      console.log(response)
+      if (response.success && response.data?.clients) {
+        setClients(response.data.clients)
+      }
+      else {
+        setClients([])
+      }
+      setIsLoading(false)
+    }
+    fetchClientVehicle()
+  }, [user, setFlashMessage])
 
   // Cliente
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedClient, setSelectedClient] = useState(null)
-  const [vehicleType, setVehicleType] = useState("car")
+  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [selectedClient, setSelectedClient] = useState<ClientVehicle | null>(null)
+  const [vehicleType, setVehicleType] = useState<VehicleType>("car")
 
   // Vaga
-  const [selectedSpot, setSelectedSpot] = useState(null)
-  const [filterType, setFilterType] = useState("all")
-  const [filterFloor, setFilterFloor] = useState("all")
+  const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null)
+  const [filterType, setFilterType] = useState<VehicleType | "all">("all")
+  const [filterFloor, setFilterFloor] = useState<string>("all")
 
   // Entrada
-  const [entryDate, setEntryDate] = useState(new Date().toISOString().slice(0, 16))
-  const [observations, setObservations] = useState("")
+  const [entryDate, setEntryDate] = useState<string>(new Date().toISOString().slice(0, 16))
+  const [observations, setObservations] = useState<string>("")
 
-  function handleClientSelect(client) {
+  function handleClientSelect(client: ClientVehicle) {
     setSelectedClient(client)
     setStep("select-spot")
   }
 
-  function handleSpotSelect(spot) {
+  function handleSpotSelect(spot: ParkingSpot) {
     setSelectedSpot(spot)
     setStep("confirm")
   }
@@ -61,7 +85,7 @@ function ParkingAllocation() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-600 via-blue-700 to-blue-900 py-8 px-4">
+    <div className="min-h-screen bg-linear-to-r from-blue-600 via-blue-700 to-blue-900 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <Header onBack={() => alert("Voltando...")} />
 

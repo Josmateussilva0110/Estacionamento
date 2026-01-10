@@ -1,6 +1,10 @@
 import { MapPin, ArrowLeft } from "lucide-react"
 
-function Header({ onBack }) {
+interface HeaderProps {
+  onBack: () => void
+}
+
+function Header({ onBack }: HeaderProps) {
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6">
       <div className="bg-linear-to-r from-blue-600 to-blue-500 px-8 py-8">

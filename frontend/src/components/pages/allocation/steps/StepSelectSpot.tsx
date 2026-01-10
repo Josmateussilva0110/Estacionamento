@@ -1,8 +1,10 @@
 import { User, Filter, AlertCircle, X } from "lucide-react"
-import { getVehicleIcon, getVehicleLabel } from "../utils/vehicleUtils"
+import { type VehicleType, getVehicleIcon, getVehicleLabel } from "../utils/vehicleUtils"
 import { getStatusColor, getStatusLabel } from "../utils/statusUtils"
+import { type ParkingSpot } from "../types"
+import { type ClientVehicle } from "../../../../types/client/clientVehicle"
 
-const mockParkingSpots = [
+const mockParkingSpots: ParkingSpot[] = [
   { id: 1, number: "A-01", type: "car", status: "available", floor: "Térreo" },
   { id: 2, number: "A-02", type: "car", status: "occupied", floor: "Térreo" },
   { id: 3, number: "A-03", type: "car", status: "available", floor: "Térreo" },
@@ -13,6 +15,17 @@ const mockParkingSpots = [
   { id: 8, number: "C-02", type: "truck", status: "occupied", floor: "1º Andar" },
 ]
 
+interface SelectSpotStepProps {
+  selectedClient: ClientVehicle | null
+  vehicleType: VehicleType
+  setVehicleType: (type: VehicleType) => void
+  filterFloor: string
+  setFilterFloor: (floor: string) => void
+  setFilterType: (type: VehicleType | "all") => void
+  onSpotSelect: (spot: ParkingSpot) => void
+  onChangeClient: () => void
+}
+
 function SelectSpotStep({
   selectedClient,
   vehicleType,
@@ -22,7 +35,7 @@ function SelectSpotStep({
   setFilterType,
   onSpotSelect,
   onChangeClient
-}) {
+}: SelectSpotStepProps) {
   const filteredSpots = mockParkingSpots.filter(spot => {
     const matchType = vehicleType === spot.type
     const matchFloor = filterFloor === "all" || spot.floor === filterFloor
@@ -71,7 +84,7 @@ function SelectSpotStep({
           Tipo de Veículo
         </label>
         <div className="grid grid-cols-3 gap-3">
-          {(["car", "moto", "truck"]).map((type) => (
+          {(["car", "moto", "truck"] as VehicleType[]).map((type) => (
             <button
               key={type}
               onClick={() => {

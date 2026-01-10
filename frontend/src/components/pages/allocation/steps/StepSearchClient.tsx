@@ -1,4 +1,13 @@
 import { Search, User, Phone, CreditCard, Car, ChevronDown, UserPlus } from "lucide-react"
+import { type ClientVehicle } from "../../../../types/client/clientVehicle"
+interface SearchClientStepProps {
+  searchTerm: string
+  setSearchTerm: (term: string) => void
+  clients: ClientVehicle[]
+  isLoading: boolean
+  onClientSelect: (client: ClientVehicle) => void
+  onNewClient: () => void
+}
 
 function SearchClientStep({ 
   searchTerm, 
@@ -7,7 +16,7 @@ function SearchClientStep({
   isLoading, 
   onClientSelect,
   onNewClient 
-}) {
+}: SearchClientStepProps) {
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -38,17 +47,17 @@ function SearchClientStep({
         />
       </div>
 
-      {/* New Client Button */}
+      {/* New ClientVehicle Button */}
       <button
         onClick={onNewClient}
         disabled={isLoading}
-        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-60"
+        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-linear-to-r from-emerald-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-60"
       >
         <UserPlus size={20} />
         Cadastrar Novo Cliente
       </button>
 
-      {/* Client List */}
+      {/* ClientVehicle List */}
       <div className="space-y-3">
         {/* LOADING */}
         {isLoading && (

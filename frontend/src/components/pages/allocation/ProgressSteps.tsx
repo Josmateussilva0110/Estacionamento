@@ -1,6 +1,14 @@
 import { CheckCircle2 } from "lucide-react"
+import { type ClientVehicle } from "../../../types/client/clientVehicle"
+import { type Step, type ParkingSpot } from "./types"
 
-function ProgressSteps({ step, selectedClient, selectedSpot }) {
+interface ProgressStepsProps {
+  step: Step
+  selectedClient: ClientVehicle | null
+  selectedSpot: ParkingSpot | null
+}
+
+function ProgressSteps({ step, selectedClient, selectedSpot }: ProgressStepsProps) {
   return (
     <div className="px-8 py-6 border-b border-slate-200 bg-slate-50">
       <div className="flex items-center justify-between max-w-2xl mx-auto">
