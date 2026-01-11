@@ -52,17 +52,6 @@ class UserController {
   }
 
 
-
-  /*async list(request: Request, response: Response): Promise<Response> {
-    try {
-      const users = await User.findAll()
-      return response.status(200).json(users)
-    } catch (err) {
-      console.error("Error in UserController.list:", err)
-      return response.status(500).json({status: false, message: "Internal server error" })
-    }
-  }*/
-
   async getById(request: Request, response: Response): Promise<Response> {
     const { id } = request.params
     const result = await UserService.findById(id)

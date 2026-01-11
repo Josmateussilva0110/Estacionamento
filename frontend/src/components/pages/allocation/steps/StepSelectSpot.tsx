@@ -104,20 +104,6 @@ function SelectSpotStep({
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-3 items-center">
-        <Filter className="w-5 h-5 text-gray-500" />
-        <select
-          value={filterFloor}
-          onChange={(e) => setFilterFloor(e.target.value)}
-          className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-        >
-          <option value="all">Todos os andares</option>
-          {floors.map(floor => (
-            <option key={floor} value={floor}>{floor}</option>
-          ))}
-        </select>
-      </div>
 
       {/* Spots Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
