@@ -1,13 +1,16 @@
+import { useNavigate } from "react-router-dom"
 import { Search, User, Phone, CreditCard, Car, ChevronDown, UserPlus } from "lucide-react"
 import { type ClientVehicle } from "../../../../types/client/clientVehicle"
+
+
 interface SearchClientStepProps {
   searchTerm: string
   setSearchTerm: (term: string) => void
   clients: ClientVehicle[]
   isLoading: boolean
   onClientSelect: (client: ClientVehicle) => void
-  onNewClient: () => void
 }
+
 
 function SearchClientStep({ 
   searchTerm, 
@@ -15,8 +18,12 @@ function SearchClientStep({
   clients, 
   isLoading, 
   onClientSelect,
-  onNewClient 
 }: SearchClientStepProps) {
+  const navigate = useNavigate()
+
+  const handleNewClient = () => {
+    navigate("/client/register") 
+  }
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -49,7 +56,7 @@ function SearchClientStep({
 
       {/* New ClientVehicle Button */}
       <button
-        onClick={onNewClient}
+        onClick={handleNewClient}
         disabled={isLoading}
         className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-linear-to-r from-emerald-500 to-emerald-600 text-white font-semibold rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-60"
       >
