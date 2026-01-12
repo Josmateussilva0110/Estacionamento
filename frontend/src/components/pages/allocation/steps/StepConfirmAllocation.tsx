@@ -1,11 +1,17 @@
 import { User, MapPin, Calendar, CheckCircle2 } from "lucide-react"
 import { getVehicleLabel } from "../utils/vehicleUtils"
 import { type ClientVehicle } from "../../../../types/client/clientVehicle"
-import { type ParkingSpot } from "../types"
+import { type VehicleType } from "../utils/vehicleUtils"
+
+
+interface SelectedSpotInfo {
+  type: VehicleType | "pcd" | "elderly"
+  parkingId: string
+}
 
 interface ConfirmStepProps {
   selectedClient: ClientVehicle | null
-  selectedSpot: ParkingSpot | null
+  selectedSpot: SelectedSpotInfo | null  
   entryDate: string
   setEntryDate: (date: string) => void
   observations: string
@@ -26,6 +32,12 @@ function ConfirmStep({
   onCancel,
   onBack
 }: ConfirmStepProps) {
+  const getSpotTypeLabel = (type: VehicleType | "pcd" | "elderly") => {
+    if (type === "pcd") return "PCD"
+    if (type === "elderly") return "Idoso"
+    return getVehicleLabel(type as VehicleType)
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -64,10 +76,9 @@ function ConfirmStep({
             <h3 className="text-lg font-bold text-gray-800">Vaga</h3>
           </div>
           <div className="space-y-2 text-sm">
-            <p><span className="font-semibold">Número:</span> {selectedSpot?.number}</p>
-            <p><span className="font-semibold">Tipo:</span> {selectedSpot && getVehicleLabel(selectedSpot.type)}</p>
-            <p><span className="font-semibold">Andar:</span> {selectedSpot?.floor}</p>
-            <p><span className="font-semibold">Status:</span> Disponível</p>
+            <p><span className="font-semibold">Tipo:</span> {selectedSpot && getSpotTypeLabel(selectedSpot.type)}</p>
+            <p><span className="font-semibold">ID do Estacionamento:</span> {selectedSpot?.parkingId}</p>
+            <p><span className="font-semibold">Status:</span> <span className="text-green-600 font-semibold">Disponível</span></p>
           </div>
         </div>
       </div>

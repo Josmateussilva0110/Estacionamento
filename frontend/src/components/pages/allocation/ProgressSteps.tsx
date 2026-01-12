@@ -1,58 +1,81 @@
-import { CheckCircle2 } from "lucide-react"
+import { Search, MapPin, CheckCircle } from "lucide-react"
+import { type Step } from "./types/index"
 import { type ClientVehicle } from "../../../types/client/clientVehicle"
-import { type Step, type ParkingSpot } from "./types"
+import { type VehicleType } from "./utils/vehicleUtils"
+
+// Novo tipo para a vaga selecionada
+interface SelectedSpotInfo {
+  type: VehicleType | "pcd" | "elderly"
+  parkingId: string
+}
 
 interface ProgressStepsProps {
   step: Step
   selectedClient: ClientVehicle | null
-  selectedSpot: ParkingSpot | null
+  selectedSpot: SelectedSpotInfo | null 
 }
 
 function ProgressSteps({ step, selectedClient, selectedSpot }: ProgressStepsProps) {
+  const steps = [
+    {
+      id: "search",
+      label: "Buscar Cliente",
+      icon: Search,
+      completed: !!selectedClient
+    },
+    {
+      id: "select-spot",
+      label: "Selecionar Vaga",
+      icon: MapPin,
+      completed: !!selectedSpot
+    },
+    {
+      id: "confirm",
+      label: "Confirmar",
+      icon: CheckCircle,
+      completed: false
+    }
+  ]
+
   return (
-    <div className="px-8 py-6 border-b border-slate-200 bg-slate-50">
-      <div className="flex items-center justify-between max-w-2xl mx-auto">
-        {/* Step 1 */}
-        <div className="flex flex-col items-center gap-2 flex-1">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-            step === "search" ? "bg-blue-600 text-white scale-110" :
-            selectedClient ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"
-          }`}>
-            {selectedClient ? <CheckCircle2 size={20} /> : "1"}
-          </div>
-          <span className={`text-sm font-medium ${step === "search" ? "text-blue-600" : "text-gray-500"}`}>
-            Cliente
-          </span>
+    <div className="px-8 py-6">
+      <div className="flex items-center justify-between relative">
+        {/* Linha de conexão */}
+        <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200 -z-10">
+          <div 
+            className="h-full bg-blue-500 transition-all duration-300"
+            style={{
+              width: step === "search" ? "0%" : step === "select-spot" ? "50%" : "100%"
+            }}
+          />
         </div>
 
-        <div className={`h-1 flex-1 mx-2 rounded ${selectedClient ? "bg-green-500" : "bg-gray-200"}`} />
+        {steps.map((s) => {
+          const Icon = s.icon
+          const isActive = step === s.id
+          const isCompleted = s.completed
 
-        {/* Step 2 */}
-        <div className="flex flex-col items-center gap-2 flex-1">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-            step === "select-spot" ? "bg-blue-600 text-white scale-110" :
-            selectedSpot ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"
-          }`}>
-            {selectedSpot ? <CheckCircle2 size={20} /> : "2"}
-          </div>
-          <span className={`text-sm font-medium ${step === "select-spot" ? "text-blue-600" : "text-gray-500"}`}>
-            Vaga
-          </span>
-        </div>
-
-        <div className={`h-1 flex-1 mx-2 rounded ${selectedSpot ? "bg-green-500" : "bg-gray-200"}`} />
-
-        {/* Step 3 */}
-        <div className="flex flex-col items-center gap-2 flex-1">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
-            step === "confirm" ? "bg-blue-600 text-white scale-110" : "bg-gray-200 text-gray-500"
-          }`}>
-            3
-          </div>
-          <span className={`text-sm font-medium ${step === "confirm" ? "text-blue-600" : "text-gray-500"}`}>
-            Confirmar
-          </span>
-        </div>
+          return (
+            <div key={s.id} className="flex flex-col items-center gap-2 relative z-10">
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
+                  isCompleted || isActive
+                    ? "bg-blue-500 border-blue-500 text-white"
+                    : "bg-white border-gray-300 text-gray-400"
+                }`}
+              >
+                <Icon size={20} />
+              </div>
+              <span
+                className={`text-sm font-semibold whitespace-nowrap ${
+                  isActive ? "text-blue-600" : isCompleted ? "text-gray-700" : "text-gray-400"
+                }`}
+              >
+                {s.label}
+              </span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

@@ -1,19 +1,12 @@
-import { User, Filter, AlertCircle, X } from "lucide-react"
-import { type VehicleType, getVehicleIcon, getVehicleLabel } from "../utils/vehicleUtils"
-import { getStatusColor, getStatusLabel } from "../utils/statusUtils"
-import { type ParkingSpot } from "../types"
+import { useState, useEffect } from "react"
+import { User, AlertCircle, X, Car, Bike, Truck, Users } from "lucide-react"
+import { type VehicleType } from "../utils/vehicleUtils"
 import { type ClientVehicle } from "../../../../types/client/clientVehicle"
-
-const mockParkingSpots: ParkingSpot[] = [
-  { id: 1, number: "A-01", type: "car", status: "available", floor: "Térreo" },
-  { id: 2, number: "A-02", type: "car", status: "occupied", floor: "Térreo" },
-  { id: 3, number: "A-03", type: "car", status: "available", floor: "Térreo" },
-  { id: 4, number: "A-04", type: "car", status: "reserved", floor: "Térreo" },
-  { id: 5, number: "B-01", type: "moto", status: "available", floor: "Térreo" },
-  { id: 6, number: "B-02", type: "moto", status: "available", floor: "Térreo" },
-  { id: 7, number: "C-01", type: "truck", status: "available", floor: "1º Andar" },
-  { id: 8, number: "C-02", type: "truck", status: "occupied", floor: "1º Andar" },
-]
+import { useUser } from "../../../../context/useUser"
+import { requestData } from "../../../../services/requestApi"
+import useFlashMessage from "../../../../hooks/useFlashMessage"
+import { type Spots } from "../../../../types/parking/spots"
+import { type ListSpotsData } from "../../../../types/parking/spotsList"
 
 interface SelectSpotStepProps {
   selectedClient: ClientVehicle | null
@@ -21,29 +14,70 @@ interface SelectSpotStepProps {
   setVehicleType: (type: VehicleType) => void
   filterFloor: string
   setFilterFloor: (floor: string) => void
-  setFilterType: (type: VehicleType | "all") => void
-  onSpotSelect: (spot: ParkingSpot) => void
+  onSpotSelect: (spotInfo: { type: VehicleType | "pcd" | "elderly"; parkingId: string }) => void
   onChangeClient: () => void
 }
 
 function SelectSpotStep({
   selectedClient,
-  vehicleType,
-  setVehicleType,
-  filterFloor,
-  setFilterFloor,
-  setFilterType,
   onSpotSelect,
   onChangeClient
 }: SelectSpotStepProps) {
-  const filteredSpots = mockParkingSpots.filter(spot => {
-    const matchType = vehicleType === spot.type
-    const matchFloor = filterFloor === "all" || spot.floor === filterFloor
-    const matchStatus = spot.status === "available"
-    return matchType && matchFloor && matchStatus
-  })
+  const { user } = useUser()
+  const { setFlashMessage } = useFlashMessage()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [spotsData, setSpotsData] = useState<Spots | null>(null)
 
-  const floors = [...new Set(mockParkingSpots.map(s => s.floor))]
+  useEffect(() => {
+    if (!user) {
+      setFlashMessage("Usuário não autenticado", "error")
+      return
+    }
+    
+    async function fetchParkingSpots() {
+      setIsLoading(true)
+      const response = await requestData<ListSpotsData>(`/allocation/spots/${user?.id}`, "GET", {}, true)
+      
+      if (response.success && response.data?.spots && response.data.spots.length > 0) {
+        setSpotsData(response.data.spots[0])
+      } else {
+        setSpotsData(null)
+        setFlashMessage("Nenhuma vaga disponível no momento", "warning")
+      }
+      
+      setIsLoading(false)
+    }
+    
+    fetchParkingSpots()
+  }, [user, setFlashMessage])
+
+  const getAvailableSpots = (type: VehicleType | "pcd" | "elderly"): number => {
+    if (!spotsData) return 0
+    
+    switch (type) {
+      case "car":
+        return spotsData.carSpots
+      case "moto":
+        return spotsData.motoSpots
+      case "truck":
+        return spotsData.truckSpots
+      case "pcd":
+        return spotsData.pcdSpots
+      case "elderly":
+        return spotsData.elderlySpots
+      default:
+        return 0
+    }
+  }
+
+  const handleSpotSelection = (type: VehicleType | "pcd" | "elderly") => {
+    if (!spotsData) return
+    
+    const available = getAvailableSpots(type)
+    if (available > 0) {
+      onSpotSelect({ type: type as VehicleType, parkingId: spotsData.parking_id })
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -71,79 +105,198 @@ function SelectSpotStep({
 
       <div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Selecione a Vaga
+          Selecione o Tipo de Vaga
         </h2>
         <p className="text-gray-600">
-          Escolha uma vaga disponível para o veículo
+          Escolha o tipo de vaga disponível para o veículo
         </p>
       </div>
 
-      {/* Vehicle Type Selector */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-3">
-          Tipo de Veículo
-        </label>
-        <div className="grid grid-cols-3 gap-3">
-          {(["car", "moto", "truck"] as VehicleType[]).map((type) => (
-            <button
-              key={type}
-              onClick={() => {
-                setVehicleType(type)
-                setFilterType(type)
-              }}
-              className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-                vehicleType === type
-                  ? "bg-blue-50 border-blue-500 text-blue-700"
-                  : "bg-slate-50 border-slate-200 text-gray-600 hover:border-slate-300"
-              }`}
-            >
-              {getVehicleIcon(type)}
-              <span className="font-semibold text-sm">{getVehicleLabel(type)}</span>
-            </button>
-          ))}
+      {isLoading ? (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Carregando vagas disponíveis...</p>
         </div>
-      </div>
-
-
-      {/* Spots Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {filteredSpots.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-gray-500">
-            <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>Nenhuma vaga disponível com os filtros selecionados</p>
-          </div>
-        ) : (
-          filteredSpots.map((spot) => (
+      ) : !spotsData ? (
+        <div className="text-center py-12 text-gray-500">
+          <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+          <p>Nenhuma informação de vagas disponível</p>
+        </div>
+      ) : (
+        <>
+          {/* Vehicle Type Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Carros */}
             <button
-              key={spot.id}
-              onClick={() => onSpotSelect(spot)}
-              disabled={spot.status !== "available"}
-              className={`p-5 rounded-xl border-2 transition-all ${
-                spot.status === "available"
-                  ? "bg-green-50 border-green-300 hover:bg-green-100 hover:border-green-400 hover:shadow-lg transform hover:-translate-y-1"
-                  : getStatusColor(spot.status)
-              } disabled:cursor-not-allowed disabled:hover:transform-none`}
+              onClick={() => handleSpotSelection("car")}
+              disabled={spotsData.carSpots === 0}
+              className={`p-4 rounded-xl border-2 transition-all ${
+                spotsData.carSpots > 0
+                  ? "bg-green-50 border-green-300 hover:bg-green-100 hover:border-green-400 hover:shadow-lg cursor-pointer"
+                  : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+              }`}
             >
               <div className="flex flex-col items-center gap-2">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  spot.status === "available" ? "bg-green-200" : "bg-gray-200"
+                  spotsData.carSpots > 0 ? "bg-green-200" : "bg-gray-200"
                 }`}>
-                  {getVehicleIcon(spot.type)}
+                  <Car className="w-6 h-6 text-gray-700" />
                 </div>
                 <div className="text-center">
-                  <p className="font-bold text-lg">{spot.number}</p>
-                  <p className="text-xs text-gray-600">{spot.floor}</p>
-                  <span className={`text-xs font-semibold mt-1 inline-block px-2 py-1 rounded ${
-                    spot.status === "available" ? "bg-green-200 text-green-800" : ""
+                  <p className="font-bold text-base text-gray-800">Carros</p>
+                  <p className={`text-2xl font-bold mt-1 ${
+                    spotsData.carSpots > 0 ? "text-green-600" : "text-gray-400"
                   }`}>
-                    {getStatusLabel(spot.status)}
-                  </span>
+                    {spotsData.carSpots}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {spotsData.carSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
+                  </p>
                 </div>
               </div>
             </button>
-          ))
-        )}
-      </div>
+
+            {/* Motos */}
+            <button
+              onClick={() => handleSpotSelection("moto")}
+              disabled={spotsData.motoSpots === 0}
+              className={`p-4 rounded-xl border-2 transition-all ${
+                spotsData.motoSpots > 0
+                  ? "bg-green-50 border-green-300 hover:bg-green-100 hover:border-green-400 hover:shadow-lg cursor-pointer"
+                  : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+              }`}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  spotsData.motoSpots > 0 ? "bg-green-200" : "bg-gray-200"
+                }`}>
+                  <Bike className="w-6 h-6 text-gray-700" />
+                </div>
+                <div className="text-center">
+                  <p className="font-bold text-base text-gray-800">Motos</p>
+                  <p className={`text-2xl font-bold mt-1 ${
+                    spotsData.motoSpots > 0 ? "text-green-600" : "text-gray-400"
+                  }`}>
+                    {spotsData.motoSpots}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {spotsData.motoSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
+                  </p>
+                </div>
+              </div>
+            </button>
+
+            {/* Caminhões */}
+            <button
+              onClick={() => handleSpotSelection("truck")}
+              disabled={spotsData.truckSpots === 0}
+              className={`p-4 rounded-xl border-2 transition-all ${
+                spotsData.truckSpots > 0
+                  ? "bg-green-50 border-green-300 hover:bg-green-100 hover:border-green-400 hover:shadow-lg cursor-pointer"
+                  : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+              }`}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                  spotsData.truckSpots > 0 ? "bg-green-200" : "bg-gray-200"
+                }`}>
+                  <Truck className="w-6 h-6 text-gray-700" />
+                </div>
+                <div className="text-center">
+                  <p className="font-bold text-base text-gray-800">Caminhões</p>
+                  <p className={`text-2xl font-bold mt-1 ${
+                    spotsData.truckSpots > 0 ? "text-green-600" : "text-gray-400"
+                  }`}>
+                    {spotsData.truckSpots}
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {spotsData.truckSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
+                  </p>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          {/* Vagas Especiais */}
+          <div>
+            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-blue-600" />
+              Vagas Especiais
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* PCD */}
+              <button
+                onClick={() => handleSpotSelection("pcd" as VehicleType)}
+                disabled={spotsData.pcdSpots === 0}
+                className={`p-4 rounded-xl border-2 transition-all ${
+                  spotsData.pcdSpots > 0
+                    ? "bg-blue-50 border-blue-300 hover:bg-blue-100 hover:border-blue-400 hover:shadow-lg cursor-pointer"
+                    : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                    spotsData.pcdSpots > 0 ? "bg-blue-200" : "bg-gray-200"
+                  }`}>
+                    <User className="w-6 h-6 text-gray-700" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold text-base text-gray-800">PCD</p>
+                    <div className="flex items-baseline gap-2">
+                      <p className={`text-2xl font-bold ${
+                        spotsData.pcdSpots > 0 ? "text-blue-600" : "text-gray-400"
+                      }`}>
+                        {spotsData.pcdSpots}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {spotsData.pcdSpots === 1 ? "vaga" : "vagas"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+
+              {/* Idosos */}
+              <button
+                onClick={() => handleSpotSelection("elderly" as VehicleType)}
+                disabled={spotsData.elderlySpots === 0}
+                className={`p-4 rounded-xl border-2 transition-all ${
+                  spotsData.elderlySpots > 0
+                    ? "bg-purple-50 border-purple-300 hover:bg-purple-100 hover:border-purple-400 hover:shadow-lg cursor-pointer"
+                    : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                    spotsData.elderlySpots > 0 ? "bg-purple-200" : "bg-gray-200"
+                  }`}>
+                    <Users className="w-6 h-6 text-gray-700" />
+                  </div>
+                  <div className="text-left">
+                    <p className="font-bold text-base text-gray-800">Idosos</p>
+                    <div className="flex items-baseline gap-2">
+                      <p className={`text-2xl font-bold ${
+                        spotsData.elderlySpots > 0 ? "text-purple-600" : "text-gray-400"
+                      }`}>
+                        {spotsData.elderlySpots}
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        {spotsData.elderlySpots === 1 ? "vaga" : "vagas"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Total de Vagas */}
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+            <p className="text-sm text-gray-600">Total de vagas no estacionamento</p>
+            <p className="text-2xl font-bold text-gray-800">{spotsData.totalSpots}</p>
+          </div>
+        </>
+      )}
     </div>
   )
 }
