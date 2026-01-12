@@ -5,13 +5,18 @@ import SearchClientStep from "../allocation/steps/StepSearchClient"
 import SelectSpotStep from "../allocation/steps/StepSelectSpot"
 import ConfirmStep from "../allocation/steps/StepConfirmAllocation"
 import { type VehicleType } from "../allocation/utils/vehicleUtils"
-import { type ParkingSpot, type Step } from "../allocation/types/index"
+import { type Step } from "../allocation/types/index"
 import { useUser } from "../../../context/useUser"
 import { type ClientVehicle } from "../../../types/client/clientVehicle"
 import { requestData } from "../../../services/requestApi"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { type ListClientsVehicleData } from "../../../types/client/listClientVehicle"
 
+// Novo tipo para a vaga selecionada (vindo da API)
+interface SelectedSpotInfo {
+  type: VehicleType | "pcd" | "elderly"
+  parkingId: string
+}
 
 function ParkingAllocation() {
   const { user } = useUser()
@@ -40,14 +45,11 @@ function ParkingAllocation() {
     fetchClientVehicle()
   }, [user, setFlashMessage])
 
-  // Cliente
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [selectedClient, setSelectedClient] = useState<ClientVehicle | null>(null)
   const [vehicleType, setVehicleType] = useState<VehicleType>("car")
 
-  // Vaga
-  const [selectedSpot, setSelectedSpot] = useState<ParkingSpot | null>(null)
-  const [filterType, setFilterType] = useState<VehicleType | "all">("all")
+  const [selectedSpot, setSelectedSpot] = useState<SelectedSpotInfo | null>(null)
   const [filterFloor, setFilterFloor] = useState<string>("all")
 
   // Entrada
@@ -59,8 +61,9 @@ function ParkingAllocation() {
     setStep("select-spot")
   }
 
-  function handleSpotSelect(spot: ParkingSpot) {
-    setSelectedSpot(spot)
+ 
+  function handleSpotSelect(spotInfo: SelectedSpotInfo) {
+    setSelectedSpot(spotInfo)
     setStep("confirm")
   }
 
@@ -106,7 +109,6 @@ function ParkingAllocation() {
                 clients={clients}
                 isLoading={isLoading}
                 onClientSelect={handleClientSelect}
-                onNewClient={() => alert("Cadastrar novo cliente")}
               />
             )}
 
@@ -117,9 +119,11 @@ function ParkingAllocation() {
                 setVehicleType={setVehicleType}
                 filterFloor={filterFloor}
                 setFilterFloor={setFilterFloor}
-                setFilterType={setFilterType}
                 onSpotSelect={handleSpotSelect}
-                onChangeClient={() => setStep("search")}
+                onChangeClient={() => {
+                  setSelectedSpot(null) 
+                  setStep("search")
+                }}
               />
             )}
 
@@ -133,7 +137,10 @@ function ParkingAllocation() {
                 setObservations={setObservations}
                 onConfirm={handleConfirm}
                 onCancel={resetAllocation}
-                onBack={() => setStep("select-spot")}
+                onBack={() => {
+                  setSelectedSpot(null) 
+                  setStep("select-spot")
+                }}
               />
             )}
           </div>
