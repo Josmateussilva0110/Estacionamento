@@ -11,6 +11,7 @@ import { type ClientVehicle } from "../../../types/client/clientVehicle"
 import { requestData } from "../../../services/requestApi"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { type ListClientsVehicleData } from "../../../types/client/listClientVehicle"
+import { mapVehicleTypeToApi } from "../allocation/utils/vehicleUtils"
 
 // Novo tipo para a vaga selecionada (vindo da API)
 interface SelectedSpotInfo {
@@ -68,16 +69,24 @@ function ParkingAllocation() {
   }
 
   function handleConfirm() {
-    console.log({
-      client: selectedClient,
-      spot: selectedSpot,
-      vehicleType,
-      entryDate,
-      observations
-    })
+    if (!selectedClient || !selectedSpot) return
+
+    const payload = {
+      client_id: selectedClient.id,
+      parking_id: selectedSpot.parkingId,
+      vehicle_type: mapVehicleTypeToApi(vehicleType), 
+      entry_date: entryDate,
+      observations,
+    }
+
+    console.log(payload)
+
+    // await requestData("/allocations", "POST", payload, true)
+
     alert("Alocação realizada com sucesso!")
     resetAllocation()
   }
+
 
   function resetAllocation() {
     setStep("search")

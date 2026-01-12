@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { User, MapPin, Calendar, CheckCircle2 } from "lucide-react"
 import { getVehicleLabel } from "../utils/vehicleUtils"
 import { type ClientVehicle } from "../../../../types/client/clientVehicle"
@@ -37,6 +38,20 @@ function ConfirmStep({
     if (type === "elderly") return "Idoso"
     return getVehicleLabel(type as VehicleType)
   }
+
+    useEffect(() => {
+      if (!entryDate) {
+        const now = new Date()
+        const timezoneOffset = now.getTimezoneOffset() * 60000
+        const localTime = new Date(now.getTime() - timezoneOffset)
+        const localDateTime = localTime.toISOString().slice(0, 16)
+
+        setEntryDate(localDateTime)
+      }
+    }, [entryDate, setEntryDate])
+
+
+
 
   return (
     <div className="space-y-6">
