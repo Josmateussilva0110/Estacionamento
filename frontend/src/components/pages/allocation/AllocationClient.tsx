@@ -34,7 +34,6 @@ function ParkingAllocation() {
     async function fetchClientVehicle() {
       setIsLoading(true)
       const response = await requestData<ListClientsVehicleData>(`/clients/vehicle/${user?.id}`, "GET", {}, true)
-      console.log(response)
       if (response.success && response.data?.clients) {
         setClients(response.data.clients)
       }

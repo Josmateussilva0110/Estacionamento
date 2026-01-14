@@ -7,7 +7,7 @@ import { Car, FileText, CarFront } from "lucide-react"
 import Input from "../../ui/Input"
 import { Select } from "../../ui/Select"
 import { ColorPicker } from "../../ui/ColorPicker"
-import { ClientSearch } from "../../ui/ClientSearch"
+import { SearchSelect } from "../../ui/ClientSearch"
 
 import { VEHICLE_TYPES, type VehicleType } from "../../../types/vehicleTypes"
 import { VEHICLE_TYPE_LABEL } from "../../../utils/mapVehicleType"
@@ -110,16 +110,35 @@ function RegisterVehicle() {
             onSubmit={handleSubmit(onSubmit)}
             className="px-6 py-8 space-y-6"
           >
-            <ClientSearch
-              clients={clients}
+            <SearchSelect<ClientDetails, number>
+              items={clients}
               value={clientId}
+              label="Cliente"
+              placeholder="Buscar cliente por nome ou CPF"
+              isLoading={isLoading}
+
               onChange={(id) =>
                 setValue("client_id", id, { shouldValidate: true })
               }
-              label="Cliente *"
-              error={errors.client_id?.message}
-              isLoading={isLoading}
+
+              getId={(c) => c.id}
+              getLabel={(c) => c.username}
+
+              filterBy={(c, search) =>
+                c.username.toLowerCase().includes(search.toLowerCase()) ||
+                c.cpf.includes(search)
+              }
+
+              renderItem={(client) => (
+                <>
+                  <div className="font-medium">{client.username}</div>
+                  <div className="text-sm text-gray-500">
+                    CPF: {client.cpf}
+                  </div>
+                </>
+              )}
             />
+
 
 
             <Input

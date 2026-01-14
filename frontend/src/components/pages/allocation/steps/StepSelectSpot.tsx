@@ -7,6 +7,9 @@ import { requestData } from "../../../../services/requestApi"
 import useFlashMessage from "../../../../hooks/useFlashMessage"
 import { type Spots } from "../../../../types/parking/spots"
 import { type ListSpotsData } from "../../../../types/parking/spotsList"
+import { type Parking } from "../../../../types/parking/parking"
+import { type ListParkingsData } from "../../../../types/parking/listParkingData"
+import { SearchSelect } from "../../../ui/ClientSearch"
 
 interface SelectSpotStepProps {
   selectedClient: ClientVehicle | null
@@ -25,8 +28,13 @@ function SelectSpotStep({
 }: SelectSpotStepProps) {
   const { user } = useUser()
   const { setFlashMessage } = useFlashMessage()
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoadingSpots, setIsLoadingSpots] = useState<boolean>(false)
+  const [isLoadingParkings, setIsLoadingParkings] = useState<boolean>(false)
   const [spotsData, setSpotsData] = useState<Spots | null>(null)
+  const [parkings, setParkings] = useState<Parking[]>([])
+  const [selectedParkingId, setSelectedParkingId] = useState<number | null>(null)
+
+
 
   useEffect(() => {
     if (!user) {
@@ -35,7 +43,7 @@ function SelectSpotStep({
     }
     
     async function fetchParkingSpots() {
-      setIsLoading(true)
+      setIsLoadingSpots(true)
       const response = await requestData<ListSpotsData>(`/allocation/spots/${user?.id}`, "GET", {}, true)
       
       if (response.success && response.data?.spots && response.data.spots.length > 0) {
@@ -45,11 +53,35 @@ function SelectSpotStep({
         setFlashMessage("Nenhuma vaga disponível no momento", "warning")
       }
       
-      setIsLoading(false)
+      setIsLoadingSpots(false)
     }
     
     fetchParkingSpots()
   }, [user, setFlashMessage])
+
+  useEffect(() => {
+    if (!user) {
+      setFlashMessage("Usuário não autenticado", "error")
+      return
+    }
+    
+    async function fetchParking() {
+      setIsLoadingParkings(true)
+      const response = await requestData<ListParkingsData>(`/parking/names/${user?.id}`, "GET", {}, true)
+      console.log(response)
+      
+      if (response.success && response.data?.parking) {
+        setParkings(response.data.parking)
+      } else {
+        setParkings([])
+      }
+      
+      setIsLoadingParkings(false)
+    }
+    
+    fetchParking()
+  }, [user, setFlashMessage])
+
 
   const getAvailableSpots = (type: VehicleType | "pcd" | "elderly"): number => {
     if (!spotsData) return 0
@@ -103,6 +135,33 @@ function SelectSpotStep({
         </div>
       </div>
 
+      <SearchSelect<Parking, number>
+        label="Estacionamento"
+        placeholder="Buscar pelo nome"
+        isLoading={isLoadingParkings}
+
+        items={parkings}
+        value={selectedParkingId}
+        onChange={setSelectedParkingId}
+
+        getId={(p) => p.id}
+        getLabel={(p) => p.parkingName}
+
+        filterBy={(p, search) =>
+          p.parkingName.toLowerCase().includes(search.toLowerCase()) ||
+          p.managerName.toLowerCase().includes(search.toLowerCase())
+        }
+
+        renderItem={(parking) => (
+          <div>
+            <div className="font-medium">{parking.parkingName}</div>
+            <div className="text-xs text-gray-500">
+              Gerente: {parking.managerName}
+            </div>
+          </div>
+        )}
+      />
+
       <div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
           Selecione o Tipo de Vaga
@@ -112,7 +171,7 @@ function SelectSpotStep({
         </p>
       </div>
 
-      {isLoading ? (
+      {isLoadingSpots ? (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           <p className="mt-4 text-gray-600">Carregando vagas disponíveis...</p>
