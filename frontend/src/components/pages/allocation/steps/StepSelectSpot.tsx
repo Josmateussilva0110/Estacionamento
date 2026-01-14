@@ -10,6 +10,7 @@ import { type ListSpotsData } from "../../../../types/parking/spotsList"
 import { type Parking } from "../../../../types/parking/parking"
 import { type ListParkingsData } from "../../../../types/parking/listParkingData"
 import { SearchSelect } from "../../../ui/ClientSearch"
+import { type SelectedSpotInfo } from "../types/selectedSpot"
 
 interface SelectSpotStepProps {
   selectedClient: ClientVehicle | null
@@ -17,7 +18,7 @@ interface SelectSpotStepProps {
   setVehicleType: (type: VehicleType) => void
   filterFloor: string
   setFilterFloor: (floor: string) => void
-  onSpotSelect: (spotInfo: { type: VehicleType | "pcd" | "elderly"; parkingId: string }) => void
+  onSpotSelect: (spotInfo: SelectedSpotInfo) => void
   onChangeClient: () => void
 }
 
@@ -32,7 +33,7 @@ function SelectSpotStep({
   const [isLoadingParkings, setIsLoadingParkings] = useState<boolean>(false)
   const [spotsData, setSpotsData] = useState<Spots | null>(null)
   const [parkings, setParkings] = useState<Parking[]>([])
-  const [selectedParkingId, setSelectedParkingId] = useState<number | null>(null)
+  const [selectedParking, setSelectedParking] = useState<Parking | null>(null)
 
 
 
@@ -103,13 +104,20 @@ function SelectSpotStep({
   }
 
   const handleSpotSelection = (type: VehicleType | "pcd" | "elderly") => {
-    if (!spotsData) return
-    
+    if (!spotsData || !selectedParking) return
+
     const available = getAvailableSpots(type)
     if (available > 0) {
-      onSpotSelect({ type: type as VehicleType, parkingId: spotsData.parking_id })
+      onSpotSelect({
+        type,
+        parking: {
+          id: selectedParking.id,
+          name: selectedParking.parkingName,
+        },
+      })
     }
   }
+
 
   return (
     <div className="space-y-6">
@@ -141,8 +149,11 @@ function SelectSpotStep({
         isLoading={isLoadingParkings}
 
         items={parkings}
-        value={selectedParkingId}
-        onChange={setSelectedParkingId}
+        value={selectedParking?.id ?? null}
+        onChange={(id) => {
+          const parking = parkings.find(p => p.id === id) || null
+          setSelectedParking(parking)
+        }}
 
         getId={(p) => p.id}
         getLabel={(p) => p.parkingName}

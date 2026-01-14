@@ -12,12 +12,7 @@ import { requestData } from "../../../services/requestApi"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { type ListClientsVehicleData } from "../../../types/client/listClientVehicle"
 import { mapVehicleTypeToApi } from "../allocation/utils/vehicleUtils"
-
-// Novo tipo para a vaga selecionada (vindo da API)
-interface SelectedSpotInfo {
-  type: VehicleType | "pcd" | "elderly"
-  parkingId: string
-}
+import { type SelectedSpotInfo } from "./types/selectedSpot"
 
 function ParkingAllocation() {
   const { user } = useUser()
@@ -72,11 +67,12 @@ function ParkingAllocation() {
 
     const payload = {
       client_id: selectedClient.id,
-      parking_id: selectedSpot.parkingId,
-      vehicle_type: mapVehicleTypeToApi(vehicleType), 
+      parking_id: selectedSpot.parking.id,
+      vehicle_type: mapVehicleTypeToApi(vehicleType),
       entry_date: entryDate,
       observations,
     }
+
 
     console.log(payload)
 
