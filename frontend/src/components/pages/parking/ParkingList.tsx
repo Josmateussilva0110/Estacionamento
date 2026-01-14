@@ -21,6 +21,7 @@ import {
 import { type ListParkingData } from "../../../types/parking/listParking"
 import { type ParkingDetails } from "../../../types/parking/parkingDetail"
 import { type RemoveParkingResponse } from "../../../types/parking/parkingResponses"
+import ConfirmDeleteModal from "../../layout/DeleteModal"
 import { requestData } from "../../../services/requestApi"
 import { useUser } from "../../../context/useUser"
 import useFlashMessage from "../../../hooks/useFlashMessage"
@@ -32,6 +33,7 @@ function ParkingList() {
     const { setFlashMessage } = useFlashMessage()
     const [searchTerm, setSearchTerm] = useState("")
     const [isLoading, setIsLoading] = useState(true)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [openMenuId, setOpenMenuId] = useState<number | null>(null)
     const { user } = useUser()
     const [page, setPage] = useState(1)
@@ -39,6 +41,17 @@ function ParkingList() {
     const [total, setTotal] = useState(0)
 
     const [parkings, setParkings] = useState<ParkingDetails[]>([])
+
+    const [deleteModal, setDeleteModal] = useState<{
+        isOpen: boolean
+        parkingId: number | null
+        parkingName: string
+    }>({
+        isOpen: false,
+        parkingId: null,
+        parkingName: ""
+    })
+
 
     useEffect(() => {
         if (!user?.id) return
@@ -67,19 +80,50 @@ function ParkingList() {
         fetchParking()
     }, [user?.id, page])
 
-    async function remove(id: number): Promise<void> {
-        const response = await requestData<RemoveParkingResponse>(`/parking/${id}`, "DELETE", {}, true)
+    function openDeleteModal(id: number, name: string) {
+        setDeleteModal({
+            isOpen: true,
+            parkingId: id,
+            parkingName: name
+        })
+        setOpenMenuId(null) 
+    }
+
+    function closeDeleteModal() {
+        setDeleteModal({
+            isOpen: false,
+            parkingId: null,
+            parkingName: ""
+        })
+    }
+
+    async function confirmDelete() {
+        if (!deleteModal.parkingId) return
+
+        setIsDeleting(true)
+
+        const response = await requestData<RemoveParkingResponse>(
+            `/parking/${deleteModal.parkingId}`,
+            "DELETE",
+            {},
+            true
+        )
+
         if (response.success && response.data?.status) {
             setFlashMessage(response.data.message, "success")
 
-            setParkings((prev) => prev.filter((p) => p.id !== id))
+            setParkings((prev) => prev.filter((p) => p.id !== deleteModal.parkingId))
             setTotal((prev) => Math.max(prev - 1, 0))
+            
             if (parkings.length === 1 && page > 1) {
                 setPage((p) => p - 1)
             }
         } else {
             setFlashMessage(getApiErrorMessage(response), "error")
         }
+
+        setIsDeleting(false)
+        closeDeleteModal()
     }
 
     const filteredParkings = parkings.filter(
@@ -210,7 +254,10 @@ function ParkingList() {
                                                         >
                                                             <Edit size={16} /> Editar
                                                         </button>
-                                                        <button onClick={() => remove(parking.id)} className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 w-full">
+                                                        <button
+                                                            onClick={() => openDeleteModal(parking.id, parking.parkingName)}
+                                                            className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 w-full"
+                                                        >
                                                             <Trash2 size={16} /> Excluir
                                                         </button>
                                                     </div>
@@ -312,7 +359,7 @@ function ParkingList() {
 
                                         {/* Excluir */}
                                         <button
-                                            onClick={() => remove(parking.id)}
+                                            onClick={() => openDeleteModal(parking.id, parking.parkingName)}
                                             className="
                                                 flex items-center gap-2
                                                 h-12 px-6
@@ -400,6 +447,13 @@ function ParkingList() {
                     </div>
                 </div>
             </div>
+            <ConfirmDeleteModal
+                isOpen={deleteModal.isOpen}
+                onClose={closeDeleteModal}
+                onConfirm={confirmDelete}
+                itemName={deleteModal.parkingName}
+                isLoading={isDeleting}
+            />
         </div>
     )
 }
