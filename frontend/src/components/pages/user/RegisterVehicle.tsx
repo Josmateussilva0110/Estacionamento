@@ -7,7 +7,7 @@ import { Car, FileText, CarFront } from "lucide-react"
 import Input from "../../ui/Input"
 import { Select } from "../../ui/Select"
 import { ColorPicker } from "../../ui/ColorPicker"
-import { SearchSelect } from "../../ui/ClientSearch"
+import { SearchSelect } from "../../ui/SelectSearch"
 
 import { VEHICLE_TYPES, type VehicleType } from "../../../types/vehicleTypes"
 import { VEHICLE_TYPE_LABEL } from "../../../utils/mapVehicleType"

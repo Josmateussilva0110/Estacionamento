@@ -9,7 +9,7 @@ import { type Spots } from "../../../../types/parking/spots"
 import { type ListSpotsData } from "../../../../types/parking/spotsList"
 import { type Parking } from "../../../../types/parking/parking"
 import { type ListParkingsData } from "../../../../types/parking/listParkingData"
-import { SearchSelect } from "../../../ui/ClientSearch"
+import { SearchSelect } from "../../../ui/SelectSearch"
 import { type SelectedSpotInfo } from "../types/selectedSpot"
 
 interface SelectSpotStepProps {
@@ -72,7 +72,6 @@ function SelectSpotStep({
     async function fetchParking() {
       setIsLoadingParkings(true)
       const response = await requestData<ListParkingsData>(`/parking/names/${user?.id}`, "GET", {}, true)
-      console.log(response)
       
       if (response.success && response.data?.parking) {
         setParkings(response.data.parking)
@@ -156,8 +155,9 @@ function SelectSpotStep({
       </div>
 
       <SearchSelect<Parking, number>
-        label="Estacionamento"
-        placeholder="Buscar pelo nome"
+        label="Estacionamento *"
+        placeholder="Buscar pelo nome ou gerente"
+        size="lg"
         isLoading={isLoadingParkings}
 
         items={parkings}
@@ -167,7 +167,6 @@ function SelectSpotStep({
           setSelectedParking(parking)
           setParkingError(null)
         }}
-
 
         getId={(p) => p.id}
         getLabel={(p) => p.parkingName}
@@ -186,6 +185,7 @@ function SelectSpotStep({
           </div>
         )}
       />
+
 
       {parkingError && (
         <div className="mt-2 flex items-center gap-2 text-sm text-red-600">

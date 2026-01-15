@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import Header from "../allocation/Header"
 import ProgressSteps from "../allocation/ProgressSteps"
 import SearchClientStep from "../allocation/steps/StepSearchClient"
@@ -16,6 +17,7 @@ import { type SelectedSpotInfo } from "./types/selectedSpot"
 
 function ParkingAllocation() {
   const { user } = useUser()
+  const navigate = useNavigate()
   const { setFlashMessage } = useFlashMessage()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [step, setStep] = useState<Step>("search")
@@ -64,7 +66,6 @@ function ParkingAllocation() {
 
   function handleConfirm() {
     if (!selectedClient || !selectedSpot) return
-    console.log("v: ", vehicleType)
 
     const payload = {
       client_id: selectedClient.id,
@@ -95,7 +96,7 @@ function ParkingAllocation() {
   return (
     <div className="min-h-screen bg-linear-to-r from-blue-600 via-blue-700 to-blue-900 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        <Header onBack={() => alert("Voltando...")} />
+        <Header onBack={() => navigate("/")} />
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6">
           <ProgressSteps 
