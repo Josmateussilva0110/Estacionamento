@@ -31,6 +31,7 @@ function ParkingAllocation() {
     async function fetchClientVehicle() {
       setIsLoading(true)
       const response = await requestData<ListClientsVehicleData>(`/clients/vehicle/${user?.id}`, "GET", {}, true)
+
       if (response.success && response.data?.clients) {
         setClients(response.data.clients)
       }
@@ -70,6 +71,7 @@ function ParkingAllocation() {
     const payload = {
       client_id: selectedClient.id,
       parking_id: selectedSpot.parking.id,
+      vehicle_id: selectedClient.vehicle_id,
       vehicle_type: mapVehicleTypeToApi(vehicleType),
       entry_date: entryDate,
       observations,
