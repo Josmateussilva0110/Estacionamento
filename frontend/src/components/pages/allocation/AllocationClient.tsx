@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import Header from "../allocation/Header"
 import ProgressSteps from "../allocation/ProgressSteps"
 import SearchClientStep from "../allocation/steps/StepSearchClient"
@@ -12,15 +13,11 @@ import { requestData } from "../../../services/requestApi"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { type ListClientsVehicleData } from "../../../types/client/listClientVehicle"
 import { mapVehicleTypeToApi } from "../allocation/utils/vehicleUtils"
-
-// Novo tipo para a vaga selecionada (vindo da API)
-interface SelectedSpotInfo {
-  type: VehicleType | "pcd" | "elderly"
-  parkingId: string
-}
+import { type SelectedSpotInfo } from "./types/selectedSpot"
 
 function ParkingAllocation() {
   const { user } = useUser()
+  const navigate = useNavigate()
   const { setFlashMessage } = useFlashMessage()
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [step, setStep] = useState<Step>("search")
@@ -34,7 +31,7 @@ function ParkingAllocation() {
     async function fetchClientVehicle() {
       setIsLoading(true)
       const response = await requestData<ListClientsVehicleData>(`/clients/vehicle/${user?.id}`, "GET", {}, true)
-      console.log(response)
+
       if (response.success && response.data?.clients) {
         setClients(response.data.clients)
       }
@@ -73,11 +70,13 @@ function ParkingAllocation() {
 
     const payload = {
       client_id: selectedClient.id,
-      parking_id: selectedSpot.parkingId,
-      vehicle_type: mapVehicleTypeToApi(vehicleType), 
+      parking_id: selectedSpot.parking.id,
+      vehicle_id: selectedClient.vehicle_id,
+      vehicle_type: mapVehicleTypeToApi(vehicleType),
       entry_date: entryDate,
       observations,
     }
+
 
     console.log(payload)
 
@@ -99,7 +98,7 @@ function ParkingAllocation() {
   return (
     <div className="min-h-screen bg-linear-to-r from-blue-600 via-blue-700 to-blue-900 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        <Header onBack={() => alert("Voltando...")} />
+        <Header onBack={() => navigate("/")} />
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6">
           <ProgressSteps 

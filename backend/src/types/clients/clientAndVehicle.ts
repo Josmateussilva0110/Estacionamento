@@ -2,6 +2,7 @@ export interface ClientAndVehicleRow {
     client_id?: number
     username: string
     phone: string
+    vehicle_id?: number
     plate: string
     brand: string
     color: string

@@ -7,6 +7,9 @@ import { type ParkingDetailsRow } from "../types/parking/ParkingDetailsRow"
 import { type PgRawResult } from "../types/database/BdResult"
 import { parseOpeningHours } from "../utils/parseOpeningHours"
 import { type ParkingEditRow } from "../types/parking/ParkingEdit"
+import { type ParkingRow } from "../types/parking/parking"
+import { mapParkingRowList } from "../mappers/parking.mapper"
+import { type ParkingResponse } from "../mappers/parking.mapper"
 
 export interface ParkingData {
   id?: number
@@ -198,6 +201,37 @@ class Parking extends Model<ParkingData> {
         err
       )
       return null
+    }
+  }
+
+  async getNames(user_id: string): Promise<ParkingResponse[]> {
+    try {
+      const result = await db.raw<PgRawResult<ParkingRow>>(
+        `
+        select 
+            p.id as parking_id, 
+            p.parking_name,
+            p.manager_name,
+            p.created_by,
+            p.updated_at
+        from parking p
+        where p.created_by = ?
+        `,
+        [user_id]
+        )
+
+        if (!result.rows.length) {
+        return []
+        }
+
+        return mapParkingRowList(result.rows)
+
+    } catch (err) {
+        console.error(
+        `Erro ao buscar nomes de estacionamentos da tabela: ${this.tableName}`,
+        err
+        )
+        return []
     }
   }
 }

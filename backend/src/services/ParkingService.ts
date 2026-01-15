@@ -9,6 +9,7 @@ import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { ParkingErrorCode } from "../types/code/parkingCode"
 import { type PaginatedParkingResult } from "../types/parking/PaginatedParkingResult"
 import { ParkingEditDTO } from "../dtos/ParkingEditDTO"
+import { type ParkingResponse } from "../mappers/parking.mapper"
 
 
 class ParkingService {
@@ -314,6 +315,36 @@ class ParkingService {
     }
   }
 }
+
+  async parkingNames(user_id: string): Promise<ServiceResult<ParkingResponse[]>> {
+    try {
+      const parking = await Parking.getNames(user_id)
+      if (parking.length === 0) {
+          return {
+              status: false,
+              error: {
+                  code: ParkingErrorCode.PARKING_NOT_FOUND,
+                  message: "Nenhum estacionamento encontrado",
+              },
+          }
+      }
+
+      return {
+        status: true,
+        data: parking
+      }
+    } catch (error) {
+        console.error("ParkingService.names error:", error)
+
+        return {
+            status: false,
+            error: {
+                code: ParkingErrorCode.PARKING_FETCH_FAILED,
+                message: "Erro interno ao buscar estacionamento",
+            },
+        }
+    }
+  }
 }
 
 export default new ParkingService()

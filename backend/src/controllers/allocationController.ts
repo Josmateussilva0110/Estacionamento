@@ -21,6 +21,16 @@ class AllocationController {
 
         return response.status(200).json({status: true, spots: result.data})   
     }
+
+    async allocation(request: Request, response: Response): Promise<Response> {
+        const result = await AllocationService.allocation(request.body)
+        if(!result.status) {
+            const httpStatus = getHttpStatusFromError(result.error!.code, allocationErrorHttpStatusMap)
+            return response.status(httpStatus).json({status: false, message: result.error?.message})
+        }
+
+        return response.status(201).json({status: true, allocation_id: result.data})
+    }
 }
 
 

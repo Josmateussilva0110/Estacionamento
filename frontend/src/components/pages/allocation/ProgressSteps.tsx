@@ -1,12 +1,7 @@
 import { Search, MapPin, CheckCircle } from "lucide-react"
 import { type Step } from "./types"
 import { type ClientVehicle } from "../../../types/client/clientVehicle"
-import { type VehicleType } from "./utils/vehicleUtils"
-
-interface SelectedSpotInfo {
-  type: VehicleType | "pcd" | "elderly"
-  parkingId: string
-}
+import { type SelectedSpotInfo } from "../allocation/types/selectedSpot"
 
 interface ProgressStepsProps {
   step: Step
@@ -14,26 +9,26 @@ interface ProgressStepsProps {
   selectedSpot: SelectedSpotInfo | null
 }
 
-function ProgressSteps({
+export default function ProgressSteps({
   step,
   selectedClient,
   selectedSpot,
 }: ProgressStepsProps) {
   const steps = [
     {
-      id: "search",
+      id: "search" as Step,
       label: "Buscar Cliente",
       icon: Search,
       completed: !!selectedClient,
     },
     {
-      id: "select-spot",
+      id: "select-spot" as Step,
       label: "Selecionar Vaga",
       icon: MapPin,
       completed: !!selectedSpot,
     },
     {
-      id: "confirm",
+      id: "confirm" as Step,
       label: "Confirmar",
       icon: CheckCircle,
       completed: false,
@@ -41,10 +36,11 @@ function ProgressSteps({
   ]
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-4 py-4 sm:px-8 sm:py-6">
       <div className="relative">
+        
         {/* Steps */}
-        <div className="grid grid-cols-3 place-items-center relative z-10">
+        <div className="grid grid-cols-3 place-items-center relative z-10 gap-2 sm:gap-4">
           {steps.map((s) => {
             const Icon = s.icon
             const isActive = step === s.id
@@ -53,20 +49,20 @@ function ProgressSteps({
             return (
               <div
                 key={s.id}
-                className="flex flex-col items-center gap-2"
+                className="flex flex-col items-center gap-1.5 sm:gap-2 w-full"
               >
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all ${
                     isCompleted || isActive
                       ? "bg-blue-500 border-blue-500 text-white"
                       : "bg-white border-gray-300 text-gray-400"
                   }`}
                 >
-                  <Icon size={20} />
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
 
                 <span
-                  className={`text-sm font-semibold text-center ${
+                  className={`text-xs sm:text-sm font-semibold text-center leading-tight px-1 ${
                     isActive
                       ? "text-blue-600"
                       : isCompleted
@@ -84,5 +80,3 @@ function ProgressSteps({
     </div>
   )
 }
-
-export default ProgressSteps

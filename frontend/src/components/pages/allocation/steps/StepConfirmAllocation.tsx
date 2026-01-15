@@ -3,12 +3,9 @@ import { User, MapPin, Calendar, CheckCircle2 } from "lucide-react"
 import { getVehicleLabel } from "../utils/vehicleUtils"
 import { type ClientVehicle } from "../../../../types/client/clientVehicle"
 import { type VehicleType } from "../utils/vehicleUtils"
+import { type SelectedSpotInfo } from "../types/selectedSpot"
 
 
-interface SelectedSpotInfo {
-  type: VehicleType | "pcd" | "elderly"
-  parkingId: string
-}
 
 interface ConfirmStepProps {
   selectedClient: ClientVehicle | null
@@ -33,9 +30,7 @@ function ConfirmStep({
   onCancel,
   onBack
 }: ConfirmStepProps) {
-  const getSpotTypeLabel = (type: VehicleType | "pcd" | "elderly") => {
-    if (type === "pcd") return "PCD"
-    if (type === "elderly") return "Idoso"
+  const getSpotTypeLabel = (type: VehicleType) => {
     return getVehicleLabel(type as VehicleType)
   }
 
@@ -92,7 +87,7 @@ function ConfirmStep({
           </div>
           <div className="space-y-2 text-sm">
             <p><span className="font-semibold">Tipo:</span> {selectedSpot && getSpotTypeLabel(selectedSpot.type)}</p>
-            <p><span className="font-semibold">ID do Estacionamento:</span> {selectedSpot?.parkingId}</p>
+            <p><span className="font-semibold">Estacionamento:</span> {selectedSpot?.parking.name}</p>
             <p><span className="font-semibold">Status:</span> <span className="text-green-600 font-semibold">Disponível</span></p>
           </div>
         </div>

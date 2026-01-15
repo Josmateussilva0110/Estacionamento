@@ -95,7 +95,7 @@ class Client extends Model<ClientRow> {
                 `
                     select 
                         c.id as client_id, c.username, c.phone, c.status as clientStatus, c.updated_at,
-                        v.plate, v.brand, v.color
+                        v.id as vehicle_id, v.plate, v.brand, v.color
                     from clients c
                     inner join vehicles v 
                         on v.client_id = c.id

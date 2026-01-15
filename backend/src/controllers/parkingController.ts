@@ -128,6 +128,27 @@ class ParkingController {
       message: "Estacionamento editado com sucesso"
     })
   }
+
+  async getParkingNames(request: Request, response: Response): Promise<Response> {
+    const { user_id } = request.params
+    const result = await ParkingService.parkingNames(user_id)
+
+      if (!result.status) {
+          const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            ParkingErrorHttpStatusMap
+          )
+        return response.status(httpStatus).json({
+          status: false,
+          message: result.error?.message,
+        })
+      }
+
+      return response.status(200).json({
+        status: true,
+        parking: result.data
+      })
+  }
 }
 
 
