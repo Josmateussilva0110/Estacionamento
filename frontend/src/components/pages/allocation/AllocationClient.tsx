@@ -64,6 +64,7 @@ function ParkingAllocation() {
 
   function handleConfirm() {
     if (!selectedClient || !selectedSpot) return
+    console.log("v: ", vehicleType)
 
     const payload = {
       client_id: selectedClient.id,

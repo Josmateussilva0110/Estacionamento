@@ -30,9 +30,7 @@ function ConfirmStep({
   onCancel,
   onBack
 }: ConfirmStepProps) {
-  const getSpotTypeLabel = (type: VehicleType | "pcd" | "elderly") => {
-    if (type === "pcd") return "PCD"
-    if (type === "elderly") return "Idoso"
+  const getSpotTypeLabel = (type: VehicleType) => {
     return getVehicleLabel(type as VehicleType)
   }
 

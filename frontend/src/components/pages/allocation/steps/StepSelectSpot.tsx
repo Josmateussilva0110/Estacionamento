@@ -25,6 +25,7 @@ interface SelectSpotStepProps {
 function SelectSpotStep({
   selectedClient,
   onSpotSelect,
+  setVehicleType,
   onChangeClient
 }: SelectSpotStepProps) {
   const { user } = useUser()
@@ -34,6 +35,8 @@ function SelectSpotStep({
   const [spotsData, setSpotsData] = useState<Spots | null>(null)
   const [parkings, setParkings] = useState<Parking[]>([])
   const [selectedParking, setSelectedParking] = useState<Parking | null>(null)
+  const [parkingError, setParkingError] = useState<string | null>(null)
+
 
 
 
@@ -84,7 +87,7 @@ function SelectSpotStep({
   }, [user, setFlashMessage])
 
 
-  const getAvailableSpots = (type: VehicleType | "pcd" | "elderly"): number => {
+  const getAvailableSpots = (type: VehicleType): number => {
     if (!spotsData) return 0
     
     switch (type) {
@@ -103,11 +106,19 @@ function SelectSpotStep({
     }
   }
 
-  const handleSpotSelection = (type: VehicleType | "pcd" | "elderly") => {
-    if (!spotsData || !selectedParking) return
+  const handleSpotSelection = (type: VehicleType) => {
+    if (!selectedParking) {
+      setParkingError("Selecione um estacionamento antes de escolher a vaga.")
+      return
+    }
+
+    if (!spotsData) return
 
     const available = getAvailableSpots(type)
     if (available > 0) {
+      setParkingError(null)
+      setVehicleType(type)
+
       onSpotSelect({
         type,
         parking: {
@@ -117,6 +128,7 @@ function SelectSpotStep({
       })
     }
   }
+
 
 
   return (
@@ -153,7 +165,9 @@ function SelectSpotStep({
         onChange={(id) => {
           const parking = parkings.find(p => p.id === id) || null
           setSelectedParking(parking)
+          setParkingError(null)
         }}
+
 
         getId={(p) => p.id}
         getLabel={(p) => p.parkingName}
@@ -172,6 +186,13 @@ function SelectSpotStep({
           </div>
         )}
       />
+
+      {parkingError && (
+        <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
+          <AlertCircle className="w-4 h-4" />
+          {parkingError}
+        </div>
+      )}
 
       <div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
