@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 import RegisterClient from "../components/pages/user/RegisterClient"
 import RegisterVehicle from "../components/pages/user/RegisterVehicle"
+import ClientList from "../components/pages/user/ListClients"
 
 
 export default function ClientRoutes() {
@@ -8,6 +9,7 @@ export default function ClientRoutes() {
     <Routes>
       <Route path="register" element={<RegisterClient />} />
       <Route path="vehicle/register" element={<RegisterVehicle />} />
+      <Route path="list/clients" element={<ClientList />} />
     </Routes>
   )
 }
