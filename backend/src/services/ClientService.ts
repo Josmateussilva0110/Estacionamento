@@ -6,6 +6,7 @@ import { UserErrorCode } from "../types/code/userCode"
 import { VehicleErrorCode } from "../types/code/vehicleCode"
 import { type ClientResponse } from "../mappers/client.mapper"
 import { type ClientVehicleResponse } from "../mappers/clientVehicle.mapper"
+import { type PaginatedClientListResult } from "../types/clients/paginationClientList"
 
 
 class ClientService {
@@ -186,6 +187,32 @@ class ClientService {
                 error: {
                     code: UserErrorCode.USER_FETCH_FAILED,
                     message: "Erro interno ao buscar clientes"
+                }
+            }
+        }
+    }
+
+    async listClients(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedClientListResult | null>> {
+        try {
+            const clients = await Client.list(user_id, page, limit)
+            if(clients?.total === 0) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.USER_NOT_FOUND,
+                        message: "clientes não encontrados"
+                    }
+                }
+            }
+
+            return { status: true, data: clients}
+        } catch(error) {
+            console.error("ClientService.listClients error: ", error)
+            return {
+                status: false,
+                error: {
+                    code: UserErrorCode.USER_FETCH_FAILED,
+                    message: "Erro interno ao buscar lista de clientes"
                 }
             }
         }

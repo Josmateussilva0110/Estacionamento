@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
     User,
     Mail,
@@ -17,67 +17,45 @@ import {
 import { useNavigate } from "react-router-dom"
 
 import ConfirmDeleteModal from "../../layout/DeleteModal"
+import { requestData } from "../../../services/requestApi"
+import { useUser } from "../../../context/useUser"
+import { type ListPaginationClientsData } from "../../../types/client/listClients"
+import { type ClientsDetails } from "../../../types/client/clientsDetail"
 
-// Dados mockados
-const mockClients = [
-    {
-        id: 1,
-        name: "João Silva",
-        email: "joao.silva@email.com",
-        phone: "(85) 98765-4321",
-        cpf: "123.456.789-00",
-        registrationDate: "2024-01-15",
-        vehicleCount: 2,
-    },
-    {
-        id: 2,
-        name: "Maria Santos",
-        email: "maria.santos@email.com",
-        phone: "(85) 99876-5432",
-        cpf: "987.654.321-00",
-        registrationDate: "2024-02-20",
-        vehicleCount: 1,
-    },
-    {
-        id: 3,
-        name: "Pedro Oliveira",
-        email: "pedro.oliveira@email.com",
-        phone: "(85) 97654-3210",
-        cpf: "456.789.123-00",
-        registrationDate: "2024-03-10",
-        vehicleCount: 3,
-    },
-    {
-        id: 4,
-        name: "Ana Costa",
-        email: "ana.costa@email.com",
-        phone: "(85) 96543-2109",
-        cpf: "321.654.987-00",
-        registrationDate: "2023-12-05",
-        vehicleCount: 1,
-    },
-    {
-        id: 5,
-        name: "Carlos Mendes",
-        email: "carlos.mendes@email.com",
-        phone: "(85) 95432-1098",
-        cpf: "654.321.987-00",
-        registrationDate: "2024-04-18",
-        vehicleCount: 2,
-    }
-]
+
 
 
 function ClientList() {
     const navigate = useNavigate()
+    const { user } = useUser()
     const [searchTerm, setSearchTerm] = useState("")
-    const [isLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const [isDeleting, setIsDeleting] = useState(false)
     const [openMenuId, setOpenMenuId] = useState<number | null>(null)
     const [page, setPage] = useState(1)
     const limit = 3
+    const [total, setTotal] = useState(0)
 
-    const [clients, setClients] = useState(mockClients)
+    const [clients, setClients] = useState<ClientsDetails[]>([])
+
+    useEffect(() => {
+        if (!user?.id) return
+        async function fetchClients() {
+            setIsLoading(true)
+            const response = await requestData<ListPaginationClientsData>(`/clients/pagination/${user?.id}`, "GET", {page, limit}, true)
+            console.log(response)
+            if(response.success && response.data?.clients) {
+                setClients(response.data.clients.rows)
+                setTotal(response.data.clients.total)
+            }   
+            else {
+                setClients([])
+                setTotal(0)
+            }
+            setIsLoading(false)
+        }
+        fetchClients()
+    }, [user?.id, page, limit])
 
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean
@@ -121,16 +99,13 @@ function ClientList() {
 
     const filteredClients = clients.filter(
         (c) =>
-            c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
             c.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
             c.cpf.includes(searchTerm)
     )
 
     // Paginação
-    const startIndex = (page - 1) * limit
-    const endIndex = startIndex + limit
-    const paginatedClients = filteredClients.slice(startIndex, endIndex)
-    const totalPages = Math.ceil(filteredClients.length / limit)
+    const totalPages = Math.ceil(total / limit)
     const canGoPrev = page > 1
     const canGoNext = page < totalPages
 
@@ -202,7 +177,7 @@ function ClientList() {
                         )}
 
                         {/* Nenhum cliente */}
-                        {!isLoading && paginatedClients.length === 0 && (
+                        {!isLoading && filteredClients.length === 0 && (
                             <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500">
                                 <Users className="w-12 h-12 mb-4 text-gray-400" />
                                 <p className="text-lg font-semibold">
@@ -214,7 +189,7 @@ function ClientList() {
                             </div>
                         )}
 
-                        {!isLoading && paginatedClients.map((client) => (
+                        {!isLoading && filteredClients.map((client) => (
                             <div
                                 key={client.id}
                                 className="
@@ -236,7 +211,7 @@ function ClientList() {
                                             <div>
                                                 <h3 className="text-xl font-bold flex items-center gap-2">
                                                     <User className="w-5 h-5 text-blue-600" />
-                                                    {client.name}
+                                                    {client.username}
                                                 </h3>
                                                 <p className="text-gray-500 text-sm">
                                                     CPF: {client.cpf}
@@ -265,7 +240,7 @@ function ClientList() {
                                                             <Edit size={16} /> Editar
                                                         </button>
                                                         <button
-                                                            onClick={() => openDeleteModal(client.id, client.name)}
+                                                            onClick={() => openDeleteModal(client.id, client.username)}
                                                             className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 w-full text-left rounded-b-xl"
                                                         >
                                                             <Trash2 size={16} /> Excluir
@@ -330,7 +305,7 @@ function ClientList() {
 
                                         {/* Excluir */}
                                         <button
-                                            onClick={() => openDeleteModal(client.id, client.name)}
+                                            onClick={() => openDeleteModal(client.id, client.username)}
                                             className="
                                                 flex items-center gap-2
                                                 h-12 px-6
@@ -355,14 +330,14 @@ function ClientList() {
                         ))}
 
                         {/* Pagination */}
-                        {!isLoading && paginatedClients.length > 0 && (
+                        {!isLoading && filteredClients.length > 0 && (
                             <div className="
                                 flex flex-col gap-4
                                 sm:flex-row sm:items-center sm:justify-between
                                 pt-6 border-t border-slate-200
                             ">
                                 <p className="text-sm text-gray-500 text-center sm:text-left">
-                                    Mostrando {paginatedClients.length} de {filteredClients.length} clientes
+                                    Mostrando {filteredClients.length} de {filteredClients.length} clientes
                                 </p>
 
                                 <div className="flex items-center justify-center gap-2">
