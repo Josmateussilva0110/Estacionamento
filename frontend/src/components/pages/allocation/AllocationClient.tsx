@@ -14,6 +14,8 @@ import useFlashMessage from "../../../hooks/useFlashMessage"
 import { type ListClientsVehicleData } from "../../../types/client/listClientVehicle"
 import { mapVehicleTypeToApi } from "../allocation/utils/vehicleUtils"
 import { type SelectedSpotInfo } from "./types/selectedSpot"
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
+import { type RegisterAllocationResponse } from "../../../types/allocation/allocationResponses"
 
 function ParkingAllocation() {
   const { user } = useUser()
@@ -65,7 +67,7 @@ function ParkingAllocation() {
     setStep("confirm")
   }
 
-  function handleConfirm() {
+  async function handleConfirm() {
     if (!selectedClient || !selectedSpot) return
 
     const payload = {
@@ -78,11 +80,19 @@ function ParkingAllocation() {
     }
 
 
-    console.log(payload)
+    //console.log(payload)
 
-    // await requestData("/allocations", "POST", payload, true)
-
-    alert("Alocação realizada com sucesso!")
+    const response = await requestData<RegisterAllocationResponse>("/allocation", "POST", payload, true)
+    console.log(response)
+    if(response.success && response.data?.status) {
+      setFlashMessage(response.data.message, "success")
+    }
+    else {
+      setFlashMessage(
+        getApiErrorMessage(response),
+        "error"
+      )
+    }
     resetAllocation()
   }
 

@@ -1,6 +1,6 @@
 import {
   User,
-  UserPlus,
+  Users,
   Car,
   ParkingSquare,
   MapPinPlus
@@ -18,9 +18,9 @@ export const MENU_ITEMS = [
     icon: ParkingSquare,
   },
   {
-    label: "Adicionar Cliente",
-    to: "/client/register",
-    icon: UserPlus,
+    label: "Clientes",
+    to: "/client/list/clients",
+    icon: Users,
   },
   {
     label: "Adicionar Veículo",

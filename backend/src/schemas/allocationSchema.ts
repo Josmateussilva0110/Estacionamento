@@ -2,12 +2,11 @@ import { z } from "zod"
 
 const requiredSelect = (message: string) =>
   z
-    .string()
-    .min(1, message) 
-    .transform(Number)
+    .number()
     .refine((val) => Number.isInteger(val) && val > 0, {
       message,
     })
+
 
 export const AllocationSchema = z.object({
   client_id: requiredSelect("Selecione um cliente"),

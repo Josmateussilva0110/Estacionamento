@@ -78,7 +78,7 @@ function ParkingList() {
         }
 
         fetchParking()
-    }, [user?.id, page])
+    }, [user?.id, page, limit])
 
     function openDeleteModal(id: number, name: string) {
         setDeleteModal({

@@ -29,7 +29,7 @@ class AllocationController {
             return response.status(httpStatus).json({status: false, message: result.error?.message})
         }
 
-        return response.status(201).json({status: true, allocation_id: result.data})
+        return response.status(201).json({status: true, allocation_id: result.data, message: "Alocação cadastrada com sucesso",})
     }
 }
 

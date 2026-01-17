@@ -83,6 +83,28 @@ class ClientController {
 
         return response.status(200).json({status: true, clients: result.data})
     }
+
+    async listClients(request: Request, response: Response): Promise<Response> {
+        const { user_id } = request.params
+        const page = Number(request.query.page ?? 1)
+        const limit = Number(request.query.limit ?? 3)
+        const result = await ClientService.listClients(user_id, page, limit)
+        if(!result.status) {
+            const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            userErrorHttpStatusMap
+            )
+            return response.status(httpStatus).json({
+                status: false,
+                message: result.error?.message,
+            })
+        }
+
+        return response.status(200).json({
+            status: true,
+            clients: result.data
+        })
+    }
 }
 
 

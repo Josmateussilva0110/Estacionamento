@@ -7,6 +7,9 @@ import { type ClientResponse } from "../mappers/client.mapper"
 import { type ClientVehicleResponse } from "../mappers/clientVehicle.mapper"
 import { mapClientRowList } from "../mappers/client.mapper"
 import { mapClientVehicleRowList } from "../mappers/clientVehicle.mapper"
+import { type ClientList } from "../types/clients/clientList"
+import { type PaginatedClientListResult } from "../types/clients/paginationClientList"
+import { ClientListDTO } from "../dtos/ClientListDTO"
 
 
 class Client extends Model<ClientRow> {
@@ -113,6 +116,76 @@ class Client extends Model<ClientRow> {
             console.error(
             `Erro ao buscar veiculo de cliente da tabela: ${this.tableName}`, err)
             return []
+        }
+    }
+
+    async list(id: string, page: number, limit: number): Promise<PaginatedClientListResult | null> {
+        const offset = (page - 1) * limit
+        try {
+            const result = await db.raw<PgRawResult<ClientList>>(
+                `   
+                select
+                    q.client_id,
+                    q.username,
+                    q.email,
+                    q.phone,
+                    q.cpf,
+                    q.updated_at,
+                    q.vehicle_count,
+                    count(*) over() as total
+                from (
+                    select
+                        c.id as client_id,
+                        c.username,
+                        c.email,
+                        c.phone,
+                        c.cpf,
+                        c.updated_at,
+                        count(v.id) as vehicle_count
+                    from clients c
+                    left join vehicles v
+                        on v.client_id = c.id
+                    where c.user_id = ?
+                    group by
+                        c.id,
+                        c.username,
+                        c.email,
+                        c.phone,
+                        c.cpf,
+                        c.updated_at
+                ) q
+                order by q.updated_at desc
+                limit ?
+                offset ?
+
+                `
+                ,[id, limit, offset]
+            )
+
+            const rows = result.rows
+
+            if(!rows.length) {
+                return { rows: [], total: 0}
+            }
+
+            const total = Number(rows[0].total)
+
+            const mapped: ClientListDTO[] = rows.map((row) => ({
+                id: row.client_id,
+                username: row.username,
+                cpf: row.cpf,
+                email: row.email,
+                phone: row.phone,
+                vehicleCount: row.vehicle_count,
+                registrationDate: row.updated_at
+            }))
+
+            return { rows: mapped, total: total}
+
+        } catch(err) {
+            console.error(`Erro ao buscar lista de clientes: ", ${this.tableName}`,
+        err)
+            return null
         }
     }
 
