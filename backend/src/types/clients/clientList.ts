@@ -4,7 +4,7 @@ export interface ClientList {
     cpf: string
     phone: string
     email: string
-    updated_at: string
+    created_at: string
     total: number
     vehicle_count: number
 }
