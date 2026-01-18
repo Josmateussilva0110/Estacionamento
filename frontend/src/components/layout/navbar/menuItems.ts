@@ -23,8 +23,8 @@ export const MENU_ITEMS = [
     icon: Users,
   },
   {
-    label: "Adicionar Veículo",
-    to: "/client/vehicle/register",
+    label: "Veículos",
+    to: "/client/list/vehicles",
     icon: Car,
   },
   {
