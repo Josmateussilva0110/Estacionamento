@@ -14,6 +14,7 @@ router.post("/client/vehicle/register", validate(RegisterVehicleSchema), ClientC
 router.get("/clients/:user_id", validate(UserIdParamSchema, "params"), ClientController.getClients)
 router.get("/clients/vehicle/:user_id", validate(UserIdParamSchema, "params"), ClientController.getClientAndVehicle)
 router.get("/clients/pagination/:user_id", validate(UserIdParamSchema, "params"), ClientController.listClients)
+router.get("/clients/vehicles/pagination/:user_id", validate(UserIdParamSchema, "params"), ClientController.listVehicle)
 
 
 export default router

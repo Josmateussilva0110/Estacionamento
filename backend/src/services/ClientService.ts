@@ -7,6 +7,7 @@ import { VehicleErrorCode } from "../types/code/vehicleCode"
 import { type ClientResponse } from "../mappers/client.mapper"
 import { type ClientVehicleResponse } from "../mappers/clientVehicle.mapper"
 import { type PaginatedClientListResult } from "../types/clients/paginationClientList"
+import { type PaginatedVehicleListResult } from "../types/vehicles/paginationVehicleList"
 
 
 class ClientService {
@@ -213,6 +214,32 @@ class ClientService {
                 error: {
                     code: UserErrorCode.USER_FETCH_FAILED,
                     message: "Erro interno ao buscar lista de clientes"
+                }
+            }
+        }
+    }
+
+    async listVehicles(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedVehicleListResult | null>> {
+        try {
+            const result = await Vehicle.listPagination(user_id, page, limit)
+            if(result?.total === 0) {
+                return {
+                    status: false,
+                    error: {
+                        code: VehicleErrorCode.VEHICLE_NOT_FOUND,
+                        message: "Nenhum veículo encontrado"
+                    }
+                }
+            }
+
+            return { status: true, data: result }
+        } catch(error) {
+            console.error("ClientService.listVehicles: ", error)
+            return {
+                status: false,
+                error: {
+                    code: VehicleErrorCode.VEHICLE_FETCH_FAILED,
+                    message: "Erro interno ao buscar veículos"
                 }
             }
         }

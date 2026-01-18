@@ -130,7 +130,7 @@ class Client extends Model<ClientRow> {
                     q.email,
                     q.phone,
                     q.cpf,
-                    q.updated_at,
+                    q.created_at,
                     q.vehicle_count,
                     count(*) over() as total
                 from (
@@ -140,7 +140,7 @@ class Client extends Model<ClientRow> {
                         c.email,
                         c.phone,
                         c.cpf,
-                        c.updated_at,
+                        c.created_at,
                         count(v.id) as vehicle_count
                     from clients c
                     left join vehicles v
@@ -152,9 +152,9 @@ class Client extends Model<ClientRow> {
                         c.email,
                         c.phone,
                         c.cpf,
-                        c.updated_at
+                        c.created_at
                 ) q
-                order by q.updated_at desc
+                order by q.created_at desc
                 limit ?
                 offset ?
 
@@ -177,7 +177,7 @@ class Client extends Model<ClientRow> {
                 email: row.email,
                 phone: row.phone,
                 vehicleCount: row.vehicle_count,
-                registrationDate: row.updated_at
+                registrationDate: row.created_at
             }))
 
             return { rows: mapped, total: total}
