@@ -17,6 +17,7 @@ router.get("/clients/vehicle/:user_id", validate(UserIdParamSchema, "params"), C
 router.get("/clients/pagination/:user_id", validate(UserIdParamSchema, "params"), ClientController.listClients)
 router.get("/clients/vehicles/pagination/:user_id", validate(UserIdParamSchema, "params"), ClientController.listVehicle)
 router.delete("/client/:id", validate(IdParamSchema, "params"), ClientController.remove)
+router.delete("/client/vehicle/:id", validate(IdParamSchema, "params"), ClientController.removeVehicle)
 
 
 export default router

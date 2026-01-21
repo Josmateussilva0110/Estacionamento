@@ -278,6 +278,40 @@ class ClientService {
             }
         }
     }
+
+    async removeVehicle(vehicle_id: string): Promise<ServiceResult<{vehicle_id: string }>> {
+        try {
+            const vehicleExist = await Vehicle.findById(vehicle_id)
+            if(!vehicleExist) {
+                return {
+                    status: false,
+                    error: {
+                        code: VehicleErrorCode.VEHICLE_NOT_FOUND,
+                        message: "Veículo não encontrado"
+                    }
+                }
+            }
+            const result = await Vehicle.delete(vehicle_id)
+            if(!result) {
+                return {
+                    status: false,
+                    error: {
+                        code: VehicleErrorCode.VEHICLE_DELETE_FAILED,
+                        message: "Erro ao deletar veículo"
+                    }
+                }
+            }
+            return { status: true, data: {vehicle_id}}
+        } catch(error) {
+            return {
+                status: false,
+                error: {
+                    code: VehicleErrorCode.VEHICLE_DELETE_FAILED,
+                    message: "Erro interno ao remover veículo"
+                }
+            }
+        }
+    }
 }
 
 export default new ClientService()
