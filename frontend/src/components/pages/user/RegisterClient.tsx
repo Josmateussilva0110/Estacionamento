@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import {
   User,
   Mail,
@@ -22,6 +22,8 @@ import { type RegisterResponse } from "../../../types/authResponses"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import { useUser } from "../../../context/useUser"
+import { type ClientResponseDetail } from "../../../types/client/clientResponseDetail"
+
 
 interface RegisterClientProps {
   mode: "create" | "edit"
@@ -33,6 +35,7 @@ function RegisterClient({ mode }: RegisterClientProps) {
   const navigate = useNavigate()
   const { user } = useUser()
   const { setFlashMessage } = useFlashMessage()
+  const [isLoading, setIsLoading] = useState(true)
 
   const {
     register,
@@ -43,34 +46,49 @@ function RegisterClient({ mode }: RegisterClientProps) {
     resolver: zodResolver(RegisterClientSchema),
   })
 
-  /**
-   * 🔹 Carrega cliente no modo edição
-   */
+  
   useEffect(() => {
-    if (!isEditMode) return
+  if (!isEditMode) {
+    setIsLoading(false)
+    return
+  }
 
-    if (!id) {
-      setFlashMessage("Cliente inválido", "error")
-      navigate("/client/list/clients")
-      return
-    }
+  if (!id) {
+    setFlashMessage("Cliente inválido", "error")
+    navigate("/client/list/clients")
+    return
+  }
 
-    async function loadClient() {
-      const response = await requestData<{
-        status: boolean
-        client: RegisterClientFormInput
-      }>(`/client/${id}`, "GET", {}, true)
+  async function loadClient() {
+      try {
+        setIsLoading(true)
 
-      if (response.success && response.data?.status) {
-        reset(response.data.client)
-      } else {
-        setFlashMessage("Erro ao carregar cliente", "error")
-        navigate("/client/list/clients")
+        const response = await requestData<ClientResponseDetail>(
+          `/client/${id}`,
+          "GET",
+          {},
+          true
+        )
+
+        if (response.success && response.data?.user) {
+          reset({
+            username: response.data.user.username,
+            cpf: response.data.user.cpf,
+            phone: response.data.user.phone,
+            email: response.data.user.email,
+          })
+        } else {
+          setFlashMessage(getApiErrorMessage(response), "error")
+          navigate("/client/list/clients")
+        }
+      } finally {
+        setIsLoading(false)
       }
     }
 
     loadClient()
   }, [isEditMode, id, reset, navigate, setFlashMessage])
+
 
   /**
    * 🔹 Submit
@@ -81,7 +99,7 @@ function RegisterClient({ mode }: RegisterClientProps) {
       return
     }
 
-    const payload: RegisterClientFormOutput = {
+    const payload: RegisterClientFormOutput = { 
       ...form,
       user_id: user.id,
     }
@@ -112,6 +130,17 @@ function RegisterClient({ mode }: RegisterClientProps) {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark">
+        <div className="bg-white px-6 py-4 rounded-xl shadow-lg">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    )
+  }
+
+
   return (
     <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
@@ -140,7 +169,7 @@ function RegisterClient({ mode }: RegisterClientProps) {
           </div>
 
           {/* Form */}
-                    <form
+          <form
             onSubmit={handleSubmit(onSubmit)}
             className="px-6 py-8 space-y-6"
           >

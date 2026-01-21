@@ -60,16 +60,23 @@ class Client extends Model<ClientRow> {
         }
     }
 
-    async phoneExists(phone: string): Promise<boolean> {
+    async phoneExists(phone: string, ignoreClientId?: string): Promise<boolean> {
         try {
-            const result = await db(this.tableName)
-            .select("id")
-            .where({ phone })
-            .first()
+            const query = db(this.tableName)
+                .select("id")
+                .where("phone", phone)
 
+            if (ignoreClientId) {
+                query.andWhere("id", "!=", ignoreClientId)
+            }
+
+            const result = await query.first()
             return !!result
         } catch (err) {
-            console.error(`Erro ao verificar telefone na tabela ${this.tableName}:`, err)
+            console.error(
+                `Erro ao verificar telefone na tabela ${this.tableName}:`,
+                err
+            )
             return false
         }
     }

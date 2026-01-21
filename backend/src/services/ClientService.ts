@@ -350,7 +350,7 @@ class ClientService {
                 }
             }
 
-            const phoneExists = await Client.phoneExists(data.phone)
+            const phoneExists = await Client.phoneExists(data.phone, client_id)
             if (phoneExists) {
                 return {
                     status: false,
