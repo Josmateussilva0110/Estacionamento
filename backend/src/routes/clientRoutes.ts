@@ -16,6 +16,7 @@ router.get("/clients/:user_id", validate(UserIdParamSchema, "params"), ClientCon
 router.get("/clients/vehicle/:user_id", validate(UserIdParamSchema, "params"), ClientController.getClientAndVehicle)
 router.get("/clients/pagination/:user_id", validate(UserIdParamSchema, "params"), ClientController.listClients)
 router.get("/clients/vehicles/pagination/:user_id", validate(UserIdParamSchema, "params"), ClientController.listVehicle)
+router.get("/client/:id", validate(IdParamSchema, "params"), ClientController.getById)
 router.delete("/client/:id", validate(IdParamSchema, "params"), ClientController.remove)
 router.delete("/client/vehicle/:id", validate(IdParamSchema, "params"), ClientController.removeVehicle)
 router.put("/client/:id", validate(IdParamSchema, "params"), ClientController.edit)

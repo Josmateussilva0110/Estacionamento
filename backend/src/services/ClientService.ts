@@ -9,6 +9,7 @@ import { type ClientVehicleResponse } from "../mappers/clientVehicle.mapper"
 import { type PaginatedClientListResult } from "../types/clients/paginationClientList"
 import { type PaginatedVehicleListResult } from "../types/vehicles/paginationVehicleList"
 import { ClientEditDTO } from "../dtos/ClientEditDTO"
+import { type ClientRow } from "../types/clients/client"
 
 
 class ClientService {
@@ -375,6 +376,36 @@ class ClientService {
                     code: UserErrorCode.USER_UPDATE_FAILED, 
                     message: "Erro interno ao editar usuário"
                 }
+            }
+        }
+    }
+
+    async findById(id: string): Promise<ServiceResult<ClientRow>> {
+        try {
+            const user = await Client.findById(id)
+            if (!user) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.USER_NOT_FOUND,
+                        message: "Usuário não encontrado",
+                    },
+                }
+            }
+
+            return {
+                status: true,
+                data: user
+            }
+        } catch (error) {
+            console.error("ClientService.findById error:", error)
+
+            return {
+                status: false,
+                error: {
+                    code: UserErrorCode.USER_FETCH_FAILED,
+                    message: "Erro interno ao buscar usuário",
+                },
             }
         }
     }

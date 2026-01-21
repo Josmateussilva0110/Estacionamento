@@ -173,6 +173,20 @@ class ClientController {
         }
         return response.status(200).json({status: true, message: "Cliente atualizado com sucesso", client_id: result.data?.client_id})
     }
+
+    async getById(request: Request, response: Response): Promise<Response> {
+        const { id } = request.params
+        const result = await ClientService.findById(id)
+        if(!result.status) {
+          const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            userErrorHttpStatusMap
+          )
+          return response.status(httpStatus).json({status: false, message: result.error?.message})
+        }
+    
+        return response.status(200).json({status: true, user: result.data})
+    }
 }
 
 

@@ -8,7 +8,7 @@ import VehicleList from "../components/pages/user/ListVehicles"
 export default function ClientRoutes() {
   return (
     <Routes>
-      <Route path="register" element={<RegisterClient />} />
+      <Route path="register" element={<RegisterClient mode="create" />} />
       <Route path="vehicle/register" element={<RegisterVehicle />} />
       <Route path="list/clients" element={<ClientList />} />
       <Route path="list/vehicles" element={<VehicleList />} />
