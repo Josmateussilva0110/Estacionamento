@@ -53,7 +53,7 @@ function RegisterClient() {
 
     if (response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
-      navigate("/")
+      navigate("/client/list/clients")
     } else {
       setFlashMessage(getApiErrorMessage(response), "error")
     }

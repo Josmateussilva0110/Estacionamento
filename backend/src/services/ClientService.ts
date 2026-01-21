@@ -244,6 +244,74 @@ class ClientService {
             }
         }
     }
+
+    async removeClient(client_id: string): Promise<ServiceResult<{client_id: string }>> {
+        try {
+            const clientExist = await Client.findById(client_id)
+            if(!clientExist) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.USER_NOT_FOUND,
+                        message: "Usuário não encontrado"
+                    }
+                }
+            }
+            const result = await Client.delete(client_id)
+            if(!result) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.USER_DELETE_FAILED,
+                        message: "Erro ao deletar usuário"
+                    }
+                }
+            }
+            return { status: true, data: {client_id}}
+        } catch(error) {
+            return {
+                status: false,
+                error: {
+                    code: UserErrorCode.USER_DELETE_FAILED,
+                    message: "Erro interno ao remover usuário"
+                }
+            }
+        }
+    }
+
+    async removeVehicle(vehicle_id: string): Promise<ServiceResult<{vehicle_id: string }>> {
+        try {
+            const vehicleExist = await Vehicle.findById(vehicle_id)
+            if(!vehicleExist) {
+                return {
+                    status: false,
+                    error: {
+                        code: VehicleErrorCode.VEHICLE_NOT_FOUND,
+                        message: "Veículo não encontrado"
+                    }
+                }
+            }
+            const result = await Vehicle.delete(vehicle_id)
+            if(!result) {
+                return {
+                    status: false,
+                    error: {
+                        code: VehicleErrorCode.VEHICLE_DELETE_FAILED,
+                        message: "Erro ao deletar veículo"
+                    }
+                }
+            }
+            return { status: true, data: {vehicle_id}}
+        } catch(error) {
+            return {
+                status: false,
+                error: {
+                    code: VehicleErrorCode.VEHICLE_DELETE_FAILED,
+                    message: "Erro interno ao remover veículo"
+                }
+            }
+        }
+    }
 }
 
 export default new ClientService()

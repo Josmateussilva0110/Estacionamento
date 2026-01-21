@@ -23,6 +23,9 @@ import { requestData } from "../../../services/requestApi"
 import { useUser } from "../../../context/useUser"
 import { type ListPaginationVehiclesData } from "../../../types/client/listVehicles" 
 import { type VehiclesDetails } from "../../../types/client/vehiclesDetail"
+import { type RemoveVehicleResponse } from "../../../types/client/clientResponse"
+import useFlashMessage from "../../../hooks/useFlashMessage"
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
 
@@ -37,6 +40,7 @@ function VehicleList() {
     const [page, setPage] = useState(1)
     const limit = 3
     const [total, setTotal] = useState(0)
+    const { setFlashMessage } = useFlashMessage()
 
     const [vehicles, setVehicles] = useState<VehiclesDetails[]>([])
 
@@ -61,18 +65,18 @@ function VehicleList() {
 
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean
-        clientId: number | null
+        vehicleId: number | null
         plate: string
     }>({
         isOpen: false,
-        clientId: null,
+        vehicleId: null,
         plate: ""
     })
 
     function openDeleteModal(id: number, name: string) {
         setDeleteModal({
             isOpen: true,
-            clientId: id,
+            vehicleId: id,
             plate: name
         })
         setOpenMenuId(null)
@@ -81,22 +85,31 @@ function VehicleList() {
     function closeDeleteModal() {
         setDeleteModal({
             isOpen: false,
-            clientId: null,
+            vehicleId: null,
             plate: ""
         })
     }
 
     async function confirmDelete() {
-        if (!deleteModal.clientId) return
+        if (!deleteModal.vehicleId) return
 
         setIsDeleting(true)
 
-        // Simula uma chamada API
-        setTimeout(() => {
-            setVehicles((prev) => prev.filter((c) => c.id !== deleteModal.clientId))
-            setIsDeleting(false)
+        const response = await requestData<RemoveVehicleResponse>(`/client/vehicle/${deleteModal.vehicleId}`, "DELETE", {}, true)
+        if(response.success && response.data?.status) {
+            setFlashMessage(response.data.message, "success")
+            setVehicles((prev) => prev.filter((p) => p.id !== deleteModal.vehicleId))
+            setTotal((prev) => Math.max(prev - 1, 0))
+            
+            if (vehicles.length === 1 && page > 1) {
+                setPage((p) => p - 1)
+            }
             closeDeleteModal()
-        }, 1000)
+        }
+        else {
+            setFlashMessage(getApiErrorMessage(response), "error")
+        }
+        setIsDeleting(false)
     }
 
     const filteredVehicles = vehicles.filter(

@@ -18,9 +18,12 @@ import { useNavigate } from "react-router-dom"
 
 import ConfirmDeleteModal from "../../layout/DeleteModal"
 import { requestData } from "../../../services/requestApi"
+import useFlashMessage from "../../../hooks/useFlashMessage"
 import { useUser } from "../../../context/useUser"
 import { type ListPaginationClientsData } from "../../../types/client/listClients"
 import { type ClientsDetails } from "../../../types/client/clientsDetail"
+import { type RemoveClientResponse } from "../../../types/client/clientResponse" 
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
 
@@ -35,6 +38,7 @@ function ClientList() {
     const [page, setPage] = useState(1)
     const limit = 3
     const [total, setTotal] = useState(0)
+    const { setFlashMessage } = useFlashMessage()
 
     const [clients, setClients] = useState<ClientsDetails[]>([])
 
@@ -89,12 +93,21 @@ function ClientList() {
 
         setIsDeleting(true)
 
-        // Simula uma chamada API
-        setTimeout(() => {
-            setClients((prev) => prev.filter((c) => c.id !== deleteModal.clientId))
-            setIsDeleting(false)
+        const response = await requestData<RemoveClientResponse>(`/client/${deleteModal.clientId}`, "DELETE", {}, true)
+        if(response.success && response.data?.status) {
+            setFlashMessage(response.data.message, "success")
+            setClients((prev) => prev.filter((p) => p.id !== deleteModal.clientId))
+            setTotal((prev) => Math.max(prev - 1, 0))
+            
+            if (clients.length === 1 && page > 1) {
+                setPage((p) => p - 1)
+            }
             closeDeleteModal()
-        }, 1000)
+        }
+        else {
+            setFlashMessage(getApiErrorMessage(response), "error")
+        }
+        setIsDeleting(false)
     }
 
     const filteredClients = clients.filter(

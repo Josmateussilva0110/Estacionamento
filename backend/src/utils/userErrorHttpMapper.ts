@@ -9,4 +9,5 @@ export const userErrorHttpStatusMap: Record<UserErrorCode, number> = {
   [UserErrorCode.USER_CREATE_FAILED]: 500,   // Internal Server Error
   [UserErrorCode.LOGIN_FAILED]: 500,
   [UserErrorCode.USER_FETCH_FAILED]: 500,
+  [UserErrorCode.USER_DELETE_FAILED]: 500
 }

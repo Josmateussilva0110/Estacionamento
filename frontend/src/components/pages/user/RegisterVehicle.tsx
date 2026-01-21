@@ -76,7 +76,7 @@ function RegisterVehicle() {
     const response = await requestData<RegisterVehicleResponse>("/client/vehicle/register", "POST", data, true)
     if(response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
-      navigate("/")
+      navigate("/client/list/vehicles")
     }
     else {
       setFlashMessage(getApiErrorMessage(response), "error")
