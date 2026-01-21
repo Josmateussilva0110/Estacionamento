@@ -137,7 +137,7 @@ class ClientController {
                 message: result.error?.message,
             })
         }
-        return response.status(200).json({status: true, message: "Cliente removido com sucesso", id: result.data?.client_id})
+        return response.status(200).json({status: true, message: "Cliente removido com sucesso", clientId: result.data?.client_id})
     }
 
     async removeVehicle(request: Request, response: Response): Promise<Response> {
@@ -153,7 +153,7 @@ class ClientController {
                 message: result.error?.message,
             })
         }
-        return response.status(200).json({status: true, message: "Veículo removido com sucesso", id: result.data?.vehicle_id})
+        return response.status(200).json({status: true, message: "Veículo removido com sucesso", vehicleId: result.data?.vehicle_id})
     }
 }
 
