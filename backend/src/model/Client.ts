@@ -17,30 +17,45 @@ class Client extends Model<ClientRow> {
         super("clients")
     }
 
-    async emailExists(email: string): Promise<boolean> {
+    async emailExists(email: string, ignoreClientId?: string): Promise<boolean> {
         try {
-            const result = await db(this.tableName)
-            .select("id")
-            .where({ email })
-            .first()
+            const query = db(this.tableName)
+                .select("id")
+                .where("email", email)
 
+            if (ignoreClientId) {
+                query.andWhere("id", "!=", ignoreClientId)
+            }
+
+            const result = await query.first()
             return !!result
         } catch (err) {
-            console.error(`Erro ao verificar e-mail na tabela ${this.tableName}:`, err)
+            console.error(
+                `Erro ao verificar e-mail na tabela ${this.tableName}:`,
+                err
+            )
             return false
         }
     }
 
-    async cpfExists(cpf: string): Promise<boolean> {
-        try {
-            const result = await db(this.tableName)
-            .select("id")
-            .where({ cpf })
-            .first()
 
+    async cpfExists(cpf: string, ignoreClientId?: string): Promise<boolean> {
+        try {
+            const query = db(this.tableName)
+                .select("id")
+                .where("cpf", cpf)
+
+            if (ignoreClientId) {
+                query.andWhere("id", "!=", ignoreClientId)
+            }
+
+            const result = await query.first()
             return !!result
         } catch (err) {
-            console.error(`Erro ao verificar cpf na tabela ${this.tableName}:`, err)
+            console.error(
+                `Erro ao verificar cpf na tabela ${this.tableName}:`,
+                err
+            )
             return false
         }
     }

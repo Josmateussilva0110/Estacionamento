@@ -3,6 +3,7 @@ import ClientService from "../services/ClientService"
 import { userErrorHttpStatusMap } from "../utils/userErrorHttpMapper"
 import { vehicleErrorHttpStatusMap } from "../utils/vehicleErrorHttpMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
+import { ClientEditDTO } from "../dtos/ClientEditDTO"
 
 class ClientController {
     async register(request: Request, response: Response): Promise<Response> {
@@ -154,6 +155,23 @@ class ClientController {
             })
         }
         return response.status(200).json({status: true, message: "Veículo removido com sucesso", vehicleId: result.data?.vehicle_id})
+    }
+
+    async edit(request: Request, response: Response): Promise<Response> {
+        const { id } = request.params
+        const data: ClientEditDTO = request.body
+        const result = await ClientService.edit(id, data)
+        if(!result.status) {
+            const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            userErrorHttpStatusMap
+            )
+            return response.status(httpStatus).json({
+                status: false,
+                message: result.error?.message,
+            })
+        }
+        return response.status(200).json({status: true, message: "Cliente atualizado com sucesso", client_id: result.data?.client_id})
     }
 }
 

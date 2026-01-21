@@ -8,6 +8,7 @@ import { type ClientResponse } from "../mappers/client.mapper"
 import { type ClientVehicleResponse } from "../mappers/clientVehicle.mapper"
 import { type PaginatedClientListResult } from "../types/clients/paginationClientList"
 import { type PaginatedVehicleListResult } from "../types/vehicles/paginationVehicleList"
+import { ClientEditDTO } from "../dtos/ClientEditDTO"
 
 
 class ClientService {
@@ -308,6 +309,71 @@ class ClientService {
                 error: {
                     code: VehicleErrorCode.VEHICLE_DELETE_FAILED,
                     message: "Erro interno ao remover veículo"
+                }
+            }
+        }
+    }
+
+    async edit(client_id: string, data: ClientEditDTO): Promise<ServiceResult<{ client_id: string }>> {
+        try {
+            const clientExist = await Client.findById(client_id)
+            if(!clientExist) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.USER_NOT_FOUND,
+                        message: "Cliente não encontrado"
+                    }
+                }
+            }
+
+            const emailUserExists = await Client.emailExists(data.email, client_id)
+            if(emailUserExists) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.EMAIL_ALREADY_EXISTS,
+                        message: "Email já criado",
+                    }
+                }
+            }
+
+            const cpfExists = await Client.cpfExists(data.cpf, client_id)
+            if (cpfExists) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.CPF_ALREADY_EXISTS,
+                        message: "CPF já existe",
+                    },
+                }
+            }
+
+            const phoneExists = await Client.phoneExists(data.phone)
+            if (phoneExists) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.PHONE_ALREADY_EXISTS,
+                        message: "Telefone já existe",
+                    },
+                }
+            }
+
+
+            await Client.update(client_id, data)
+
+            return {
+                status: true,
+                data: { client_id},
+            }
+
+        } catch(error) {
+            return {
+                status: false,
+                error: {
+                    code: UserErrorCode.USER_UPDATE_FAILED, 
+                    message: "Erro interno ao editar usuário"
                 }
             }
         }
