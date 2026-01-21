@@ -3,6 +3,7 @@ import ClientController from "../controllers/clientController"
 import { RegisterClientSchema } from "../schemas/clientSchema"
 import { RegisterVehicleSchema } from "../schemas/vehicleSchema"
 import { UserIdParamSchema } from "../schemas/userIdSchema"
+import { IdParamSchema } from "../schemas/IdParamSchema"
 import { validate } from "../middleware/validate"
 
 
@@ -15,6 +16,7 @@ router.get("/clients/:user_id", validate(UserIdParamSchema, "params"), ClientCon
 router.get("/clients/vehicle/:user_id", validate(UserIdParamSchema, "params"), ClientController.getClientAndVehicle)
 router.get("/clients/pagination/:user_id", validate(UserIdParamSchema, "params"), ClientController.listClients)
 router.get("/clients/vehicles/pagination/:user_id", validate(UserIdParamSchema, "params"), ClientController.listVehicle)
+router.delete("/client/:id", validate(IdParamSchema, "params"), ClientController.remove)
 
 
 export default router

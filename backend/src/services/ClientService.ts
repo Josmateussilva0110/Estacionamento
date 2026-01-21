@@ -244,6 +244,40 @@ class ClientService {
             }
         }
     }
+
+    async removeClient(client_id: string): Promise<ServiceResult<{client_id: string }>> {
+        try {
+            const clientExist = await Client.findById(client_id)
+            if(!clientExist) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.USER_NOT_FOUND,
+                        message: "Usuário não encontrado"
+                    }
+                }
+            }
+            const result = await Client.delete(client_id)
+            if(!result) {
+                return {
+                    status: false,
+                    error: {
+                        code: UserErrorCode.USER_DELETE_FAILED,
+                        message: "Erro ao deletar usuário"
+                    }
+                }
+            }
+            return { status: true, data: {client_id}}
+        } catch(error) {
+            return {
+                status: false,
+                error: {
+                    code: UserErrorCode.USER_DELETE_FAILED,
+                    message: "Erro interno ao remover usuário"
+                }
+            }
+        }
+    }
 }
 
 export default new ClientService()
