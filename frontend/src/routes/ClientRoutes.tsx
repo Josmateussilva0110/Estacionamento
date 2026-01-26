@@ -10,7 +10,8 @@ export default function ClientRoutes() {
     <Routes>
       <Route path="register" element={<RegisterClient mode="create" />} />
       <Route path="edit/:id" element={<RegisterClient mode="edit" />} />
-      <Route path="vehicle/register" element={<RegisterVehicle />} />
+      <Route path="vehicle/register" element={<RegisterVehicle mode="create" />} />
+      <Route path="vehicle/edit/:id" element={<RegisterVehicle mode="edit" />} />
       <Route path="list/clients" element={<ClientList />} />
       <Route path="list/vehicles" element={<VehicleList />} />
     </Routes>

@@ -1,4 +1,4 @@
-export interface VehicleEditDTO {
+export interface VehicleDetail {
   vehicleId: number
   clientId: number
   clientName: string

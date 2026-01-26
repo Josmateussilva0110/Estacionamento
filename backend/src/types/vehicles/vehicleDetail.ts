@@ -4,7 +4,7 @@ export interface VehicleDetail {
     client_name: string
     client_cpf: string
     plate: string
-    vehicle_type: string
+    vehicle_type: number
     brand: string
     color: string
 }

@@ -132,8 +132,7 @@ function VehicleList() {
     }
 
     function handleEdit(id: number) {
-        console.log('Editar cliente:', id)
-        // Aqui você adicionará a navegação quando integrar com seu router
+        navigate(`/client/vehicle/edit/${id}`)
     }
 
     function handleRegister() {
