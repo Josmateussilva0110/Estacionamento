@@ -24,7 +24,7 @@ export const MENU_ITEMS = [
   },
   {
     label: "Veículos",
-    to: "/client/list/vehicles",
+    to: "/vehicle/list/vehicles",
     icon: Car,
   },
   {

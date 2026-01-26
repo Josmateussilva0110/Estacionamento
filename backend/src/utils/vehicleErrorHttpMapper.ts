@@ -6,4 +6,5 @@ export const vehicleErrorHttpStatusMap: Record<VehicleErrorCode, number> = {
   [VehicleErrorCode.VEHICLE_CREATE_FAILED]: 500,   
   [VehicleErrorCode.VEHICLE_FETCH_FAILED]: 500,  
   [VehicleErrorCode.VEHICLE_DELETE_FAILED]: 500,
+  [VehicleErrorCode.VEHICLE_UPDATE_FAILED]: 500,
 }

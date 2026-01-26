@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Car, FileText, CarFront } from "lucide-react"
+import { Car, FileText, CarFront, Pencil } from "lucide-react"
 
 import Input from "../../ui/Input"
 import { Select } from "../../ui/Select"
@@ -21,42 +21,27 @@ import { useUser } from "../../../context/useUser"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { type RegisterVehicleResponse } from "../../../types/client/clientResponse"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
+import { type VehicleResponseDetail } from "../../../types/client/vehicleResponseDetail"
 
+interface RegisterVehicleProps {
+  mode: "create" | "edit"
+}
 
-
-function RegisterVehicle() {
+function RegisterVehicle({ mode }: RegisterVehicleProps) {
+  const isEditMode = mode === "edit"
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { setFlashMessage } = useFlashMessage()
   const [isLoading, setIsLoading] = useState(true)
   const { user } = useUser()
   const [clients, setClients] = useState<ClientDetails[]>([])
 
-  useEffect(() => {
-    if (!user) {
-      setFlashMessage("Usuário não autenticado", "error")
-      return
-    }
-
-    async function fetchClients() {
-      setIsLoading(true)
-      const response = await requestData<ListClientsData>(`/clients/${user?.id}`, "GET", {}, true)
-      if(response.success && response.data?.clients) {
-        setClients(response.data.clients)
-      }
-      else {
-        setClients([])
-      }
-      setIsLoading(false)
-    }
-    fetchClients()
-  },[user, setFlashMessage])
-
-
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = useForm<RegisterVehicleFormData>({
     resolver: zodResolver(RegisterVehicleSchema),
@@ -72,36 +57,133 @@ function RegisterVehicle() {
   const vehicleType = watch("vehicle_type")
   const clientId = watch("client_id")
 
-  async function onSubmit(data: RegisterVehicleFormData) {
-    const response = await requestData<RegisterVehicleResponse>("/client/vehicle/register", "POST", data, true)
-    if(response.success && response.data?.status) {
-      setFlashMessage(response.data.message, "success")
-      navigate("/client/list/vehicles")
+  useEffect(() => {
+    if (!user) {
+      setFlashMessage("Usuário não autenticado", "error")
+      return
     }
-    else {
+
+    async function fetchClients() {
+      const response = await requestData<ListClientsData>(
+        `/clients/${user?.id}`,
+        "GET",
+        {},
+        true
+      )
+      if (response.success && response.data?.clients) {
+        setClients(response.data.clients)
+      } else {
+        setClients([])
+      }
+    }
+
+    fetchClients()
+  }, [user, setFlashMessage])
+
+  useEffect(() => {
+    if (!isEditMode) {
+      setIsLoading(false)
+      return
+    }
+
+    if (!id) {
+      setFlashMessage("Veículo inválido", "error")
+      navigate("/vehicle/list/vehicles")
+      return
+    }
+
+    async function loadVehicle() {
+      try {
+        setIsLoading(true)
+
+        const response = await requestData<VehicleResponseDetail>(
+          `/vehicle/${id}`,
+          "GET",
+          {},
+          true
+        )
+
+        if (response.success && response.data?.vehicle) {
+          reset({
+            plate: response.data.vehicle.plate,
+            brand: response.data.vehicle.brand,
+            color: response.data.vehicle.color,
+            vehicle_type: response.data.vehicle.vehicleType,
+            client_id: response.data.vehicle.clientId,
+          })
+        } else {
+          setFlashMessage(getApiErrorMessage(response), "error")
+          navigate("/vehicle/list/vehicles")
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadVehicle()
+  }, [isEditMode, id, reset, navigate, setFlashMessage])
+
+  async function onSubmit(data: RegisterVehicleFormData) {
+    const endpoint = isEditMode
+      ? `/vehicle/${id}`
+      : "/vehicle/register"
+
+    const method = isEditMode ? "PUT" : "POST"
+
+    const response = await requestData<RegisterVehicleResponse>(
+      endpoint,
+      method,
+      data,
+      true
+    )
+
+    if (response.success && response.data?.status) {
+      setFlashMessage(
+        isEditMode
+          ? "Veículo atualizado com sucesso"
+          : response.data.message,
+        "success"
+      )
+      navigate("/vehicle/list/vehicles")
+    } else {
       setFlashMessage(getApiErrorMessage(response), "error")
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-600 via-blue-700 to-blue-900">
+        <div className="bg-white px-6 py-4 rounded-xl shadow-lg">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-600 via-blue-700 to-blue-900 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          
           {/* Header */}
           <div className="bg-linear-to-br from-blue-600 to-blue-500 px-6 py-8 text-center">
             <div className="mb-4 flex justify-center">
               <div className="bg-white/20 p-4 rounded-full backdrop-blur-sm">
-                <CarFront className="w-8 h-8 text-white" />
+                {isEditMode ? (
+                  <Pencil className="w-8 h-8 text-white" />
+                ) : (
+                  <CarFront className="w-8 h-8 text-white" />
+                )}
               </div>
             </div>
 
             <h1 className="text-2xl font-bold text-white">
-              Cadastro de Veículo
+              {isEditMode ? "Editar Veículo" : "Cadastro de Veículo"}
             </h1>
 
             <p className="text-blue-100 text-sm mt-2">
-              Preencha os dados abaixo para registrar um novo veículo
+              {isEditMode
+                ? "Atualize os dados do veículo"
+                : "Preencha os dados abaixo para registrar um novo veículo"}
             </p>
           </div>
 
@@ -115,20 +197,16 @@ function RegisterVehicle() {
               value={clientId}
               label="Cliente"
               placeholder="Buscar cliente por nome ou CPF"
-              isLoading={isLoading}
-
+              isLoading={false}
               onChange={(id) =>
                 setValue("client_id", id, { shouldValidate: true })
               }
-
               getId={(c) => c.id}
               getLabel={(c) => c.username}
-
               filterBy={(c, search) =>
                 c.username.toLowerCase().includes(search.toLowerCase()) ||
                 c.cpf.includes(search)
               }
-
               renderItem={(client) => (
                 <>
                   <div className="font-medium">{client.username}</div>
@@ -138,8 +216,6 @@ function RegisterVehicle() {
                 </>
               )}
             />
-
-
 
             <Input
               label="Placa *"
@@ -207,7 +283,7 @@ function RegisterVehicle() {
                 shadow-lg
               "
             >
-              Cadastrar Veículo
+              {isEditMode ? "Salvar Alterações" : "Cadastrar Veículo"}
             </button>
 
             <div className="text-center pt-4 border-t border-gray-200">
