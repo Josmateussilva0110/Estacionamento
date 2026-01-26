@@ -88,7 +88,7 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
 
     if (!id) {
       setFlashMessage("Veículo inválido", "error")
-      navigate("/client/list/vehicles")
+      navigate("/vehicle/list/vehicles")
       return
     }
 
@@ -97,7 +97,7 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
         setIsLoading(true)
 
         const response = await requestData<VehicleResponseDetail>(
-          `/client/vehicle/${id}`,
+          `/vehicle/${id}`,
           "GET",
           {},
           true
@@ -113,7 +113,7 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
           })
         } else {
           setFlashMessage(getApiErrorMessage(response), "error")
-          navigate("/client/list/vehicles")
+          navigate("/vehicle/list/vehicles")
         }
       } finally {
         setIsLoading(false)
@@ -125,8 +125,8 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
 
   async function onSubmit(data: RegisterVehicleFormData) {
     const endpoint = isEditMode
-      ? `/client/vehicle/${id}`
-      : "/client/vehicle/register"
+      ? `/vehicle/${id}`
+      : "/vehicle/register"
 
     const method = isEditMode ? "PUT" : "POST"
 
@@ -144,7 +144,7 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
           : response.data.message,
         "success"
       )
-      navigate("/client/list/vehicles")
+      navigate("/vehicle/list/vehicles")
     } else {
       setFlashMessage(getApiErrorMessage(response), "error")
     }

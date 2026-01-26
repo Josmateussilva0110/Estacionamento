@@ -8,6 +8,7 @@ import PrivateRoute from "./PrivateRouter"
 import PageNotFound from "../components/pages/errors/PageNotFound"
 import ParkingRoutes from "./PakingRoutes"
 import ClientRoutes from "./ClientRoutes"
+import VehicleRoutes from "./VehicleRoutes"
 
 export default function AppRoutes() {
   return (
@@ -25,6 +26,7 @@ export default function AppRoutes() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/parking/*" element={<ParkingRoutes />} />
         <Route path="/client/*" element={<ClientRoutes />} />
+        <Route path="/vehicle/*" element={<VehicleRoutes />} />
       </Route>
 
       {/* Rota 404 */}

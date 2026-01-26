@@ -48,7 +48,7 @@ function VehicleList() {
         if (!user?.id) return
         async function fetchClients() {
             setIsLoading(true)
-            const response = await requestData<ListPaginationVehiclesData>(`/clients/vehicles/pagination/${user?.id}`, "GET", {page, limit}, true)
+            const response = await requestData<ListPaginationVehiclesData>(`/vehicles/pagination/${user?.id}`, "GET", {page, limit}, true)
             console.log(response)
             if(response.success && response.data?.vehicles) {
                 setVehicles(response.data.vehicles.rows)
@@ -95,7 +95,7 @@ function VehicleList() {
 
         setIsDeleting(true)
 
-        const response = await requestData<RemoveVehicleResponse>(`/client/vehicle/${deleteModal.vehicleId}`, "DELETE", {}, true)
+        const response = await requestData<RemoveVehicleResponse>(`/vehicle/${deleteModal.vehicleId}`, "DELETE", {}, true)
         if(response.success && response.data?.status) {
             setFlashMessage(response.data.message, "success")
             setVehicles((prev) => prev.filter((p) => p.id !== deleteModal.vehicleId))
@@ -132,11 +132,11 @@ function VehicleList() {
     }
 
     function handleEdit(id: number) {
-        navigate(`/client/vehicle/edit/${id}`)
+        navigate(`/vehicle/edit/${id}`)
     }
 
     function handleRegister() {
-        navigate("/client/vehicle/register")
+        navigate("/vehicle/register")
     }
 
     function getVehicleIcon(type: string) {
