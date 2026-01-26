@@ -436,6 +436,49 @@ class ClientService {
             }
         }
     }
+
+    async editVehicle(vehicle_id: string, data: VehicleEditDTO): Promise<ServiceResult<{ vehicle_id: string }>> {
+        try {
+            const vehicleExist = await Vehicle.findById(vehicle_id)
+            if(!vehicleExist) {
+                return {
+                    status: false,
+                    error: {
+                        code: VehicleErrorCode.VEHICLE_NOT_FOUND,
+                        message: "Veículo não encontrado"
+                    }
+                }
+            }
+
+            const plateExists = await Vehicle.plateExists(data.plate, vehicle_id)
+            if (plateExists) {
+                return {
+                    status: false,
+                    error: {
+                        code: VehicleErrorCode.PLATE_ALREADY_EXISTS,
+                        message: "Essa placa já existe",
+                    },
+                }
+            }
+
+
+           await Vehicle.update(vehicle_id, data)
+
+            return {
+                status: true,
+                data: { vehicle_id},
+            }
+
+        } catch(error) {
+            return {
+                status: false,
+                error: {
+                    code: VehicleErrorCode.VEHICLE_UPDATE_FAILED, 
+                    message: "Erro interno ao editar veículo"
+                }
+            }
+        }
+    }
 }
 
 export default new ClientService()

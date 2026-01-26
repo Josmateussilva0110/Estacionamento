@@ -4,6 +4,7 @@ import { userErrorHttpStatusMap } from "../utils/userErrorHttpMapper"
 import { vehicleErrorHttpStatusMap } from "../utils/vehicleErrorHttpMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 import { ClientEditDTO } from "../dtos/ClientEditDTO"
+import { VehicleEditDTO } from "../dtos/VehicleEditDTO"
 
 class ClientController {
     async register(request: Request, response: Response): Promise<Response> {
@@ -199,6 +200,23 @@ class ClientController {
           return response.status(httpStatus).json({status: false, message: result.error?.message})
         }
         return response.status(200).json({status: true, vehicle: result.data})
+    }
+
+    async editVehicle(request: Request, response: Response): Promise<Response> {
+        const { id } = request.params
+        const data: VehicleEditDTO = request.body
+        const result = await ClientService.editVehicle(id, data)
+        if(!result.status) {
+            const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            userErrorHttpStatusMap
+            )
+            return response.status(httpStatus).json({
+                status: false,
+                message: result.error?.message,
+            })
+        }
+        return response.status(200).json({status: true, message: "Veículo atualizado com sucesso", vehicle_id: result.data?.vehicle_id})
     }
 }
 

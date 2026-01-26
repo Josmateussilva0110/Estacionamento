@@ -25,16 +25,40 @@ class Vehicle extends Model<VehicleData> {
         super("vehicles")
     }
 
-    async plateExists(plate: string): Promise<boolean> {
+    async plateExists(plate: string, ignoreVehicleId?: string): Promise<boolean> {
         try {
-            const result = await db(this.tableName)
-            .select("id")
-            .where({ plate })
-            .first()
-
+            const query = db(this.tableName)
+                .select("id")
+                .where("plate", plate)
+            
+            if(ignoreVehicleId) {
+                query.andWhere("id", "!=", ignoreVehicleId)
+            }
+            const result = await query.first()
             return !!result
         } catch (err) {
             console.error(`Erro ao verificar placa na tabela ${this.tableName}:`, err)
+            return false
+        }
+    }
+
+    async cpfExists(cpf: string, ignoreClientId?: string): Promise<boolean> {
+        try {
+            const query = db(this.tableName)
+                .select("id")
+                .where("cpf", cpf)
+
+            if (ignoreClientId) {
+                query.andWhere("id", "!=", ignoreClientId)
+            }
+
+            const result = await query.first()
+            return !!result
+        } catch (err) {
+            console.error(
+                `Erro ao verificar cpf na tabela ${this.tableName}:`,
+                err
+            )
             return false
         }
     }
