@@ -187,6 +187,19 @@ class ClientController {
     
         return response.status(200).json({status: true, user: result.data})
     }
+
+    async getVehicleDetail(request: Request, response: Response): Promise<Response> {
+        const { id } = request.params
+        const result = await ClientService.vehicleDetail(id)
+        if(!result.status) {
+            const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            vehicleErrorHttpStatusMap
+          )
+          return response.status(httpStatus).json({status: false, message: result.error?.message})
+        }
+        return response.status(200).json({status: true, vehicle: result.data})
+    }
 }
 
 

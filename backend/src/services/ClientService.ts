@@ -9,6 +9,7 @@ import { type ClientVehicleResponse } from "../mappers/clientVehicle.mapper"
 import { type PaginatedClientListResult } from "../types/clients/paginationClientList"
 import { type PaginatedVehicleListResult } from "../types/vehicles/paginationVehicleList"
 import { ClientEditDTO } from "../dtos/ClientEditDTO"
+import { VehicleEditDTO } from "../dtos/VehicleEditDTO"
 import { type ClientRow } from "../types/clients/client"
 
 
@@ -406,6 +407,32 @@ class ClientService {
                     code: UserErrorCode.USER_FETCH_FAILED,
                     message: "Erro interno ao buscar usuário",
                 },
+            }
+        }
+    }
+
+    async vehicleDetail(vehicle_id: string): Promise<ServiceResult<VehicleEditDTO>> {
+        try {
+            const vehicle = await Vehicle.vehicleDetail(vehicle_id)
+            if(!vehicle) {
+                return {
+                    status: false,
+                    error: {
+                        code: VehicleErrorCode.VEHICLE_NOT_FOUND,
+                        message: "Veículo não encontrado",
+                    },
+                }
+            }
+
+            return { status: true, data: vehicle}
+        } catch(error) {
+            console.error("ClientService.vehicleDetail: ", error)
+            return {
+                status: false,
+                error: {
+                    code: VehicleErrorCode.VEHICLE_FETCH_FAILED,
+                    message: "Erro interno ao buscar detalhes de veículo",
+                }
             }
         }
     }

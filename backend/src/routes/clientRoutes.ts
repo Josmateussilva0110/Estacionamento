@@ -20,6 +20,7 @@ router.get("/client/:id", validate(IdParamSchema, "params"), ClientController.ge
 router.delete("/client/:id", validate(IdParamSchema, "params"), ClientController.remove)
 router.delete("/client/vehicle/:id", validate(IdParamSchema, "params"), ClientController.removeVehicle)
 router.put("/client/:id", validate(IdParamSchema, "params"), ClientController.edit)
+router.get("/client/vehicle/:id", validate(IdParamSchema, "params"), ClientController.getVehicleDetail)
 
 
 export default router

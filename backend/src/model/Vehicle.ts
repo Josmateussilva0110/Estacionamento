@@ -3,6 +3,8 @@ import db from "../database/connection/connection"
 import { type PaginatedVehicleListResult } from "../types/vehicles/paginationVehicleList"
 import { type VehicleList } from "../types/vehicles/vehicleList"
 import { VehicleListDTO } from "../dtos/VehicleListDTO"
+import { type VehicleDetail } from "../types/vehicles/vehicleDetail"
+import { VehicleEditDTO } from "../dtos/VehicleEditDTO"
 import { PgRawResult } from "../types/database/BdResult"
 
 
@@ -94,6 +96,41 @@ class Vehicle extends Model<VehicleData> {
         }
     }
 
+    async vehicleDetail(vehicle_id: string): Promise<VehicleEditDTO | null> {
+        try {
+            const result = await db.raw<PgRawResult<VehicleDetail>>(
+                `
+                    select 
+                        v.id as vehicle_id, v.plate, v.vehicle_type, v.brand, v.color,
+                        c.id as client_id, c.username as client_name, c.cpf as client_cpf
+                    from vehicles v
+                    inner join clients c 
+                        on c.id = v.client_id
+                    where v.id = ?
+                `,
+                [vehicle_id]
+            )
+            if(result.rows.length === 0) return null
+            const row = result.rows[0]
+
+            const mapper: VehicleEditDTO = {
+                vehicleId: row.vehicle_id,
+                clientId: row.client_id,
+                clientName: row.client_name,
+                cpf: row.client_cpf,
+                plate: row.plate,
+                vehicleType: row.vehicle_type,
+                brand: row.brand,
+                color: row.color,
+            }
+
+            return mapper
+
+        } catch(err) {
+            console.error(`Erro ao buscar veículos detalhes: ${this.tableName}`, err)
+            return null
+        }
+    }
 
 }
 
