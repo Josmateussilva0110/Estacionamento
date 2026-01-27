@@ -11,8 +11,7 @@ import {
     ChevronRight,
     Users,
     Calendar,
-    MoreVertical,
-    Car
+    Car,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
@@ -26,17 +25,14 @@ import { type RemoveClientResponse } from "../../../types/client/clientResponse"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
-
-
 function ClientList() {
     const navigate = useNavigate()
     const { user } = useUser()
     const [searchTerm, setSearchTerm] = useState("")
     const [isLoading, setIsLoading] = useState(true)
     const [isDeleting, setIsDeleting] = useState(false)
-    const [openMenuId, setOpenMenuId] = useState<number | null>(null)
     const [page, setPage] = useState(1)
-    const limit = 3
+    const limit = 6
     const [total, setTotal] = useState(0)
     const { setFlashMessage } = useFlashMessage()
 
@@ -77,7 +73,6 @@ function ClientList() {
             clientId: id,
             clientName: name
         })
-        setOpenMenuId(null)
     }
 
     function closeDeleteModal() {
@@ -119,8 +114,8 @@ function ClientList() {
 
     // Paginação
     const totalPages = Math.ceil(total / limit)
-    const canGoPrev = page > 1
-    const canGoNext = page < totalPages
+    const startIndex = (page - 1) * limit
+    const endIndex = startIndex + limit
 
     function formatDate(dateString: string) {
         const date = new Date(dateString)
@@ -135,276 +130,324 @@ function ClientList() {
         navigate("/client/register")
     }
 
+    function formatPhone(phone: string) {
+        const cleaned = phone.replace(/\D/g, "")
+
+        if (cleaned.length !== 11) return phone
+
+        const ddd = cleaned.slice(0, 2)
+        const firstPart = cleaned.slice(2, 7)
+        const secondPart = cleaned.slice(7)
+
+        return `(${ddd}) ${firstPart}-${secondPart}`
+    }
+
+
+
     return (
-        <div className="min-h-screen bg-linear-to-br from-blue-600 via-blue-700 to-blue-900 px-4 py-8">
-            <div className="max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                    <div className="bg-linear-to-r from-blue-600 to-blue-500 px-8 py-8">
-                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center backdrop-blur">
-                                    <Users className="w-7 h-7 text-white" />
+        <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 px-4 py-8">
+            <div className="max-w-7xl mx-auto space-y-6">
+                <div className="relative overflow-hidden bg-white rounded-3xl shadow-xl border border-slate-200/60">
+                    <div className="absolute inset-0 bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 opacity-[0.97]" />
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl" />
+                    
+                    <div className="relative px-8 py-10">
+                        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                            <div className="flex items-center gap-5">
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-white/30 rounded-2xl blur-xl" />
+                                    <div className="relative w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
+                                        <Users className="w-8 h-8 text-white" />
+                                    </div>
                                 </div>
                                 <div>
-                                    <h1 className="text-3xl font-bold text-white">
+                                    <h1 className="text-4xl font-bold text-white mb-1 tracking-tight">
                                         Clientes
                                     </h1>
-                                    <p className="text-blue-100">
-                                        Gerencie seus clientes cadastrados
+                                    <p className="text-blue-100 text-lg">
+                                        Gerencie seus clientes
                                     </p>
                                 </div>
                             </div>
 
+                            <div className="flex flex-wrap gap-3">
+                                <button
+                                    onClick={handleRegister}
+                                    className="flex items-center gap-2 bg-white hover:bg-white/90 text-blue-600 font-semibold px-5 py-3 rounded-xl transition-all hover:scale-105 shadow-lg"
+                                >
+                                    <Plus size={18} />
+                                    Novo Cliente
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Search and Filters */}
+                <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
+                    <div className="space-y-4">
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+                            <input
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Buscar por nome, e-mail ou CPF..."
+                                className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-700 placeholder:text-slate-400"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Loading */}
+                {isLoading && (
+                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-16">
+                        <div className="flex flex-col items-center justify-center gap-4">
+                            <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-200 border-t-blue-600"></div>
+                            <p className="text-slate-600 font-medium">Carregando clientes...</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && filteredClients.length === 0 && (
+                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-16 text-center">
+                        <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <Users className="w-10 h-10 text-slate-400" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                            Nenhum cliente encontrado
+                        </h3>
+                        <p className="text-slate-500 mb-6">
+                            {searchTerm 
+                                ? "Tente ajustar sua busca ou limpar os filtros"
+                                : "Comece cadastrando seu primeiro cliente"
+                            }
+                        </p>
+                        {!searchTerm && (
                             <button
                                 onClick={handleRegister}
-                                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-xl transition"
+                                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all hover:scale-105"
                             >
                                 <Plus size={18} />
                                 Novo Cliente
                             </button>
-                        </div>
-                    </div>
-
-                    {/* Search */}
-                    <div className="px-8 py-6 border-b border-slate-200">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Buscar por nome, e-mail, CPF ou cidade..."
-                                className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                        </div>
-                    </div>
-
-                    {/* List */}
-                    <div className="px-8 py-6 space-y-6">
-                        {/* Loading */}
-                        {isLoading && (
-                            <div className="flex justify-center py-16">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                            </div>
                         )}
+                    </div>
+                )}
 
-                        {/* Nenhum cliente */}
-                        {!isLoading && filteredClients.length === 0 && (
-                            <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500">
-                                <Users className="w-12 h-12 mb-4 text-gray-400" />
-                                <p className="text-lg font-semibold">
-                                    Nenhum cliente encontrado
-                                </p>
-                                <p className="text-sm">
-                                    {searchTerm ? "Tente buscar com outros termos" : 'Clique em "Novo Cliente" para começar'}
-                                </p>
-                            </div>
-                        )}
-
-                        {!isLoading && filteredClients.map((client) => (
-                            <div
-                                key={client.id}
-                                className="
-                                    bg-white
-                                    border border-blue-200
-                                    rounded-2xl
-                                    shadow-sm
-                                    p-6
-                                    transition-all duration-300
-                                    hover:shadow-lg
-                                    hover:-translate-y-1
-                                    hover:border-blue-400
-                                "
-                            >
-                                <div className="flex flex-col lg:flex-row justify-between gap-6">
-                                    {/* Info */}
-                                    <div className="space-y-3 flex-1">
-                                        <div className="flex justify-between">
-                                            <div>
-                                                <h3 className="text-xl font-bold flex items-center gap-2">
-                                                    <User className="w-5 h-5 text-blue-600" />
+                {/* Client Cards */}
+                <div className="grid gap-4">
+                    {!isLoading && filteredClients.map((client) => (
+                        <div
+                            key={client.id}
+                            className="group bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                        >
+                            <div className="flex flex-col lg:flex-row gap-6">
+                                <div className="flex-1 space-y-4">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <h3 className="text-xl font-bold text-slate-800">
                                                     {client.username}
                                                 </h3>
-                                                <p className="text-gray-500 text-sm">
-                                                    CPF: {client.cpf}
+                                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                                    <User className="w-3.5 h-3.5" />
+                                                    Cliente
+                                                </span>
+                                            </div>
+                                            <p className="text-slate-600 text-sm font-semibold">
+                                                CPF: {client.cpf}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Info Grid */}
+                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <Mail className="w-5 h-5 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                    E-mail
+                                                </p>
+                                                <p className="font-semibold text-slate-800 text-sm break-all">
+                                                    {client.email}
                                                 </p>
                                             </div>
+                                        </div>
 
-                                            {/* Mobile menu */}
-                                            <div className="relative lg:hidden">
-                                                <button
-                                                    onClick={() =>
-                                                        setOpenMenuId(
-                                                            openMenuId === client.id ? null : client.id
-                                                        )
-                                                    }
-                                                    className="p-2 hover:bg-gray-100 rounded-lg"
-                                                >
-                                                    <MoreVertical className="w-5 h-5" />
-                                                </button>
-
-                                                {openMenuId === client.id && (
-                                                    <div className="absolute right-0 mt-2 bg-white border rounded-xl shadow-md z-10 min-w-[140px]">
-                                                        <button
-                                                            onClick={() => handleEdit(client.id)}
-                                                            className="flex items-center gap-2 px-4 py-2 hover:bg-gray-50 w-full text-left rounded-t-xl"
-                                                        >
-                                                            <Edit size={16} /> Editar
-                                                        </button>
-                                                        <button
-                                                            onClick={() => openDeleteModal(client.id, client.username)}
-                                                            className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 w-full text-left rounded-b-xl"
-                                                        >
-                                                            <Trash2 size={16} /> Excluir
-                                                        </button>
-                                                    </div>
-                                                )}
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <Phone className="w-5 h-5 text-purple-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                    Telefone
+                                                </p>
+                                                <p className="font-semibold text-slate-800 text-sm">
+                                                    {formatPhone(client.phone)}
+                                                </p>
                                             </div>
                                         </div>
 
-                                        {/* Details */}
-                                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-gray-600">
-                                            <div className="flex gap-2">
-                                                <Mail className="text-blue-600 w-4 h-4 shrink-0 mt-0.5" />
-                                                <span className="break-all">{client.email}</span>
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <Calendar className="w-5 h-5 text-orange-600" />
                                             </div>
-                                            <div className="flex gap-2">
-                                                <Phone className="text-blue-600 w-4 h-4 shrink-0" />
-                                                {client.phone}
+                                            <div>
+                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                    Cadastrado em
+                                                </p>
+                                                <p className="font-semibold text-slate-800 text-sm">
+                                                    {formatDate(client.registrationDate)}
+                                                </p>
                                             </div>
-                                        </div>
-
-                                        {/* Chips */}
-                                        <div className="flex flex-wrap gap-3 pt-2">
-                                            {/* Data de cadastro */}
-                                            <span className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
-                                                bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
-                                                <Calendar size={14} />
-                                                Cadastro: {formatDate(client.registrationDate)}
-                                            </span>
-
-                                            {/* Veículos */}
-                                            <span className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
-                                                bg-blue-100 text-blue-700 hover:bg-blue-200 transition">
-                                                <Car size={14} />
-                                                {client.vehicleCount} {client.vehicleCount === 1 ? 'veículo' : 'veículos'}
-                                            </span>
-
                                         </div>
                                     </div>
 
-                                    {/* Desktop actions */}
-                                    <div className="hidden lg:flex items-center gap-4">
-                                        {/* Editar */}
-                                        <button
-                                            onClick={() => handleEdit(client.id)}
-                                            className="
-                                                flex items-center gap-2
-                                                h-12 px-6
-                                                bg-blue-600
-                                                text-white font-semibold
-                                                rounded-xl
-                                                transition-all duration-300
-                                                hover:bg-blue-700
-                                                hover:shadow-lg
-                                                hover:-translate-y-0.5
-                                                active:scale-95
-                                            "
-                                        >
-                                            <Edit size={18} />
-                                            Editar
-                                        </button>
-
-                                        {/* Excluir */}
-                                        <button
-                                            onClick={() => openDeleteModal(client.id, client.username)}
-                                            className="
-                                                flex items-center gap-2
-                                                h-12 px-6
-                                                border border-red-200
-                                                bg-red-50
-                                                text-red-600 font-semibold
-                                                rounded-xl
-                                                transition-all duration-300
-                                                hover:bg-red-100
-                                                hover:border-red-300
-                                                hover:shadow-md
-                                                hover:-translate-y-0.5
-                                                active:scale-95
-                                            "
-                                        >
-                                            <Trash2 size={18} />
-                                            Excluir
-                                        </button>
+                                    {/* Chips */}
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <Car size={14} />
+                                            {client.vehicleCount} {client.vehicleCount === 1 ? 'veículo' : 'veículos'}
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
 
-                        {/* Pagination */}
-                        {!isLoading && filteredClients.length > 0 && (
-                            <div className="
-                                flex flex-col gap-4
-                                sm:flex-row sm:items-center sm:justify-between
-                                pt-6 border-t border-slate-200
-                            ">
-                                <p className="text-sm text-gray-500 text-center sm:text-left">
-                                    Mostrando {filteredClients.length} de {filteredClients.length} clientes
-                                </p>
-
-                                <div className="flex items-center justify-center gap-2">
-                                    {/* Anterior */}
+                                {/* Right side - Actions */}
+                                <div className="flex lg:flex-col items-center justify-center gap-3 lg:min-w-[180px]">
                                     <button
-                                        onClick={() => setPage((p) => p - 1)}
-                                        disabled={!canGoPrev}
+                                        onClick={() => handleEdit(client.id)}
                                         className="
-                                            flex items-center gap-1
-                                            px-4 py-2
-                                            rounded-lg text-sm font-medium
-                                            transition-all
-                                            disabled:opacity-40
-                                            disabled:cursor-not-allowed
-                                            disabled:hover:shadow-none
-                                            bg-gray-100 hover:bg-gray-200
+                                            group/btn
+                                            flex items-center justify-center gap-2
+                                            w-full
+                                            px-6 py-4
+                                            bg-linear-to-r from-blue-600 to-indigo-600
+                                            text-white font-semibold
+                                            rounded-xl
+                                            transition-all duration-300
+                                            hover:from-blue-700 hover:to-indigo-700
+                                            hover:shadow-xl hover:shadow-blue-500/30
+                                            hover:scale-105
+                                            active:scale-95
                                         "
                                     >
-                                        <ChevronLeft size={16} />
-                                        <span className="hidden sm:inline">Anterior</span>
+                                        <Edit size={18} className="group-hover/btn:rotate-12 transition-transform" />
+                                        Editar
                                     </button>
 
-                                    {/* Página atual */}
-                                    <span className="
-                                        px-4 py-2
-                                        bg-blue-600 text-white
-                                        rounded-lg text-sm font-semibold
-                                        min-w-10 text-center
-                                    ">
-                                        {page}
-                                    </span>
-
-                                    {/* Próximo */}
                                     <button
-                                        onClick={() => setPage((p) => p + 1)}
-                                        disabled={!canGoNext}
+                                        onClick={() => openDeleteModal(client.id, client.username)}
                                         className="
-                                            flex items-center gap-1
-                                            px-4 py-2
-                                            rounded-lg text-sm font-medium
-                                            transition-all
-                                            disabled:opacity-40
-                                            disabled:cursor-not-allowed
-                                            disabled:hover:shadow-none
-                                            bg-gray-100 hover:bg-gray-200
+                                            group/btn
+                                            flex items-center justify-center gap-2
+                                            w-full
+                                            px-6 py-4
+                                            bg-linear-to-r from-red-500 to-red-600
+                                            text-white font-semibold
+                                            rounded-xl
+                                            transition-all duration-300
+                                            hover:from-red-600 hover:to-red-700
+                                            hover:shadow-xl hover:shadow-red-500/30
+                                            hover:scale-105
+                                            active:scale-95
                                         "
                                     >
-                                        <span className="hidden sm:inline">Próximo</span>
-                                        <ChevronRight size={16} />
+                                        <Trash2 size={18} className="group-hover/btn:rotate-12 transition-transform" />
+                                        Excluir
                                     </button>
                                 </div>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    ))}
                 </div>
+
+                {/* Pagination */}
+                {filteredClients.length > 0 && (
+                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <p className="text-sm text-slate-600 text-center sm:text-left">
+                                Mostrando <span className="font-semibold text-slate-800">{startIndex + 1}-
+                                {Math.min(endIndex, filteredClients.length)}</span> de{" "}
+                                <span className="font-semibold text-slate-800">{filteredClients.length}</span> clientes
+                            </p>
+
+                            <div className="flex items-center justify-center gap-2">
+                                <button
+                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                    className="
+                                        flex items-center gap-1
+                                        px-4 py-2.5
+                                        rounded-xl text-sm font-medium
+                                        transition-all
+                                        disabled:opacity-40
+                                        disabled:cursor-not-allowed
+                                        bg-slate-100 hover:bg-slate-200
+                                        text-slate-700
+                                    "
+                                >
+                                    <ChevronLeft size={16} />
+                                    <span className="hidden sm:inline">Anterior</span>
+                                </button>
+
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                                        let pageNum
+                                        if (totalPages <= 5) {
+                                            pageNum = i + 1
+                                        } else if (page <= 3) {
+                                            pageNum = i + 1
+                                        } else if (page >= totalPages - 2) {
+                                            pageNum = totalPages - 4 + i
+                                        } else {
+                                            pageNum = page - 2 + i
+                                        }
+                                        
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                onClick={() => setPage(pageNum)}
+                                                className={`
+                                                    min-w-10 h-10
+                                                    rounded-xl text-sm font-semibold
+                                                    transition-all
+                                                    ${page === pageNum
+                                                        ? "bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
+                                                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                                    }
+                                                `}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+
+                                <button
+                                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages}
+                                    className="
+                                        flex items-center gap-1
+                                        px-4 py-2.5
+                                        rounded-xl text-sm font-medium
+                                        transition-all
+                                        disabled:opacity-40
+                                        disabled:cursor-not-allowed
+                                        bg-slate-100 hover:bg-slate-200
+                                        text-slate-700
+                                    "
+                                >
+                                    <span className="hidden sm:inline">Próximo</span>
+                                    <ChevronRight size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <ConfirmDeleteModal

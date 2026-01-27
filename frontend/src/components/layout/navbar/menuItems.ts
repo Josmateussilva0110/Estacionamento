@@ -3,7 +3,7 @@ import {
   Users,
   Car,
   ParkingSquare,
-  MapPinPlus
+  ListChecks
 } from "lucide-react"
 
 export const MENU_ITEMS = [
@@ -28,8 +28,8 @@ export const MENU_ITEMS = [
     icon: Car,
   },
   {
-    label: "Alocar cliente",
-    to: "/parking/allocation",
-    icon: MapPinPlus,
+    label: "Alocações",
+    to: "/parking/management",
+    icon: ListChecks,
   },
 ]
