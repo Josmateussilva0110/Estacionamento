@@ -5,6 +5,9 @@ import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { AllocationErrorCode } from "../types/code/allocation"
 import { ParkingErrorCode } from "../types/code/parkingCode"
 import { type SpotResponse } from "../mappers/spots.mapper" 
+import { AllocationDetailDTO } from "../dtos/AllocationDetailDTO"
+import { type PaginatedAllocationsServiceResult } from "../types/allocation/paginatedAllocationServiceResult"
+import { calculateHourlyStayValue } from "../utils/calculateEstimatedCost"
 
 
 class AllocationService {
@@ -85,12 +88,72 @@ class AllocationService {
             }}
 
         } catch(error) {
-            console.log("AllocationService.allocation: ", error)
+            console.error("AllocationService.allocation: ", error)
             return {
                 status: false,
                 error: {
                     code: AllocationErrorCode.ALLOCATION_CREATE_FAILED,
                     message: "Erro interno ao cadastrar alocação"
+                }
+            }
+        }
+    }
+
+    async getAllocations(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedAllocationsServiceResult | null>> {
+        try {
+            const result = await Allocation.getAllocationByUser(user_id, page, limit)
+            if(!result || result.total === 0) {
+                return {
+                    status: false,
+                    error: {
+                        code: AllocationErrorCode.ALLOCATION_NOT_FOUND,
+                        message: "Nenhuma alocação encontrada"
+                    }
+                }
+            }
+
+            const value = calculateHourlyStayValue({
+                entryAt: new Date("2026-01-26T16:30:00"),
+                exitAt: new Date("2026-01-27T02:00:00"),
+
+                pricePerHour: 10.25,
+                nightPricePerHour: 12,
+                vehicleFixedPrice: 5,
+
+                nightPeriod: {
+                    start: "17:00",
+                    end: "23:00",
+                },
+            })
+
+            //console.log("cost: ", value)
+
+
+            const estimatedCost = value
+            const mapped: AllocationDetailDTO[] = result.rows.map((row) => ({
+                id: row.allocation_id,
+                clientName: row.client_name,
+                phone: row.phone,
+                parkingName: row.parking_name,
+                plate: row.plate,
+                brand: row.brand,
+                vehicleType: row.vehicle_type,
+                entryDate: row.entry_date,
+                observations: row.observations,
+                currentDuration: row.current_duration,
+                estimatedCost: estimatedCost
+            }))  
+
+
+            return {status: true, data: {rows: mapped, total: result.total}}
+
+        } catch(error) {
+            console.error("AllocationService.getAllocations: ", error)
+            return {
+                status: false,
+                error: {
+                    code: AllocationErrorCode.ALLOCATION_FETCH_FAILED,
+                    message: "Erro interno ao buscar alocações"
                 }
             }
         }
