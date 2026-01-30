@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useCallback, useMemo, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import {
     Car,
@@ -43,24 +43,37 @@ function AllocationManagement() {
     const [allocations, setAllocations] = useState<AllocationDetail[]>([])
     const [showFilters, setShowFilters] = useState(false)
 
-    useEffect(() => {
+    const fetchAllocations = useCallback(async () => {
         if (!user?.id) return
-        async function fetchAllocations() {
-            setIsLoading(true)
-            const response = await requestData<ListPaginationAllocationData>(`/allocations/pagination/${user?.id}`, "GET", { page, limit }, true)
-            console.log(response)
-            if (response.success && response.data?.allocations) {
-                setAllocations(response.data.allocations.rows)
-                setTotal(response.data.allocations.total)
-            }
-            else {
-                setAllocations([])
-                setTotal(0)
-            }
-            setIsLoading(false)
+
+        setIsLoading(true)
+
+        const response = await requestData<ListPaginationAllocationData>(
+            `/allocations/pagination/${user.id}`,
+            "GET",
+            { page, limit },
+            true
+        )
+
+        if (response.success && response.data?.allocations) {
+            setAllocations(response.data.allocations.rows)
+            setTotal(response.data.allocations.total)
+        } else {
+            setAllocations([])
+            setTotal(0)
         }
-        fetchAllocations()
+
+        setIsLoading(false)
     }, [user?.id, page, limit])
+
+    useEffect(() => {
+        fetchAllocations()
+    }, [fetchAllocations])
+
+    
+    function updateAllocations() {
+        fetchAllocations()
+    }
 
     const [endModal, setEndModal] = useState<{
         isOpen: boolean
@@ -94,7 +107,7 @@ function AllocationManagement() {
             case "moto":
                 return "Moto"
             case "caminhonete":
-                return "Caminhão"
+                return "Caminhonete"
             case "pcd":
                 return "PCD"
             case "elderly":
@@ -106,13 +119,13 @@ function AllocationManagement() {
 
     function getVehicleTypeBadge(type: string) {
         const configs = {
-            car: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+            carro: "bg-blue-500/10 text-blue-600 border-blue-500/20",
             moto: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-            truck: "bg-orange-500/10 text-orange-600 border-orange-500/20",
+            caminhonete: "bg-orange-500/10 text-orange-600 border-orange-500/20",
             pcd: "bg-purple-500/10 text-purple-600 border-purple-500/20",
             elderly: "bg-pink-500/10 text-pink-600 border-pink-500/20"
         }
-        return configs[type as keyof typeof configs] || configs.car
+        return configs[type as keyof typeof configs] || configs.carro
     }
 
 
@@ -147,17 +160,20 @@ function AllocationManagement() {
     }
 
     // Filtros
-    const filteredAllocations = allocations.filter((allocation) => {
-        const matchesSearch =
+    const filteredAllocations = useMemo(() => {
+        return allocations.filter((allocation) => {
+            const matchesSearch =
             allocation.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             allocation.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
             allocation.parkingName.toLowerCase().includes(searchTerm.toLowerCase())
 
-        const matchesType =
+            const matchesType =
             filterType === "all" || allocation.vehicleType === filterType
 
-        return matchesSearch && matchesType
-    })
+            return matchesSearch && matchesType
+        })
+    }, [allocations, searchTerm, filterType])
+
 
 
     return (
@@ -191,7 +207,7 @@ function AllocationManagement() {
 
                             <div className="flex flex-wrap gap-3">
                                 <button
-                                    onClick={() => setFlashMessage("Dados atualizados!", "success")}
+                                    onClick={() => updateAllocations()}
                                     className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-xl text-white font-semibold px-5 py-3 rounded-xl transition-all border border-white/30 hover:scale-105"
                                 >
                                     <RefreshCw size={18} />
@@ -309,8 +325,8 @@ function AllocationManagement() {
                                     Todos
                                 </button>
                                 <button
-                                    onClick={() => setFilterType("car")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "car"
+                                    onClick={() => setFilterType("carro")}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "carro"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                                         }`}
@@ -329,8 +345,8 @@ function AllocationManagement() {
                                     Motos
                                 </button>
                                 <button
-                                    onClick={() => setFilterType("truck")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "truck"
+                                    onClick={() => setFilterType("caminhonete")}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "caminhonete"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                                         }`}

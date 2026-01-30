@@ -45,6 +45,14 @@ function ParkingAllocation() {
     fetchClientVehicle()
   }, [user, setFlashMessage])
 
+  function getLocalDateTimeForInput(): string {
+    const now = new Date()
+    const offset = now.getTimezoneOffset()
+    const localDate = new Date(now.getTime() - offset * 60 * 1000)
+    return localDate.toISOString().slice(0, 16)
+  }
+
+
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [selectedClient, setSelectedClient] = useState<ClientVehicle | null>(null)
   const [vehicleType, setVehicleType] = useState<VehicleType>("car")
@@ -53,7 +61,10 @@ function ParkingAllocation() {
   const [filterFloor, setFilterFloor] = useState<string>("all")
 
   // Entrada
-  const [entryDate, setEntryDate] = useState<string>(new Date().toISOString().slice(0, 16))
+  const [entryDate, setEntryDate] = useState<string>(
+    getLocalDateTimeForInput
+  )
+
   const [observations, setObservations] = useState<string>("")
 
   function handleClientSelect(client: ClientVehicle) {
@@ -67,6 +78,11 @@ function ParkingAllocation() {
     setStep("confirm")
   }
 
+  function localInputToUTC(dateTimeLocal: string): string {
+    return new Date(dateTimeLocal).toISOString()
+  }
+
+
   async function handleConfirm() {
     if (!selectedClient || !selectedSpot) return
 
@@ -75,7 +91,7 @@ function ParkingAllocation() {
       parking_id: selectedSpot.parking.id,
       vehicle_id: selectedClient.vehicle_id,
       vehicle_type: mapVehicleTypeToApi(vehicleType),
-      entry_date: entryDate,
+      entry_date: localInputToUTC(entryDate),
       observations,
     }
 
@@ -83,9 +99,10 @@ function ParkingAllocation() {
     //console.log(payload)
 
     const response = await requestData<RegisterAllocationResponse>("/allocation", "POST", payload, true)
-    console.log(response)
+    //console.log(response)
     if(response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
+      navigate('/parking/management')
     }
     else {
       setFlashMessage(

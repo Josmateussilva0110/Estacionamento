@@ -37,14 +37,14 @@ function ConfirmStep({
     useEffect(() => {
       if (!entryDate) {
         const now = new Date()
-        const timezoneOffset = now.getTimezoneOffset() * 60000
-        const localTime = new Date(now.getTime() - timezoneOffset)
-        const localDateTime = localTime.toISOString().slice(0, 16)
 
-        setEntryDate(localDateTime)
+        // remove o offset do timezone
+        const offset = now.getTimezoneOffset()
+        const localDate = new Date(now.getTime() - offset * 60 * 1000)
+
+        setEntryDate(localDate.toISOString().slice(0, 16))
       }
     }, [entryDate, setEntryDate])
-
 
 
 
