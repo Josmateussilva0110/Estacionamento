@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import {
     Car,
@@ -19,151 +19,48 @@ import {
     Activity,
     Plus
 } from "lucide-react"
+import { useUser } from "../../../context/useUser"
+import { requestData } from "../../../services/requestApi"
+import { type AllocationDetail } from "../../../types/allocation/allocationDetail"
+import { type ListPaginationAllocationData } from "../../../types/allocation/listAllocations"
 import ConfirmDeleteModal from "../../layout/DeleteModal"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import Pagination from "../../layout/Pagination"
+import { formatDateTime, formatMinutesToDaysHHMM, formatPhone, } from "../../../utils/formatations"
 
-// Tipos
-interface ActiveAllocation {
-    id: number
-    clientName: string
-    clientPhone: string
-    vehiclePlate: string
-    vehicleModel: string
-    vehicleType: "car" | "moto" | "truck" | "pcd" | "elderly"
-    parkingName: string
-    entryDate: string
-    entryTime: string
-    observations?: string
-    currentDuration: string
-    estimatedCost: number
-}
 
-// Dados mockados
-const mockAllocations: ActiveAllocation[] = [
-    {
-        id: 1,
-        clientName: "João Silva",
-        clientPhone: "(11) 98765-4321",
-        vehiclePlate: "ABC-1234",
-        vehicleModel: "Honda Civic 2020",
-        vehicleType: "car",
-        parkingName: "Estacionamento Centro",
-        entryDate: "27/01/2026",
-        entryTime: "08:30",
-        observations: "Cliente preferencial",
-        currentDuration: "3h 45min",
-        estimatedCost: 45.0,
-    },
-    {
-        id: 2,
-        clientName: "Maria Santos",
-        clientPhone: "(11) 97654-3210",
-        vehiclePlate: "XYZ-5678",
-        vehicleModel: "Honda CG 160",
-        vehicleType: "moto",
-        parkingName: "Estacionamento Shopping",
-        entryDate: "27/01/2026",
-        entryTime: "10:15",
-        observations: "",
-        currentDuration: "2h 00min",
-        estimatedCost: 16.0,
-    },
-    {
-        id: 3,
-        clientName: "Pedro Oliveira",
-        clientPhone: "(11) 96543-2109",
-        vehiclePlate: "DEF-9012",
-        vehicleModel: "Toyota Corolla 2022",
-        vehicleType: "car",
-        parkingName: "Estacionamento Centro",
-        entryDate: "27/01/2026",
-        entryTime: "07:00",
-        observations: "",
-        currentDuration: "5h 15min",
-        estimatedCost: 63.0,
-    },
-    {
-        id: 4,
-        clientName: "Ana Costa",
-        clientPhone: "(11) 95432-1098",
-        vehiclePlate: "GHI-3456",
-        vehicleModel: "Fiat Uno 2019",
-        vehicleType: "pcd",
-        parkingName: "Estacionamento Norte",
-        entryDate: "27/01/2026",
-        entryTime: "09:00",
-        observations: "Vaga PCD",
-        currentDuration: "3h 15min",
-        estimatedCost: 39.0,
-    },
-    {
-        id: 5,
-        clientName: "Carlos Mendes",
-        clientPhone: "(11) 94321-0987",
-        vehiclePlate: "JKL-7890",
-        vehicleModel: "Mercedes Sprinter",
-        vehicleType: "truck",
-        parkingName: "Estacionamento Shopping",
-        entryDate: "27/01/2026",
-        entryTime: "06:30",
-        observations: "Veículo de carga",
-        currentDuration: "5h 45min",
-        estimatedCost: 86.25,
-    },
-    {
-        id: 6,
-        clientName: "Rosa Lima",
-        clientPhone: "(11) 93210-9876",
-        vehiclePlate: "MNO-2345",
-        vehicleModel: "Chevrolet Onix 2021",
-        vehicleType: "elderly",
-        parkingName: "Estacionamento Norte",
-        entryDate: "27/01/2026",
-        entryTime: "11:00",
-        observations: "Vaga para idosos",
-        currentDuration: "1h 15min",
-        estimatedCost: 15.0,
-    },
-    {
-        id: 7,
-        clientName: "Lucas Ferreira",
-        clientPhone: "(11) 92109-8765",
-        vehiclePlate: "PQR-6789",
-        vehicleModel: "Yamaha Fazer 250",
-        vehicleType: "moto",
-        parkingName: "Estacionamento Centro",
-        entryDate: "27/01/2026",
-        entryTime: "08:45",
-        observations: "",
-        currentDuration: "3h 30min",
-        estimatedCost: 28.0,
-    },
-    {
-        id: 8,
-        clientName: "Juliana Rocha",
-        clientPhone: "(11) 91098-7654",
-        vehiclePlate: "STU-0123",
-        vehicleModel: "Volkswagen Gol 2020",
-        vehicleType: "car",
-        parkingName: "Estacionamento Shopping",
-        entryDate: "27/01/2026",
-        entryTime: "10:30",
-        observations: "",
-        currentDuration: "1h 45min",
-        estimatedCost: 21.0,
-    }
-]
 
 function AllocationManagement() {
     const navigate = useNavigate()
+    const { user } = useUser()
     const { setFlashMessage } = useFlashMessage()
+    const [isLoading, setIsLoading] = useState(true)
+    const [total, setTotal] = useState(0)
     const [searchTerm, setSearchTerm] = useState("")
     const [filterType, setFilterType] = useState<string>("all")
-    const [allocations] = useState<ActiveAllocation[]>(mockAllocations)
     const [page, setPage] = useState(1)
     const limit = 3
+    const [allocations, setAllocations] = useState<AllocationDetail[]>([])
     const [showFilters, setShowFilters] = useState(false)
+
+    useEffect(() => {
+        if (!user?.id) return
+        async function fetchAllocations() {
+            setIsLoading(true)
+            const response = await requestData<ListPaginationAllocationData>(`/allocations/pagination/${user?.id}`, "GET", { page, limit }, true)
+            console.log(response)
+            if (response.success && response.data?.allocations) {
+                setAllocations(response.data.allocations.rows)
+                setTotal(response.data.allocations.total)
+            }
+            else {
+                setAllocations([])
+                setTotal(0)
+            }
+            setIsLoading(false)
+        }
+        fetchAllocations()
+    }, [user?.id, page, limit])
 
     const [endModal, setEndModal] = useState<{
         isOpen: boolean
@@ -179,16 +76,12 @@ function AllocationManagement() {
 
     function getVehicleIcon(type: string) {
         switch (type) {
-            case "car":
+            case "carro":
                 return <Car className="w-4 h-4" />
             case "moto":
                 return <Bike className="w-4 h-4" />
-            case "truck":
+            case "caminhonete":
                 return <Truck className="w-4 h-4" />
-            case "pcd":
-                return <User className="w-4 h-4" />
-            case "elderly":
-                return <UsersIcon className="w-4 h-4" />
             default:
                 return <Car className="w-4 h-4" />
         }
@@ -196,11 +89,11 @@ function AllocationManagement() {
 
     function getVehicleTypeLabel(type: string) {
         switch (type) {
-            case "car":
+            case "carro":
                 return "Carro"
             case "moto":
                 return "Moto"
-            case "truck":
+            case "caminhonete":
                 return "Caminhão"
             case "pcd":
                 return "PCD"
@@ -257,7 +150,7 @@ function AllocationManagement() {
     const filteredAllocations = allocations.filter((allocation) => {
         const matchesSearch =
             allocation.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            allocation.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            allocation.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
             allocation.parkingName.toLowerCase().includes(searchTerm.toLowerCase())
 
         const matchesType =
@@ -266,21 +159,17 @@ function AllocationManagement() {
         return matchesSearch && matchesType
     })
 
-    // Paginação
-    const startIndex = (page - 1) * limit
-    const endIndex = startIndex + limit
-    const paginatedAllocations = filteredAllocations.slice(startIndex, endIndex)
 
     return (
         <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 px-4 py-8">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="relative overflow-hidden bg-white rounded-3xl shadow-xl border border-slate-200/60">
                     <div className="absolute inset-0 bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 opacity-[0.97]" />
-                    
+
                     {/* Decorative elements */}
                     <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl" />
                     <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl" />
-                    
+
                     <div className="relative px-8 py-10">
                         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                             <div className="flex items-center gap-5">
@@ -412,65 +301,59 @@ function AllocationManagement() {
                             <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200">
                                 <button
                                     onClick={() => setFilterType("all")}
-                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        filterType === "all"
+                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "all"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                    }`}
+                                        }`}
                                 >
                                     Todos
                                 </button>
                                 <button
                                     onClick={() => setFilterType("car")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        filterType === "car"
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "car"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                    }`}
+                                        }`}
                                 >
                                     <Car size={16} />
                                     Carros
                                 </button>
                                 <button
                                     onClick={() => setFilterType("moto")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        filterType === "moto"
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "moto"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                    }`}
+                                        }`}
                                 >
                                     <Bike size={16} />
                                     Motos
                                 </button>
                                 <button
                                     onClick={() => setFilterType("truck")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        filterType === "truck"
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "truck"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                    }`}
+                                        }`}
                                 >
                                     <Truck size={16} />
                                     Caminhões
                                 </button>
                                 <button
                                     onClick={() => setFilterType("pcd")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        filterType === "pcd"
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "pcd"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                    }`}
+                                        }`}
                                 >
                                     <User size={16} />
                                     PCD
                                 </button>
                                 <button
                                     onClick={() => setFilterType("elderly")}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        filterType === "elderly"
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "elderly"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
                                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                    }`}
+                                        }`}
                                 >
                                     <UsersIcon size={16} />
                                     Idosos
@@ -480,152 +363,176 @@ function AllocationManagement() {
                     </div>
                 </div>
 
+                {/* Loading */}
+                {isLoading && (
+                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-16">
+                        <div className="flex flex-col items-center justify-center gap-4">
+                            <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-200 border-t-blue-600"></div>
+                            <p className="text-slate-600 font-medium">Carregando alocações...</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Empty State */}
+                {!isLoading && filteredAllocations.length === 0 && (
+                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-16 text-center">
+                        <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <Car className="w-10 h-10 text-slate-400" />
+                        </div>
+                        <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                            Nenhum alocação encontrado
+                        </h3>
+                        <p className="text-slate-500 mb-6">
+                            {searchTerm || filterType !== "all"
+                                ? "Tente ajustar sua busca ou limpar os filtros"
+                                : "Comece cadastrando seu primeiro veículo"
+                            }
+                        </p>
+                        {!searchTerm && filterType === "all" && (
+                            <button
+                                onClick={handleRegister}
+                                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all hover:scale-105"
+                            >
+                                <Plus size={18} />
+                                Nova Alocação
+                            </button>
+                        )}
+                    </div>
+                )}
+
                 {/* Allocation Cards */}
                 <div className="grid gap-4">
-                    {paginatedAllocations.length === 0 ? (
-                        <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-16 text-center">
-                            <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                <Car className="w-10 h-10 text-slate-400" />
-                            </div>
-                            <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                                Nenhuma alocação encontrada
-                            </h3>
-                            <p className="text-slate-500">
-                                Tente ajustar os filtros ou realizar uma nova busca
-                            </p>
-                        </div>
-                    ) : (
-                        paginatedAllocations.map((allocation) => (
-                            <div
-                                key={allocation.id}
-                                className="group bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
-                            >
-                                <div className="flex flex-col lg:flex-row gap-6">
-                                    <div className="flex-1 space-y-4">
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2 flex-wrap">
-                                                    <h3 className="text-xl font-bold text-slate-800">
-                                                        {allocation.clientName}
-                                                    </h3>
-                                                    <span
-                                                        className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${getVehicleTypeBadge(
-                                                            allocation.vehicleType
-                                                        )}`}
-                                                    >
-                                                        {getVehicleIcon(allocation.vehicleType)}
-                                                        {getVehicleTypeLabel(allocation.vehicleType)}
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-2 text-slate-600">
-                                                    <span className="font-mono font-semibold text-base">
-                                                        {allocation.vehiclePlate}
-                                                    </span>
-                                                    <span className="text-slate-400">•</span>
-                                                    <span className="text-sm">
-                                                        {allocation.vehicleModel}
-                                                    </span>
-                                                </div>
+                    {!isLoading && (filteredAllocations.map((allocation) => (
+                        <div
+                            key={allocation.id}
+                            className="group bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                        >
+                            <div className="flex flex-col lg:flex-row gap-6">
+                                <div className="flex-1 space-y-4">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-2 flex-wrap">
+                                                <h3 className="text-xl font-bold text-slate-800">
+                                                    {allocation.clientName}
+                                                </h3>
+                                                <span
+                                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${getVehicleTypeBadge(
+                                                        allocation.vehicleType
+                                                    )}`}
+                                                >
+                                                    {getVehicleIcon(allocation.vehicleType)}
+                                                    {getVehicleTypeLabel(allocation.vehicleType)}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-slate-600">
+                                                <span className="font-mono font-semibold text-base">
+                                                    {allocation.plate}
+                                                </span>
+                                                <span className="text-slate-400">•</span>
+                                                <span className="text-sm">
+                                                    {allocation.brand}
+                                                </span>
                                             </div>
                                         </div>
-
-                                        {/* Info Grid */}
-                                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                            <div className="flex items-start gap-3">
-                                                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-                                                    <MapPin className="w-5 h-5 text-blue-600" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-slate-500 font-medium mb-0.5">
-                                                        Estacionamento
-                                                    </p>
-                                                    <p className="font-semibold text-slate-800 text-sm">
-                                                        {allocation.parkingName}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center shrink-0">
-                                                    <Calendar className="w-5 h-5 text-purple-600" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-slate-500 font-medium mb-0.5">
-                                                        Entrada
-                                                    </p>
-                                                    <p className="font-semibold text-slate-800 text-sm">
-                                                        {allocation.entryDate} às {allocation.entryTime}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
-                                                    <Clock className="w-5 h-5 text-orange-600" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-slate-500 font-medium mb-0.5">
-                                                        Tempo decorrido
-                                                    </p>
-                                                    <p className="font-bold text-orange-600 text-lg">
-                                                        {allocation.currentDuration}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start gap-3">
-                                                <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
-                                                    <DollarSign className="w-5 h-5 text-emerald-600" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-slate-500 font-medium mb-0.5">
-                                                        Valor estimado
-                                                    </p>
-                                                    <p className="font-bold text-emerald-600 text-lg">
-                                                        R$ {allocation.estimatedCost.toFixed(2)}
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-start gap-3 sm:col-span-2">
-                                                <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
-                                                    <User className="w-5 h-5 text-slate-600" />
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs text-slate-500 font-medium mb-0.5">
-                                                        Contato
-                                                    </p>
-                                                    <p className="font-semibold text-slate-800 text-sm">
-                                                        {allocation.clientPhone}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Observations */}
-                                        {allocation.observations && (
-                                            <div className="bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200/60 rounded-xl p-4">
-                                                <p className="text-xs text-blue-700 font-semibold mb-1 uppercase tracking-wide">
-                                                    Observações
-                                                </p>
-                                                <p className="text-sm text-slate-700">
-                                                    {allocation.observations}
-                                                </p>
-                                            </div>
-                                        )}
                                     </div>
 
-                                    {/* Right side - Action */}
-                                    <div className="flex lg:flex-col items-center justify-center gap-3 lg:min-w-[180px]">
-                                        <button
-                                            onClick={() =>
-                                                openEndModal(
-                                                    allocation.id,
-                                                    allocation.clientName,
-                                                    allocation.vehiclePlate
-                                                )
-                                            }
-                                            className="
+                                    {/* Info Grid */}
+                                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <MapPin className="w-5 h-5 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                    Estacionamento
+                                                </p>
+                                                <p className="font-semibold text-slate-800 text-sm">
+                                                    {allocation.parkingName}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <Calendar className="w-5 h-5 text-purple-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                    Entrada
+                                                </p>
+                                                <p className="font-semibold text-slate-800 text-sm">
+                                                    {formatDateTime(allocation.entryDate)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <Clock className="w-5 h-5 text-orange-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                    Tempo decorrido
+                                                </p>
+                                                <p className="font-bold text-orange-600 text-lg">
+                                                    {formatMinutesToDaysHHMM(allocation.currentDuration)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <DollarSign className="w-5 h-5 text-emerald-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                    Valor estimado
+                                                </p>
+                                                <p className="font-bold text-emerald-600 text-lg">
+                                                    R$ {allocation.estimatedCost.toFixed(2)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-start gap-3 sm:col-span-2">
+                                            <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
+                                                <User className="w-5 h-5 text-slate-600" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                    Contato
+                                                </p>
+                                                <p className="font-semibold text-slate-800 text-sm">
+                                                    {formatPhone(allocation.phone)}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Observations */}
+                                    {allocation.observations && (
+                                        <div className="bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200/60 rounded-xl p-4">
+                                            <p className="text-xs text-blue-700 font-semibold mb-1 uppercase tracking-wide">
+                                                Observações
+                                            </p>
+                                            <p className="text-sm text-slate-700">
+                                                {allocation.observations}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Right side - Action */}
+                                <div className="flex lg:flex-col items-center justify-center gap-3 lg:min-w-[180px]">
+                                    <button
+                                        onClick={() =>
+                                            openEndModal(
+                                                allocation.id,
+                                                allocation.clientName,
+                                                allocation.plate
+                                            )
+                                        }
+                                        className="
                                                 group/btn
                                                 flex items-center justify-center gap-2
                                                 w-full
@@ -639,21 +546,21 @@ function AllocationManagement() {
                                                 hover:scale-105
                                                 active:scale-95
                                             "
-                                        >
-                                            <LogOut size={20} className="group-hover/btn:rotate-12 transition-transform" />
-                                            Encerrar Vaga
-                                        </button>
-                                    </div>
+                                    >
+                                        <LogOut size={20} className="group-hover/btn:rotate-12 transition-transform" />
+                                        Encerrar Vaga
+                                    </button>
                                 </div>
                             </div>
-                        ))
+                        </div>
+                    ))
                     )}
                 </div>
 
                 {/* Pagination */}
                 <Pagination
                     page={page}
-                    total={filteredAllocations.length}
+                    total={total}
                     limit={limit}
                     label="alocações"
                     onPageChange={setPage}

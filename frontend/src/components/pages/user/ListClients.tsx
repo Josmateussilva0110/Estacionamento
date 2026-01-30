@@ -22,6 +22,7 @@ import { type ClientsDetails } from "../../../types/client/clientsDetail"
 import { type RemoveClientResponse } from "../../../types/client/clientResponse" 
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import Pagination from "../../layout/Pagination"
+import { formatPhone, formatCPF } from "../../../utils/formatations"
 
 
 function ClientList() {
@@ -124,17 +125,6 @@ function ClientList() {
         navigate("/client/register")
     }
 
-    function formatPhone(phone: string) {
-        const cleaned = phone.replace(/\D/g, "")
-
-        if (cleaned.length !== 11) return phone
-
-        const ddd = cleaned.slice(0, 2)
-        const firstPart = cleaned.slice(2, 7)
-        const secondPart = cleaned.slice(7)
-
-        return `(${ddd}) ${firstPart}-${secondPart}`
-    }
 
 
 
@@ -251,7 +241,7 @@ function ClientList() {
                                                 </span>
                                             </div>
                                             <p className="text-slate-600 text-sm font-semibold">
-                                                CPF: {client.cpf}
+                                                CPF: {formatCPF(client.cpf)}
                                             </p>
                                         </div>
                                     </div>
