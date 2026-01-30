@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import { ParkingRegisterDTO } from "../dtos/ParkingRegisterDTO"
 import ParkingService from "../services/ParkingService"
-import { ParkingErrorHttpStatusMap } from "../utils/parkingErrorHttpMapper"
+import { ParkingErrorHttpStatusMap } from "../errors/parkingErrorHttpMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
 class ParkingController {

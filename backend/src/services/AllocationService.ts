@@ -5,6 +5,10 @@ import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { AllocationErrorCode } from "../types/code/allocation"
 import { ParkingErrorCode } from "../types/code/parkingCode"
 import { type SpotResponse } from "../mappers/spots.mapper" 
+import { AllocationDetailDTO } from "../dtos/AllocationDetailDTO"
+import { type PaginatedAllocationsServiceResult } from "../types/allocation/paginatedAllocationServiceResult"
+import { calculateHourlyStayValue } from "../utils/calculateEstimatedCost"
+import { parseOpeningHours } from "../utils/parseOpeningHours"
 
 
 class AllocationService {
@@ -85,12 +89,75 @@ class AllocationService {
             }}
 
         } catch(error) {
-            console.log("AllocationService.allocation: ", error)
+            console.error("AllocationService.allocation: ", error)
             return {
                 status: false,
                 error: {
                     code: AllocationErrorCode.ALLOCATION_CREATE_FAILED,
                     message: "Erro interno ao cadastrar alocação"
+                }
+            }
+        }
+    }
+
+    async getAllocations(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedAllocationsServiceResult | null>> {
+        try {
+            const result = await Allocation.getAllocationByUser(user_id, page, limit)
+            if(!result || result.total === 0) {
+                return {
+                    status: false,
+                    error: {
+                        code: AllocationErrorCode.ALLOCATION_NOT_FOUND,
+                        message: "Nenhuma alocação encontrada"
+                    }
+                }
+            }
+
+
+            const mapped: AllocationDetailDTO[] = result.rows.map((row) => {
+                const nightPeriod = parseOpeningHours(row.night_period ?? null)
+
+                if (!nightPeriod) {
+                throw new Error("Estacionamento sem período noturno")
+                }
+
+                const estimatedCost = calculateHourlyStayValue({
+                entryAt: new Date(row.entry_date),
+                exitAt: new Date(),
+
+                pricePerHour: row.price_per_hour,
+                nightPricePerHour: row.night_price_per_hour,
+                vehicleFixedPrice: row.vehicle_fixed_price,
+
+                nightPeriod,
+                })
+
+                return {
+                    id: row.allocation_id,
+                    clientName: row.client_name,
+                    phone: row.phone,
+                    parkingName: row.parking_name,
+                    plate: row.plate,
+                    brand: row.brand,
+                    vehicleType: row.vehicle_type,
+                    entryDate: row.entry_date,
+                    observations: row.observations,
+                    currentDuration: row.current_duration,
+                    estimatedCost,
+                }
+            })
+
+
+
+            return {status: true, data: {rows: mapped, total: result.total}}
+
+        } catch(error) {
+            console.error("AllocationService.getAllocations: ", error)
+            return {
+                status: false,
+                error: {
+                    code: AllocationErrorCode.ALLOCATION_FETCH_FAILED,
+                    message: "Erro interno ao buscar alocações"
                 }
             }
         }

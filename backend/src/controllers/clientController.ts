@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import ClientService from "../services/ClientService"
-import { userErrorHttpStatusMap } from "../utils/userErrorHttpMapper"
+import { userErrorHttpStatusMap } from "../errors/userErrorHttpMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 import { ClientEditDTO } from "../dtos/ClientEditDTO"
 
