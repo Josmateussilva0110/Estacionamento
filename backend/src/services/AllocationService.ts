@@ -8,6 +8,7 @@ import { type SpotResponse } from "../mappers/spots.mapper"
 import { AllocationDetailDTO } from "../dtos/AllocationDetailDTO"
 import { type PaginatedAllocationsServiceResult } from "../types/allocation/paginatedAllocationServiceResult"
 import { calculateHourlyStayValue } from "../utils/calculateEstimatedCost"
+import { parseOpeningHours } from "../utils/parseOpeningHours"
 
 
 class AllocationService {
@@ -112,37 +113,40 @@ class AllocationService {
                 }
             }
 
-            const value = calculateHourlyStayValue({
-                entryAt: new Date("2026-01-26T16:30:00"),
-                exitAt: new Date("2026-01-27T02:00:00"),
 
-                pricePerHour: 10.25,
-                nightPricePerHour: 12,
-                vehicleFixedPrice: 5,
+            const mapped: AllocationDetailDTO[] = result.rows.map((row) => {
+                const nightPeriod = parseOpeningHours(row.night_period ?? null)
 
-                nightPeriod: {
-                    start: "17:00",
-                    end: "23:00",
-                },
+                if (!nightPeriod) {
+                throw new Error("Estacionamento sem período noturno")
+                }
+
+                const estimatedCost = calculateHourlyStayValue({
+                entryAt: new Date(row.entry_date),
+                exitAt: new Date(),
+
+                pricePerHour: row.price_per_hour,
+                nightPricePerHour: row.night_price_per_hour,
+                vehicleFixedPrice: row.vehicle_fixed_price,
+
+                nightPeriod,
+                })
+
+                return {
+                    id: row.allocation_id,
+                    clientName: row.client_name,
+                    phone: row.phone,
+                    parkingName: row.parking_name,
+                    plate: row.plate,
+                    brand: row.brand,
+                    vehicleType: row.vehicle_type,
+                    entryDate: row.entry_date,
+                    observations: row.observations,
+                    currentDuration: row.current_duration,
+                    estimatedCost,
+                }
             })
 
-            //console.log("cost: ", value)
-
-
-            const estimatedCost = value
-            const mapped: AllocationDetailDTO[] = result.rows.map((row) => ({
-                id: row.allocation_id,
-                clientName: row.client_name,
-                phone: row.phone,
-                parkingName: row.parking_name,
-                plate: row.plate,
-                brand: row.brand,
-                vehicleType: row.vehicle_type,
-                entryDate: row.entry_date,
-                observations: row.observations,
-                currentDuration: row.current_duration,
-                estimatedCost: estimatedCost
-            }))  
 
 
             return {status: true, data: {rows: mapped, total: result.total}}

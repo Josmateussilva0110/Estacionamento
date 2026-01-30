@@ -9,5 +9,9 @@ export interface AllocationDetail {
     entry_date: string
     observations?: string
     current_duration: number
+    price_per_hour: number
+    night_price_per_hour: number
+    vehicle_fixed_price: number
+    night_period?: string
     total: number
 }

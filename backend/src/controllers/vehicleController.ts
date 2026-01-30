@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import VehicleService from "../services/VehicleService"
-import { vehicleErrorHttpStatusMap } from "../utils/vehicleErrorHttpMapper"
+import { vehicleErrorHttpStatusMap } from "../errors/vehicleErrorHttpMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 import { VehicleEditDTO } from "../dtos/VehicleEditDTO"
 

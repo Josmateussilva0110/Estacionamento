@@ -21,7 +21,7 @@ import { useUser } from "../../../context/useUser"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { type RegisterVehicleResponse } from "../../../types/client/clientResponse"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
-import { type VehicleResponseDetail } from "../../../types/client/vehicleResponseDetail"
+import { type VehicleResponseDetail } from "../../../types/vehicle/vehicleResponseDetail"
 
 interface RegisterVehicleProps {
   mode: "create" | "edit"

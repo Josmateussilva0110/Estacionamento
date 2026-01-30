@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import UserService from "../services/UserService"
-import { userErrorHttpStatusMap } from "../utils/userErrorHttpMapper"
+import { userErrorHttpStatusMap } from "../errors/userErrorHttpMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
 class UserController {

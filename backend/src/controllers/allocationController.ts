@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import AllocationService from "../services/AllocationService"
-import { allocationErrorHttpStatusMap } from "../utils/allocationErrorHttpMapper" 
+import { allocationErrorHttpStatusMap } from "../errors/allocationErrorHttpMapper" 
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
 class AllocationController {

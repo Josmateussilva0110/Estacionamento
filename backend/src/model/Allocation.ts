@@ -52,6 +52,15 @@ class Allocation extends Model<AllocationData> {
                        end as vehicle_type,
                        p.parking_name,
                        FLOOR(EXTRACT(EPOCH FROM (NOW() - a.entry_date)) / 60)::int as current_duration,
+                       pp.price_hour as price_per_hour,
+                       pp.night_rate as night_price_per_hour,
+                       pp.night_period,
+                       CASE
+                            WHEN v.vehicle_type = 1 THEN pp.car_price
+                            WHEN v.vehicle_type = 2 THEN pp.moto_price
+                            WHEN v.vehicle_type = 3 THEN pp.truck_price
+                            ELSE 0
+                        END AS vehicle_fixed_price,
                        count(*) over() as total
                     from allocations a
                     inner join clients c
@@ -60,6 +69,8 @@ class Allocation extends Model<AllocationData> {
                         on v.id = a.vehicle_id
                     inner join parking p
                         on p.id = a.parking_id
+                    inner join parking_prices pp
+                        on pp.parking_id = p.id
                     where p.created_by = ?
                     limit ?
                     offset ?
