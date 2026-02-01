@@ -448,14 +448,16 @@ function VehicleList() {
                     })}
                 </div>
 
-            {/* Pagination */}
-            <Pagination
-                page={page}
-                total={total}
-                limit={limit}
-                label="veículos"
-                onPageChange={setPage}
-            />
+                {/* Pagination */}
+                {total >= 1 && (
+                    <Pagination
+                        page={page}
+                        total={total}
+                        limit={limit}
+                        label="Veículos"
+                        onPageChange={setPage}
+                    />
+                )}
             </div>
 
             <ConfirmDeleteModal

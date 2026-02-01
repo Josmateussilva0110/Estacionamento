@@ -25,6 +25,11 @@ export const AllocationSchema = z.object({
       message: "Data de entrada inválida",
     }),
 
+  payment_type: z
+  .string()
+  .min(1, "Selecione a forma de pagamento"),
+
+
   observations: z
     .string()
     .max(500, "Observações devem ter no máximo 500 caracteres")

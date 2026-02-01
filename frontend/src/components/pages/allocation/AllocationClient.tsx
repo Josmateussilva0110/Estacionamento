@@ -95,6 +95,7 @@ function ParkingAllocation() {
       parking_id: selectedSpot.parking.id,
       vehicle_id: selectedClient.vehicle_id,
       vehicle_type: mapVehicleTypeToApi(vehicleType),
+      payment_type: paymentType,
       entry_date: localInputToUTC(entryDate),
       observations,
     }

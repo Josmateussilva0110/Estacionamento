@@ -574,13 +574,15 @@ function AllocationManagement() {
                 </div>
 
                 {/* Pagination */}
-                <Pagination
-                    page={page}
-                    total={total}
-                    limit={limit}
-                    label="alocações"
-                    onPageChange={setPage}
-                />
+                {total >= 1 && (
+                    <Pagination
+                        page={page}
+                        total={total}
+                        limit={limit}
+                        label="Alocações"
+                        onPageChange={setPage}
+                    />
+                )}
             </div>
 
             <ConfirmDeleteModal

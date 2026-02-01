@@ -350,13 +350,15 @@ function ClientList() {
                 </div>
 
                 {/* Pagination */}
-                <Pagination
-                    page={page}
-                    total={total}
-                    limit={limit}
-                    label="clientes"
-                    onPageChange={setPage}
-                />
+                {total >= 1 && (
+                    <Pagination
+                        page={page}
+                        total={total}
+                        limit={limit}
+                        label="Clientes"
+                        onPageChange={setPage}
+                    />
+                )}
 
             </div>
 
