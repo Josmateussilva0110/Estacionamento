@@ -1,5 +1,17 @@
 import { useState, useEffect } from "react"
-import { User, AlertCircle, X, Car, Bike, Truck, Users } from "lucide-react"
+import { 
+  User, 
+  AlertCircle, 
+  X, 
+  Car, 
+  Bike, 
+  Truck, 
+  Users, 
+  MapPin,
+  CheckCircle2,
+  Sparkles,
+  Building2
+} from "lucide-react"
 import { type VehicleType } from "../utils/vehicleUtils"
 import { type ClientVehicle } from "../../../../types/client/clientVehicle"
 import { useUser } from "../../../../context/useUser"
@@ -36,9 +48,6 @@ function SelectSpotStep({
   const [parkings, setParkings] = useState<Parking[]>([])
   const [selectedParking, setSelectedParking] = useState<Parking | null>(null)
   const [parkingError, setParkingError] = useState<string | null>(null)
-
-
-
 
   useEffect(() => {
     if (!user) {
@@ -85,7 +94,6 @@ function SelectSpotStep({
     fetchParking()
   }, [user, setFlashMessage])
 
-
   const getAvailableSpots = (type: VehicleType): number => {
     if (!spotsData) return 0
     
@@ -128,266 +136,354 @@ function SelectSpotStep({
     }
   }
 
-
-
   return (
-    <div className="space-y-6">
-      {/* Header com info do cliente */}
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-5">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-              <User className="w-6 h-6 text-blue-600" />
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 px-3 sm:px-4 py-4 sm:py-8">
+      <div className="max-w-6xl mx-auto space-y-4 sm:space-y-6">
+        
+        {/* Client Info Card */}
+        <div className="relative overflow-hidden bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200/60">
+          <div className="absolute inset-0 bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 opacity-[0.97]" />
+          
+          {/* Decorative elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-blue-400/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 sm:w-96 sm:h-96 bg-indigo-400/20 rounded-full blur-3xl" />
+
+          <div className="relative px-4 sm:px-8 py-6 sm:py-8">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-white/30 rounded-xl sm:rounded-2xl blur-xl" />
+                  <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-white/20 backdrop-blur-xl rounded-xl sm:rounded-2xl flex items-center justify-center border border-white/30">
+                    <User className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-blue-100 text-xs sm:text-sm font-medium mb-1">
+                    Cliente Selecionado
+                  </p>
+                  <p className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                    {selectedClient?.name}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                    <span className="text-emerald-200 text-xs sm:text-sm font-medium">
+                      Confirmado
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={onChangeClient}
+                className="flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-white/20 hover:bg-white/30 backdrop-blur-xl text-white font-semibold rounded-xl transition-all border border-white/30 hover:scale-105"
+              >
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden xs:inline">Alterar Cliente</span>
+                <span className="xs:hidden">Alterar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Parking Selection */}
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+              <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">Cliente selecionado</p>
-              <p className="text-lg font-bold text-gray-800">{selectedClient?.name}</p>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                Selecione o Estacionamento
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600">
+                Escolha onde o veículo será alocado
+              </p>
             </div>
           </div>
-          <button
-            onClick={onChangeClient}
-            className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
-          >
-            <X size={16} />
-            Alterar
-          </button>
+
+          <SearchSelect<Parking, number>
+            label="Estacionamento *"
+            placeholder="Buscar pelo nome ou gerente"
+            size="lg"
+            isLoading={isLoadingParkings}
+            items={parkings}
+            value={selectedParking?.id ?? null}
+            onChange={(id) => {
+              const parking = parkings.find(p => p.id === id) || null
+              setSelectedParking(parking)
+              setParkingError(null)
+            }}
+            getId={(p) => p.id}
+            getLabel={(p) => p.parkingName}
+            filterBy={(p, search) =>
+              p.parkingName.toLowerCase().includes(search.toLowerCase()) ||
+              p.managerName.toLowerCase().includes(search.toLowerCase())
+            }
+            renderItem={(parking) => (
+              <div>
+                <div className="font-medium">{parking.parkingName}</div>
+                <div className="text-xs text-gray-500">
+                  Gerente: {parking.managerName}
+                </div>
+              </div>
+            )}
+          />
+
+          {parkingError && (
+            <div className="mt-3 sm:mt-4 flex items-center gap-2 px-4 py-3 bg-red-50 border-2 border-red-200 rounded-xl text-sm text-red-700">
+              <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span>{parkingError}</span>
+            </div>
+          )}
+
+          {selectedParking && (
+            <div className="mt-3 sm:mt-4 flex items-center gap-2 px-4 py-3 bg-emerald-50 border-2 border-emerald-200 rounded-xl">
+              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs sm:text-sm font-semibold text-emerald-800 truncate">
+                  {selectedParking.parkingName}
+                </p>
+                <p className="text-xs text-emerald-600">
+                  Gerente: {selectedParking.managerName}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Spot Selection */}
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-200/60 p-4 sm:p-6">
+          <div className="flex items-center gap-3 mb-4 sm:mb-6">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-800">
+                Tipo de Vaga
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-600">
+                Escolha a vaga disponível para o veículo
+              </p>
+            </div>
+          </div>
+
+          {isLoadingSpots ? (
+            <div className="py-12 sm:py-16">
+              <div className="flex flex-col items-center justify-center gap-3 sm:gap-4">
+                <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-4 border-slate-200 border-t-blue-600"></div>
+                <p className="text-slate-600 text-sm sm:text-base font-medium">
+                  Carregando vagas disponíveis...
+                </p>
+              </div>
+            </div>
+          ) : !spotsData ? (
+            <div className="py-12 sm:py-16 text-center">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <AlertCircle className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-slate-700 mb-2">
+                Nenhuma vaga disponível
+              </h3>
+              <p className="text-sm sm:text-base text-slate-500">
+                Não há informações de vagas no momento
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 sm:space-y-6">
+              {/* Standard Spots */}
+              <div>
+                <h3 className="text-sm sm:text-base font-semibold text-slate-700 mb-3 sm:mb-4 flex items-center gap-2">
+                  <Car className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                  Vagas Padrão
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  {/* Cars */}
+                  <button
+                    onClick={() => handleSpotSelection("car")}
+                    disabled={spotsData.carSpots === 0}
+                    className={`group relative overflow-hidden p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all ${
+                      spotsData.carSpots > 0
+                        ? "bg-linear-to-br from-emerald-50 to-green-50 border-emerald-300 hover:border-emerald-400 hover:shadow-xl hover:scale-[1.02] active:scale-95 cursor-pointer"
+                        : "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2 sm:gap-3">
+                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all ${
+                        spotsData.carSpots > 0 
+                          ? "bg-linear-to-br from-emerald-400 to-emerald-500 group-hover:scale-110 shadow-lg shadow-emerald-500/30" 
+                          : "bg-slate-200"
+                      }`}>
+                        <Car className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-bold text-base sm:text-lg text-slate-800">
+                          Carros
+                        </p>
+                        <p className={`text-3xl sm:text-4xl font-bold mt-1 ${
+                          spotsData.carSpots > 0 ? "text-emerald-600" : "text-slate-400"
+                        }`}>
+                          {spotsData.carSpots}
+                        </p>
+                        <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                          {spotsData.carSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Motos */}
+                  <button
+                    onClick={() => handleSpotSelection("moto")}
+                    disabled={spotsData.motoSpots === 0}
+                    className={`group relative overflow-hidden p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all ${
+                      spotsData.motoSpots > 0
+                        ? "bg-linear-to-br from-cyan-50 to-blue-50 border-cyan-300 hover:border-cyan-400 hover:shadow-xl hover:scale-[1.02] active:scale-95 cursor-pointer"
+                        : "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2 sm:gap-3">
+                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all ${
+                        spotsData.motoSpots > 0 
+                          ? "bg-linear-to-br from-cyan-400 to-cyan-500 group-hover:scale-110 shadow-lg shadow-cyan-500/30" 
+                          : "bg-slate-200"
+                      }`}>
+                        <Bike className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-bold text-base sm:text-lg text-slate-800">
+                          Motos
+                        </p>
+                        <p className={`text-3xl sm:text-4xl font-bold mt-1 ${
+                          spotsData.motoSpots > 0 ? "text-cyan-600" : "text-slate-400"
+                        }`}>
+                          {spotsData.motoSpots}
+                        </p>
+                        <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                          {spotsData.motoSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Trucks */}
+                  <button
+                    onClick={() => handleSpotSelection("truck")}
+                    disabled={spotsData.truckSpots === 0}
+                    className={`group relative overflow-hidden p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all ${
+                      spotsData.truckSpots > 0
+                        ? "bg-linear-to-br from-orange-50 to-amber-50 border-orange-300 hover:border-orange-400 hover:shadow-xl hover:scale-[1.02] active:scale-95 cursor-pointer"
+                        : "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center gap-2 sm:gap-3">
+                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all ${
+                        spotsData.truckSpots > 0 
+                          ? "bg-linear-to-br from-orange-400 to-orange-500 group-hover:scale-110 shadow-lg shadow-orange-500/30" 
+                          : "bg-slate-200"
+                      }`}>
+                        <Truck className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                      </div>
+                      <div className="text-center">
+                        <p className="font-bold text-base sm:text-lg text-slate-800">
+                          Caminhões
+                        </p>
+                        <p className={`text-3xl sm:text-4xl font-bold mt-1 ${
+                          spotsData.truckSpots > 0 ? "text-orange-600" : "text-slate-400"
+                        }`}>
+                          {spotsData.truckSpots}
+                        </p>
+                        <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                          {spotsData.truckSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Special Spots */}
+              <div>
+                <h3 className="text-sm sm:text-base font-semibold text-slate-700 mb-3 sm:mb-4 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                  Vagas Especiais
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  {/* PCD */}
+                  <button
+                    onClick={() => handleSpotSelection("pcd" as VehicleType)}
+                    disabled={spotsData.pcdSpots === 0}
+                    className={`group p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all ${
+                      spotsData.pcdSpots > 0
+                        ? "bg-linear-to-br from-blue-50 to-indigo-50 border-blue-300 hover:border-blue-400 hover:shadow-xl hover:scale-[1.02] active:scale-95 cursor-pointer"
+                        : "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all ${
+                        spotsData.pcdSpots > 0 
+                          ? "bg-linear-to-br from-blue-400 to-blue-500 group-hover:scale-110 shadow-lg shadow-blue-500/30" 
+                          : "bg-slate-200"
+                      }`}>
+                        <User className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                      </div>
+                      <div className="text-left flex-1">
+                        <p className="font-bold text-base sm:text-lg text-slate-800 mb-1">
+                          PCD
+                        </p>
+                        <div className="flex items-baseline gap-2">
+                          <p className={`text-3xl sm:text-4xl font-bold ${
+                            spotsData.pcdSpots > 0 ? "text-blue-600" : "text-slate-400"
+                          }`}>
+                            {spotsData.pcdSpots}
+                          </p>
+                          <p className="text-xs sm:text-sm text-slate-600">
+                            {spotsData.pcdSpots === 1 ? "vaga" : "vagas"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Elderly */}
+                  <button
+                    onClick={() => handleSpotSelection("elderly" as VehicleType)}
+                    disabled={spotsData.elderlySpots === 0}
+                    className={`group p-4 sm:p-5 rounded-xl sm:rounded-2xl border-2 transition-all ${
+                      spotsData.elderlySpots > 0
+                        ? "bg-linear-to-br from-purple-50 to-pink-50 border-purple-300 hover:border-purple-400 hover:shadow-xl hover:scale-[1.02] active:scale-95 cursor-pointer"
+                        : "bg-slate-50 border-slate-200 opacity-60 cursor-not-allowed"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all ${
+                        spotsData.elderlySpots > 0 
+                          ? "bg-linear-to-br from-purple-400 to-purple-500 group-hover:scale-110 shadow-lg shadow-purple-500/30" 
+                          : "bg-slate-200"
+                      }`}>
+                        <Users className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                      </div>
+                      <div className="text-left flex-1">
+                        <p className="font-bold text-base sm:text-lg text-slate-800 mb-1">
+                          Idosos
+                        </p>
+                        <div className="flex items-baseline gap-2">
+                          <p className={`text-3xl sm:text-4xl font-bold ${
+                            spotsData.elderlySpots > 0 ? "text-purple-600" : "text-slate-400"
+                          }`}>
+                            {spotsData.elderlySpots}
+                          </p>
+                          <p className="text-xs sm:text-sm text-slate-600">
+                            {spotsData.elderlySpots === 1 ? "vaga" : "vagas"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-      <SearchSelect<Parking, number>
-        label="Estacionamento *"
-        placeholder="Buscar pelo nome ou gerente"
-        size="lg"
-        isLoading={isLoadingParkings}
-
-        items={parkings}
-        value={selectedParking?.id ?? null}
-        onChange={(id) => {
-          const parking = parkings.find(p => p.id === id) || null
-          setSelectedParking(parking)
-          setParkingError(null)
-        }}
-
-        getId={(p) => p.id}
-        getLabel={(p) => p.parkingName}
-
-        filterBy={(p, search) =>
-          p.parkingName.toLowerCase().includes(search.toLowerCase()) ||
-          p.managerName.toLowerCase().includes(search.toLowerCase())
-        }
-
-        renderItem={(parking) => (
-          <div>
-            <div className="font-medium">{parking.parkingName}</div>
-            <div className="text-xs text-gray-500">
-              Gerente: {parking.managerName}
-            </div>
-          </div>
-        )}
-      />
-
-
-      {parkingError && (
-        <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
-          <AlertCircle className="w-4 h-4" />
-          {parkingError}
-        </div>
-      )}
-
-      <div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Selecione o Tipo de Vaga
-        </h2>
-        <p className="text-gray-600">
-          Escolha o tipo de vaga disponível para o veículo
-        </p>
-      </div>
-
-      {isLoadingSpots ? (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Carregando vagas disponíveis...</p>
-        </div>
-      ) : !spotsData ? (
-        <div className="text-center py-12 text-gray-500">
-          <AlertCircle className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-          <p>Nenhuma informação de vagas disponível</p>
-        </div>
-      ) : (
-        <>
-          {/* Vehicle Type Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Carros */}
-            <button
-              onClick={() => handleSpotSelection("car")}
-              disabled={spotsData.carSpots === 0}
-              className={`p-4 rounded-xl border-2 transition-all ${
-                spotsData.carSpots > 0
-                  ? "bg-green-50 border-green-300 hover:bg-green-100 hover:border-green-400 hover:shadow-lg cursor-pointer"
-                  : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
-              }`}
-            >
-              <div className="flex flex-col items-center gap-2">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  spotsData.carSpots > 0 ? "bg-green-200" : "bg-gray-200"
-                }`}>
-                  <Car className="w-6 h-6 text-gray-700" />
-                </div>
-                <div className="text-center">
-                  <p className="font-bold text-base text-gray-800">Carros</p>
-                  <p className={`text-2xl font-bold mt-1 ${
-                    spotsData.carSpots > 0 ? "text-green-600" : "text-gray-400"
-                  }`}>
-                    {spotsData.carSpots}
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {spotsData.carSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
-                  </p>
-                </div>
-              </div>
-            </button>
-
-            {/* Motos */}
-            <button
-              onClick={() => handleSpotSelection("moto")}
-              disabled={spotsData.motoSpots === 0}
-              className={`p-4 rounded-xl border-2 transition-all ${
-                spotsData.motoSpots > 0
-                  ? "bg-green-50 border-green-300 hover:bg-green-100 hover:border-green-400 hover:shadow-lg cursor-pointer"
-                  : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
-              }`}
-            >
-              <div className="flex flex-col items-center gap-2">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  spotsData.motoSpots > 0 ? "bg-green-200" : "bg-gray-200"
-                }`}>
-                  <Bike className="w-6 h-6 text-gray-700" />
-                </div>
-                <div className="text-center">
-                  <p className="font-bold text-base text-gray-800">Motos</p>
-                  <p className={`text-2xl font-bold mt-1 ${
-                    spotsData.motoSpots > 0 ? "text-green-600" : "text-gray-400"
-                  }`}>
-                    {spotsData.motoSpots}
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {spotsData.motoSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
-                  </p>
-                </div>
-              </div>
-            </button>
-
-            {/* Caminhões */}
-            <button
-              onClick={() => handleSpotSelection("truck")}
-              disabled={spotsData.truckSpots === 0}
-              className={`p-4 rounded-xl border-2 transition-all ${
-                spotsData.truckSpots > 0
-                  ? "bg-green-50 border-green-300 hover:bg-green-100 hover:border-green-400 hover:shadow-lg cursor-pointer"
-                  : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
-              }`}
-            >
-              <div className="flex flex-col items-center gap-2">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  spotsData.truckSpots > 0 ? "bg-green-200" : "bg-gray-200"
-                }`}>
-                  <Truck className="w-6 h-6 text-gray-700" />
-                </div>
-                <div className="text-center">
-                  <p className="font-bold text-base text-gray-800">Caminhões</p>
-                  <p className={`text-2xl font-bold mt-1 ${
-                    spotsData.truckSpots > 0 ? "text-green-600" : "text-gray-400"
-                  }`}>
-                    {spotsData.truckSpots}
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    {spotsData.truckSpots === 1 ? "vaga disponível" : "vagas disponíveis"}
-                  </p>
-                </div>
-              </div>
-            </button>
-          </div>
-
-          {/* Vagas Especiais */}
-          <div>
-            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-blue-600" />
-              Vagas Especiais
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* PCD */}
-              <button
-                onClick={() => handleSpotSelection("pcd" as VehicleType)}
-                disabled={spotsData.pcdSpots === 0}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  spotsData.pcdSpots > 0
-                    ? "bg-blue-50 border-blue-300 hover:bg-blue-100 hover:border-blue-400 hover:shadow-lg cursor-pointer"
-                    : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    spotsData.pcdSpots > 0 ? "bg-blue-200" : "bg-gray-200"
-                  }`}>
-                    <User className="w-6 h-6 text-gray-700" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-base text-gray-800">PCD</p>
-                    <div className="flex items-baseline gap-2">
-                      <p className={`text-2xl font-bold ${
-                        spotsData.pcdSpots > 0 ? "text-blue-600" : "text-gray-400"
-                      }`}>
-                        {spotsData.pcdSpots}
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        {spotsData.pcdSpots === 1 ? "vaga" : "vagas"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-              {/* Idosos */}
-              <button
-                onClick={() => handleSpotSelection("elderly" as VehicleType)}
-                disabled={spotsData.elderlySpots === 0}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  spotsData.elderlySpots > 0
-                    ? "bg-purple-50 border-purple-300 hover:bg-purple-100 hover:border-purple-400 hover:shadow-lg cursor-pointer"
-                    : "bg-gray-50 border-gray-200 opacity-60 cursor-not-allowed"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    spotsData.elderlySpots > 0 ? "bg-purple-200" : "bg-gray-200"
-                  }`}>
-                    <Users className="w-6 h-6 text-gray-700" />
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-base text-gray-800">Idosos</p>
-                    <div className="flex items-baseline gap-2">
-                      <p className={`text-2xl font-bold ${
-                        spotsData.elderlySpots > 0 ? "text-purple-600" : "text-gray-400"
-                      }`}>
-                        {spotsData.elderlySpots}
-                      </p>
-                      <p className="text-xs text-gray-600">
-                        {spotsData.elderlySpots === 1 ? "vaga" : "vagas"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          {/* Total de Vagas */}
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
-            <p className="text-sm text-gray-600">Total de vagas no estacionamento</p>
-            <p className="text-2xl font-bold text-gray-800">{spotsData.totalSpots}</p>
-          </div>
-        </>
-      )}
     </div>
   )
 }

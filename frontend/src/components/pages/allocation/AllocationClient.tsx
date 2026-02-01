@@ -162,22 +162,22 @@ function ParkingAllocation() {
               />
             )}
 
-            {step === "confirm" && (
-              <ConfirmStep
-                selectedClient={selectedClient}
-                selectedSpot={selectedSpot}
-                entryDate={entryDate}
-                setEntryDate={setEntryDate}
-                observations={observations}
-                setObservations={setObservations}
-                onConfirm={handleConfirm}
-                onCancel={resetAllocation}
-                onBack={() => {
-                  setSelectedSpot(null) 
-                  setStep("select-spot")
-                }}
-              />
-            )}
+          {step === "confirm" && selectedClient && selectedSpot && (
+            <ConfirmStep
+              selectedClient={selectedClient}
+              selectedSpot={selectedSpot}
+              entryDate={entryDate}
+              setEntryDate={setEntryDate}
+              observations={observations}
+              setObservations={setObservations}
+              onConfirm={handleConfirm}
+              onCancel={resetAllocation}
+              onBack={() => {
+                setSelectedSpot(null)
+                setStep("select-spot")
+              }}
+            />
+          )}
           </div>
         </div>
       </div>

@@ -119,12 +119,24 @@ class Client extends Model<ClientRow> {
             const result = await db.raw<PgRawResult<ClientAndVehicleRow>>(
                 `
                     select 
-                        c.id as client_id, c.username, c.phone, c.status as clientStatus, c.updated_at,
-                        v.id as vehicle_id, v.plate, v.brand, v.color
+                        c.id as client_id,
+                        c.username,
+                        c.phone,
+                        c.status as clientStatus,
+                        c.updated_at,
+                        v.id as vehicle_id,
+                        v.plate,
+                        v.brand,
+                        v.color
                     from clients c
                     inner join vehicles v 
                         on v.client_id = c.id
                     where c.user_id = ?
+                    and not exists (
+                        select 1
+                        from allocations a
+                        where a.client_id = c.id
+                    )
                     order by c.updated_at desc
                 `
                 ,[user_id]
