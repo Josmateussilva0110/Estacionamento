@@ -58,6 +58,7 @@ class AllocationService {
         parking_id: number,
         vehicle_id: number,
         vehicle_type: number,
+        payment_type: string,
         entry_date: string,
         observations: string
     }): Promise<ServiceResult<{ id: number}>> {
