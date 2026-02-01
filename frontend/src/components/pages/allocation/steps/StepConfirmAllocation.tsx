@@ -11,17 +11,21 @@ import {
   FileText,
   ArrowLeft,
   X,
-  Sparkles
+  Sparkles,
+  DollarSign,
 } from "lucide-react"
 import { getVehicleLabel } from "../utils/vehicleUtils"
 import { type ClientVehicle } from "../../../../types/client/clientVehicle"
 import { type VehicleType } from "../utils/vehicleUtils"
 import { type SelectedSpotInfo } from "../types/selectedSpot"
 import { formatPhone } from "../../../../utils/formatations"
+import { type PaymentType } from "../AllocationClient" 
+import { PAYMENT_TYPE_LABEL } from "../utils/paymentLabel"
 
 interface ConfirmStepProps {
   selectedClient: ClientVehicle
   selectedSpot: SelectedSpotInfo
+  paymentType: PaymentType  
   entryDate: string
   setEntryDate: (date: string) => void
   observations: string
@@ -34,6 +38,7 @@ interface ConfirmStepProps {
 function ConfirmStep({
   selectedClient,
   selectedSpot,
+  paymentType,
   entryDate,
   setEntryDate,
   observations,
@@ -54,6 +59,7 @@ function ConfirmStep({
       setEntryDate(localDate.toISOString().slice(0, 16))
     }
   }, [entryDate, setEntryDate])
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 px-3 sm:px-4 py-4 sm:py-8">
@@ -185,6 +191,21 @@ function ConfirmStep({
                   </p>
                 </div>
               </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center shrink-0">
+                  <DollarSign className="w-5 h-5 text-yellow-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-slate-500 font-medium mb-0.5">
+                    Tipo de Pagamento
+                  </p>
+                  <p className="font-bold text-slate-800 text-base sm:text-lg">
+                    {PAYMENT_TYPE_LABEL[paymentType]}
+                  </p>
+                </div>
+              </div>
+
 
               <div className="border-t border-slate-100 pt-4 mt-4">
                 <div className="flex items-center justify-between px-4 py-3 bg-linear-to-r from-emerald-50 to-green-50 rounded-lg border border-emerald-200">

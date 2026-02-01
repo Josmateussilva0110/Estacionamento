@@ -17,6 +17,9 @@ import { type SelectedSpotInfo } from "./types/selectedSpot"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import { type RegisterAllocationResponse } from "../../../types/allocation/allocationResponses"
 
+export type PaymentType = "hour" | "day" | "month"
+
+
 function ParkingAllocation() {
   const { user } = useUser()
   const navigate = useNavigate()
@@ -56,6 +59,7 @@ function ParkingAllocation() {
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [selectedClient, setSelectedClient] = useState<ClientVehicle | null>(null)
   const [vehicleType, setVehicleType] = useState<VehicleType>("car")
+  const [paymentType, setPaymentType] = useState<PaymentType>("hour")
 
   const [selectedSpot, setSelectedSpot] = useState<SelectedSpotInfo | null>(null)
   const [filterFloor, setFilterFloor] = useState<string>("all")
@@ -154,18 +158,22 @@ function ParkingAllocation() {
                 setVehicleType={setVehicleType}
                 filterFloor={filterFloor}
                 setFilterFloor={setFilterFloor}
+                paymentType={paymentType}
+                setPaymentType={setPaymentType}
                 onSpotSelect={handleSpotSelect}
                 onChangeClient={() => {
-                  setSelectedSpot(null) 
+                  setSelectedSpot(null)
                   setStep("search")
                 }}
               />
             )}
 
+
           {step === "confirm" && selectedClient && selectedSpot && (
             <ConfirmStep
               selectedClient={selectedClient}
               selectedSpot={selectedSpot}
+              paymentType={paymentType} 
               entryDate={entryDate}
               setEntryDate={setEntryDate}
               observations={observations}
