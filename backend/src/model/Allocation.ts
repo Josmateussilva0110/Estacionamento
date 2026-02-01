@@ -72,6 +72,7 @@ class Allocation extends Model<AllocationData> {
                     inner join parking_prices pp
                         on pp.parking_id = p.id
                     where p.created_by = ?
+                    order by a.created_at desc
                     limit ?
                     offset ?
                 `,

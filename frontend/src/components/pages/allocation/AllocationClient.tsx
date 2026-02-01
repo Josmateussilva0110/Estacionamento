@@ -17,6 +17,9 @@ import { type SelectedSpotInfo } from "./types/selectedSpot"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import { type RegisterAllocationResponse } from "../../../types/allocation/allocationResponses"
 
+export type PaymentType = "hour" | "day" | "month"
+
+
 function ParkingAllocation() {
   const { user } = useUser()
   const navigate = useNavigate()
@@ -45,15 +48,27 @@ function ParkingAllocation() {
     fetchClientVehicle()
   }, [user, setFlashMessage])
 
+  function getLocalDateTimeForInput(): string {
+    const now = new Date()
+    const offset = now.getTimezoneOffset()
+    const localDate = new Date(now.getTime() - offset * 60 * 1000)
+    return localDate.toISOString().slice(0, 16)
+  }
+
+
   const [searchTerm, setSearchTerm] = useState<string>("")
   const [selectedClient, setSelectedClient] = useState<ClientVehicle | null>(null)
   const [vehicleType, setVehicleType] = useState<VehicleType>("car")
+  const [paymentType, setPaymentType] = useState<PaymentType>("hour")
 
   const [selectedSpot, setSelectedSpot] = useState<SelectedSpotInfo | null>(null)
   const [filterFloor, setFilterFloor] = useState<string>("all")
 
   // Entrada
-  const [entryDate, setEntryDate] = useState<string>(new Date().toISOString().slice(0, 16))
+  const [entryDate, setEntryDate] = useState<string>(
+    getLocalDateTimeForInput
+  )
+
   const [observations, setObservations] = useState<string>("")
 
   function handleClientSelect(client: ClientVehicle) {
@@ -67,6 +82,11 @@ function ParkingAllocation() {
     setStep("confirm")
   }
 
+  function localInputToUTC(dateTimeLocal: string): string {
+    return new Date(dateTimeLocal).toISOString()
+  }
+
+
   async function handleConfirm() {
     if (!selectedClient || !selectedSpot) return
 
@@ -75,7 +95,7 @@ function ParkingAllocation() {
       parking_id: selectedSpot.parking.id,
       vehicle_id: selectedClient.vehicle_id,
       vehicle_type: mapVehicleTypeToApi(vehicleType),
-      entry_date: entryDate,
+      entry_date: localInputToUTC(entryDate),
       observations,
     }
 
@@ -83,9 +103,10 @@ function ParkingAllocation() {
     //console.log(payload)
 
     const response = await requestData<RegisterAllocationResponse>("/allocation", "POST", payload, true)
-    console.log(response)
+    //console.log(response)
     if(response.success && response.data?.status) {
       setFlashMessage(response.data.message, "success")
+      navigate('/parking/management')
     }
     else {
       setFlashMessage(
@@ -137,30 +158,34 @@ function ParkingAllocation() {
                 setVehicleType={setVehicleType}
                 filterFloor={filterFloor}
                 setFilterFloor={setFilterFloor}
+                paymentType={paymentType}
+                setPaymentType={setPaymentType}
                 onSpotSelect={handleSpotSelect}
                 onChangeClient={() => {
-                  setSelectedSpot(null) 
+                  setSelectedSpot(null)
                   setStep("search")
                 }}
               />
             )}
 
-            {step === "confirm" && (
-              <ConfirmStep
-                selectedClient={selectedClient}
-                selectedSpot={selectedSpot}
-                entryDate={entryDate}
-                setEntryDate={setEntryDate}
-                observations={observations}
-                setObservations={setObservations}
-                onConfirm={handleConfirm}
-                onCancel={resetAllocation}
-                onBack={() => {
-                  setSelectedSpot(null) 
-                  setStep("select-spot")
-                }}
-              />
-            )}
+
+          {step === "confirm" && selectedClient && selectedSpot && (
+            <ConfirmStep
+              selectedClient={selectedClient}
+              selectedSpot={selectedSpot}
+              paymentType={paymentType} 
+              entryDate={entryDate}
+              setEntryDate={setEntryDate}
+              observations={observations}
+              setObservations={setObservations}
+              onConfirm={handleConfirm}
+              onCancel={resetAllocation}
+              onBack={() => {
+                setSelectedSpot(null)
+                setStep("select-spot")
+              }}
+            />
+          )}
           </div>
         </div>
       </div>

@@ -31,12 +31,26 @@ class ParkingOperations extends Model<OperationsData> {
     try {
       const result = await db.raw<PgRawResult<SpotsRow>>(
         `
-            select 
-                o.parking_id, o.total_spots, o.car_spots, o.moto_spots,
-                o.truck_spots, o.pcd_spots, o.elderly_spots
-                from parking_operations o
-                where o.parking_id = ? 
-            `,
+          SELECT
+            po.parking_id,
+            po.car_spots   - COALESCE(COUNT(*) FILTER (WHERE a.vehicle_type = 1), 0) AS car_spots,
+            po.moto_spots  - COALESCE(COUNT(*) FILTER (WHERE a.vehicle_type = 2), 0) AS moto_spots,
+            po.truck_spots - COALESCE(COUNT(*) FILTER (WHERE a.vehicle_type = 3), 0) AS truck_spots,
+            po.pcd_spots   - COALESCE(COUNT(*) FILTER (WHERE a.vehicle_type = 4), 0) AS pcd_spots,
+            po.elderly_spots - COALESCE(COUNT(*) FILTER (WHERE a.vehicle_type = 5), 0) AS elderly_spots
+
+          FROM parking_operations po
+          LEFT JOIN allocations a
+            ON a.parking_id = po.parking_id
+          WHERE po.parking_id = ?
+          GROUP BY
+            po.parking_id,
+            po.car_spots,
+            po.moto_spots,
+            po.truck_spots,
+            po.pcd_spots,
+            po.elderly_spots;
+        `,
         [parking_id]
       )
 
