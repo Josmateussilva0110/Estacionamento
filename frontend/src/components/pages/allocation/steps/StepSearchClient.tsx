@@ -127,13 +127,6 @@ function SearchClientStep({
                   : "Comece cadastrando seu primeiro cliente"
                 }
               </p>
-              <button
-                onClick={handleNewClient}
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl transition-all hover:scale-105 text-sm sm:text-base"
-              >
-                <UserPlus className="w-4 h-4 sm:w-5 sm:h-5" />
-                Cadastrar Cliente
-              </button>
             </div>
           )}
 

@@ -102,9 +102,9 @@ function NavBar() {
 
                   <Link
                     to="/register"
-                    className="px-4 py-2 bg-linear-to-br from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:shadow-lg hover:shadow-blue-500/30"
+                    className="px-4 py-2 bg-linear-to-br from-blue-600 to-blue-700 text-white font-medium rounded-full hover:shadow-lg hover:shadow-blue-500/30"
                   >
-                    Registrar
+                    Criar Conta
                   </Link>
                 </>
               ) : (
