@@ -128,7 +128,6 @@ function ParkingAllocation() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-r from-blue-600 via-blue-700 to-blue-900 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <Header onBack={() => navigate("/")} />
 
@@ -190,7 +189,6 @@ function ParkingAllocation() {
           </div>
         </div>
       </div>
-    </div>
   )
 }
 
