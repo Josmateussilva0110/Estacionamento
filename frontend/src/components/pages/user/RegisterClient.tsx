@@ -7,6 +7,7 @@ import {
   CreditCard,
   UserPlus,
   Pencil,
+  ArrowLeft,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -23,7 +24,6 @@ import useFlashMessage from "../../../hooks/useFlashMessage"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import { useUser } from "../../../context/useUser"
 import { type ClientResponseDetail } from "../../../types/client/clientResponseDetail"
-
 
 interface RegisterClientProps {
   mode: "create" | "edit"
@@ -46,20 +46,19 @@ function RegisterClient({ mode }: RegisterClientProps) {
     resolver: zodResolver(RegisterClientSchema),
   })
 
-  
   useEffect(() => {
-  if (!isEditMode) {
-    setIsLoading(false)
-    return
-  }
+    if (!isEditMode) {
+      setIsLoading(false)
+      return
+    }
 
-  if (!id) {
-    setFlashMessage("Cliente inválido", "error")
-    navigate("/client/list/clients")
-    return
-  }
+    if (!id) {
+      setFlashMessage("Cliente inválido", "error")
+      navigate("/client/list/clients")
+      return
+    }
 
-  async function loadClient() {
+    async function loadClient() {
       try {
         setIsLoading(true)
 
@@ -89,24 +88,18 @@ function RegisterClient({ mode }: RegisterClientProps) {
     loadClient()
   }, [isEditMode, id, reset, navigate, setFlashMessage])
 
-
-  /**
-   * 🔹 Submit
-   */
   async function onSubmit(form: RegisterClientFormInput) {
     if (!user) {
       setFlashMessage("Usuário não autenticado", "error")
       return
     }
 
-    const payload: RegisterClientFormOutput = { 
+    const payload: RegisterClientFormOutput = {
       ...form,
       user_id: user.id,
     }
 
-    const endpoint = isEditMode
-      ? `/client/${id}`
-      : "/client/register"
+    const endpoint = isEditMode ? `/client/${id}` : "/client/register"
 
     const method = isEditMode ? "PUT" : "POST"
 
@@ -119,9 +112,7 @@ function RegisterClient({ mode }: RegisterClientProps) {
 
     if (response.success && response.data?.status) {
       setFlashMessage(
-        isEditMode
-          ? "Cliente atualizado com sucesso"
-          : response.data.message,
+        isEditMode ? "Cliente atualizado com sucesso" : response.data.message,
         "success"
       )
       navigate("/client/list/clients")
@@ -132,46 +123,57 @@ function RegisterClient({ mode }: RegisterClientProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark">
-        <div className="bg-white px-6 py-4 rounded-xl shadow-lg">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-200 border-t-blue-600"></div>
+          <p className="text-slate-600 font-medium">Carregando dados...</p>
         </div>
       </div>
     )
   }
 
-
   return (
-    <div className="min-h-screen bg-linear-to-br from-parking-primary via-blue-700 to-parking-dark flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div className="w-full max-w-md sm:max-w-lg mx-auto">
+      <div className="w-full max-w-md sm:max-w-lg">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200/60 overflow-hidden">
+          
           {/* Header */}
-          <div className="bg-linear-to-r from-parking-primary to-blue-600 px-6 py-8 text-center">
-            <div className="mb-4 flex justify-center">
-              <div className="bg-white/20 p-4 rounded-full">
-                {isEditMode ? (
-                  <Pencil className="w-8 h-8 text-white" />
-                ) : (
-                  <UserPlus className="w-8 h-8 text-white" />
-                )}
+          <div className="relative overflow-hidden bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 px-6 sm:px-8 py-8 sm:py-10">
+            
+            {/* Background decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 rounded-full blur-3xl" />
+            
+            <div className="relative">
+              {/* Icon container */}
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-white/30 rounded-2xl blur-xl" />
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
+                    {isEditMode ? (
+                      <Pencil className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                    ) : (
+                      <UserPlus className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                    )}
+                  </div>
+                </div>
               </div>
+
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 text-center tracking-tight">
+                {isEditMode ? "Editar Cliente" : "Cadastro de Cliente"}
+              </h1>
+              <p className="text-blue-100 text-sm sm:text-base text-center">
+                {isEditMode
+                  ? "Atualize os dados do cliente"
+                  : "Preencha os dados para registrar um novo cliente"}
+              </p>
             </div>
-
-            <h1 className="text-2xl font-bold text-white">
-              {isEditMode ? "Editar Cliente" : "Cadastro de Cliente"}
-            </h1>
-
-            <p className="text-blue-100 text-sm mt-2">
-              {isEditMode
-                ? "Atualize os dados do cliente"
-                : "Preencha os dados abaixo para registrar um novo cliente"}
-            </p>
           </div>
 
           {/* Form */}
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="px-6 py-8 space-y-6"
+            className="px-6 sm:px-8 py-8 sm:py-10 space-y-5 sm:space-y-6"
           >
             <Input
               label="Nome completo *"
@@ -209,17 +211,50 @@ function RegisterClient({ mode }: RegisterClientProps) {
             <button
               type="submit"
               className="
-                w-full
-                bg-linear-to-r from-parking-primary to-blue-600
-                text-white font-semibold
-                py-3 rounded-lg
-                hover:from-blue-700 hover:to-parking-primary
-                transition-all
-                shadow-lg
+                group
+                w-full 
+                flex items-center justify-center gap-2
+                bg-linear-to-r from-blue-600 to-indigo-600 
+                text-white font-bold 
+                py-3.5 sm:py-4 px-4 
+                rounded-xl 
+                hover:from-blue-700 hover:to-indigo-700 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+                transform transition-all 
+                hover:scale-[1.02] active:scale-[0.98] 
+                shadow-lg hover:shadow-xl hover:shadow-blue-500/30
+                text-sm sm:text-base
               "
             >
-              {isEditMode ? "Salvar Alterações" : "Cadastrar Cliente"}
+              {isEditMode ? (
+                <>
+                  <Pencil size={18} className="group-hover:rotate-12 transition-transform" />
+                  Salvar Alterações
+                </>
+              ) : (
+                <>
+                  <UserPlus size={18} className="group-hover:scale-110 transition-transform" />
+                  Cadastrar Cliente
+                </>
+              )}
             </button>
+
+            <div className="text-center pt-4 sm:pt-6 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={() => navigate("/client/list/clients")}
+                className="
+                  inline-flex items-center justify-center gap-2
+                  text-sm text-slate-500 
+                  hover:text-slate-700 
+                  transition-colors
+                  font-medium
+                "
+              >
+                <ArrowLeft size={16} />
+                Voltar para listagem
+              </button>
+            </div>
           </form>
         </div>
       </div>

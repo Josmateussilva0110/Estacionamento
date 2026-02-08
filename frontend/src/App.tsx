@@ -1,20 +1,44 @@
-import AppRoutes from "./routes/Index";
-import FlashMessage from "./components/ui/Message";
-import NavBar from "./components/layout/navbar/NavBar";
-import Footer from "./components/layout/Footer";
-//import { LayoutContainer } from "./components/layout/Container";
+import { useLocation } from "react-router-dom"
+import AppRoutes from "./routes/Index"
+import FlashMessage from "./components/ui/Message"
+import NavBar from "./components/layout/navbar/NavBar"
+import Footer from "./components/layout/Footer"
+import LayoutContainer from "./components/layout/Container"
 
 function App() {
+  const location = useLocation()
+  const path = location.pathname
+
+  const staticPaths = ["/login", "/register"]
+  const hideLayout = staticPaths.includes(path)
+
+
+
+  // Determinar variante do container
+  function getContainerVariant() {
+    if (path.match(/^\/parking\/(register|edit\/\d+)$/)) {
+      return "dark"
+    }
+
+    return "default"
+  }
+
+  const containerVariant = getContainerVariant()
+
   return (
     <div className="flex flex-col min-h-screen">
-      <NavBar />
+      {!hideLayout && <NavBar />}
       <FlashMessage />
+      
       <main className="flex-1">
-        <AppRoutes />
+        <LayoutContainer variant={containerVariant}>
+          <AppRoutes />
+        </LayoutContainer>
       </main>
+      
       <Footer />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

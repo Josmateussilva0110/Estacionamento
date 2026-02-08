@@ -26,6 +26,7 @@ import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import Pagination from "../../layout/Pagination"
 
 
+
 function ParkingList() {
     const navigate = useNavigate()
     const { setFlashMessage } = useFlashMessage()
@@ -130,7 +131,7 @@ function ParkingList() {
     )
 
     return (
-        <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50 px-4 py-8">
+        <div className="min-h-screen">
             <div className="max-w-7xl mx-auto space-y-6">
                 <div className="relative overflow-hidden bg-white rounded-3xl shadow-xl border border-slate-200/60">
                     <div className="absolute inset-0 bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 opacity-[0.97]" />
