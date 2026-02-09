@@ -47,10 +47,10 @@ export function MobileDrawerMenu({
           leaveFrom="translate-x-0"
           leaveTo="translate-x-full"
         >
-          <div className="fixed right-0 top-0 bottom-0 w-80 bg-white shadow-2xl">
-            <div className="relative overflow-hidden bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 px-6 py-6">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl" />
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-400/20 rounded-full blur-2xl" />
+          <div className="fixed right-0 top-0 bottom-0 w-80 bg-slate-800/95 backdrop-blur-xl shadow-2xl border-l border-slate-700/50">
+            <div className="relative overflow-hidden bg-linear-to-br from-blue-600/20 via-blue-600/20 to-indigo-600/20 px-6 py-6 border-b border-slate-700/50">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl" />
               
               <div className="relative flex items-center justify-between">
                 <span className="text-xl font-bold text-white tracking-tight">
@@ -58,7 +58,7 @@ export function MobileDrawerMenu({
                 </span>
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur-xl border border-white/20 transition-all hover:scale-105 active:scale-95"
+                  className="p-2 rounded-xl bg-slate-700/50 hover:bg-slate-700/80 backdrop-blur-xl border border-slate-600/50 transition-all hover:scale-105 active:scale-95"
                 >
                   <X className="text-white" size={20} />
                 </button>
@@ -66,18 +66,18 @@ export function MobileDrawerMenu({
             </div>
 
             {/* User Info Card */}
-            <div className="px-6 py-6 border-b border-slate-200">
-              <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100">
+            <div className="px-6 py-6 border-b border-slate-700/50">
+              <div className="bg-slate-700/30 backdrop-blur-xl rounded-2xl p-4 border border-slate-600/30">
                 <div className="flex items-center gap-4">
                   <div className="relative">
                     <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-md" />
                     <UserAvatar user={user} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-base font-bold text-slate-800 truncate">
+                    <p className="text-base font-bold text-white truncate">
                       {user?.username}
                     </p>
-                    <p className="text-sm text-slate-600 truncate">
+                    <p className="text-sm text-slate-400 truncate">
                       {user?.email}
                     </p>
                   </div>
@@ -95,19 +95,19 @@ export function MobileDrawerMenu({
                       key={item.to}
                       to={item.to}
                       onClick={onClose}
-                      className="group flex items-center justify-between px-4 py-3.5 rounded-xl hover:bg-linear-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                      className="group flex items-center justify-between px-4 py-3.5 rounded-xl hover:bg-blue-500/20 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
-                          <Icon size={20} className="text-slate-600 group-hover:text-blue-600 transition-colors" />
+                        <div className="w-10 h-10 rounded-xl bg-slate-700/50 group-hover:bg-blue-500/30 flex items-center justify-center transition-colors border border-slate-600/30 group-hover:border-blue-400/30">
+                          <Icon size={20} className="text-slate-300 group-hover:text-blue-300 transition-colors" />
                         </div>
-                        <span className="font-medium text-slate-700 group-hover:text-blue-700 transition-colors">
+                        <span className="font-medium text-slate-200 group-hover:text-blue-300 transition-colors">
                           {item.label}
                         </span>
                       </div>
                       <ChevronRight
                         size={18}
-                        className="text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all"
+                        className="text-slate-400 group-hover:text-blue-300 group-hover:translate-x-1 transition-all"
                       />
                     </Link>
                   )
@@ -121,13 +121,13 @@ export function MobileDrawerMenu({
                     onClose()
                     onLogout()
                   }}
-                  className="group flex w-full items-center justify-between px-4 py-3.5 rounded-xl bg-linear-to-r from-red-50 to-red-100 border border-red-200 hover:from-red-100 hover:to-red-200 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg hover:shadow-red-500/20"
+                  className="group flex w-full items-center justify-between px-4 py-3.5 rounded-xl bg-red-500/20 border border-red-500/30 hover:bg-red-500/30 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg hover:shadow-red-500/20"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-red-100 group-hover:bg-red-200 flex items-center justify-center transition-colors">
-                      <LogOut size={20} className="text-red-600 group-hover:rotate-12 transition-transform" />
+                    <div className="w-10 h-10 rounded-xl bg-red-500/30 group-hover:bg-red-500/40 flex items-center justify-center transition-colors border border-red-400/30">
+                      <LogOut size={20} className="text-red-300 group-hover:rotate-12 transition-transform" />
                     </div>
-                    <span className="font-semibold text-red-600">
+                    <span className="font-semibold text-red-300">
                       Sair
                     </span>
                   </div>
