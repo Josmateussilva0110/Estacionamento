@@ -36,7 +36,7 @@ function App() {
         </LayoutContainer>
       </main>
       
-      <Footer />
+      {!hideLayout && <Footer />}
     </div>
   )
 }
