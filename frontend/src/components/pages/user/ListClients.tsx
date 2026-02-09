@@ -310,7 +310,7 @@ function ClientList() {
                                             flex items-center justify-center gap-2
                                             w-full
                                             px-6 py-4
-                                            bg-linear-to-r from-blue-600 to-blue-600
+                                            bg-linear-to-r from-blue-600 to-blue-600 
                                             text-white font-semibold
                                             rounded-xl
                                             transition-all duration-300
