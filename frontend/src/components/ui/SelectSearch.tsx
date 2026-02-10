@@ -85,14 +85,14 @@ export function SearchSelect<T, V>({
   return (
     <div className="space-y-1" ref={containerRef}>
       {label && (
-        <label className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium text-white">
           {label}
         </label>
       )}
 
       <div className="relative">
         <Search
-          className={`absolute top-1/2 -translate-y-1/2 text-gray-400 ${styles.icon}`}
+          className={`absolute top-1/2 -translate-y-1/2 text-slate-400 ${styles.icon}`}
         />
 
         <input
@@ -107,17 +107,18 @@ export function SearchSelect<T, V>({
           }}
           className={`
             w-full ${styles.input}
-            border border-gray-300 rounded-xl
+            bg-slate-700/50 border-2 border-slate-600/50 rounded-xl
+            text-white placeholder:text-slate-400
             focus:ring-2 focus:ring-blue-500 focus:border-blue-500
             focus:outline-none
-            disabled:bg-gray-100 disabled:cursor-not-allowed
-            transition
+            disabled:bg-slate-700/30 disabled:cursor-not-allowed
+            transition-all
           `}
         />
 
         {isLoading && (
           <Loader2
-            className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-gray-400"
+            className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-blue-400"
             size={size === "lg" ? 20 : 16}
           />
         )}
@@ -127,13 +128,13 @@ export function SearchSelect<T, V>({
         <div
           className={`
             mt-1 max-h-60 overflow-auto
-            bg-white border border-blue-400
-            rounded-xl shadow-lg z-50
+            bg-slate-700/95 backdrop-blur-xl border-2 border-slate-600/50
+            rounded-xl shadow-2xl z-50
             ${styles.dropdown}
           `}
         >
           {filteredItems.length === 0 && !isLoading && (
-            <div className="px-4 py-3 text-gray-500">
+            <div className="px-4 py-3 text-slate-400">
               Nenhum resultado encontrado
             </div>
           )}
@@ -151,8 +152,9 @@ export function SearchSelect<T, V>({
                 }}
                 className="
                   w-full text-left px-4 py-3
-                  hover:bg-blue-50
-                  transition
+                  text-white
+                  hover:bg-slate-600/50
+                  transition-colors
                 "
               >
                 {renderItem ? renderItem(item) : getLabel(item)}

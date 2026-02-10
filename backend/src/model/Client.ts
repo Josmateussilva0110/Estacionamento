@@ -135,7 +135,7 @@ class Client extends Model<ClientRow> {
                     and not exists (
                         select 1
                         from allocations a
-                        where a.client_id = c.id
+                        where a.vehicle_id = v.id
                     )
                     order by c.updated_at desc
                 `

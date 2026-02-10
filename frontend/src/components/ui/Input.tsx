@@ -27,7 +27,7 @@ export default function Input({
   return (
     <div className="space-y-1">
       {label && (
-        <label className="block text-sm font-semibold text-gray-700">
+        <label className="block text-sm font-semibold text-white">
           {label}
         </label>
       )}

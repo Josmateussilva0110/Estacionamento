@@ -119,11 +119,11 @@ function AllocationManagement() {
 
     function getVehicleTypeBadge(type: string) {
         const configs = {
-            carro: "bg-blue-500/10 text-blue-600 border-blue-500/20",
-            moto: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
-            caminhonete: "bg-orange-500/10 text-orange-600 border-orange-500/20",
-            pcd: "bg-purple-500/10 text-purple-600 border-purple-500/20",
-            elderly: "bg-pink-500/10 text-pink-600 border-pink-500/20"
+            carro: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+            moto: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+            caminhonete: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+            pcd: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+            elderly: "bg-pink-500/20 text-pink-300 border-pink-500/30"
         }
         return configs[type as keyof typeof configs] || configs.carro
     }
@@ -179,27 +179,26 @@ function AllocationManagement() {
     return (
         <div className="min-h-screen">
             <div className="max-w-7xl mx-auto space-y-6">
-                <div className="relative overflow-hidden bg-white rounded-3xl shadow-xl border border-slate-200/60">
-                    <div className="absolute inset-0 bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 opacity-[0.97]" />
-
-                    {/* Decorative elements */}
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl" />
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl" />
+                {/* Header */}
+                <div className="relative overflow-hidden bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50">
+                    <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 via-blue-600/20 to-blue-600/20" />
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl" />
 
                     <div className="relative px-8 py-10">
                         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
                             <div className="flex items-center gap-5">
                                 <div className="relative">
-                                    <div className="absolute inset-0 bg-white/30 rounded-2xl blur-xl" />
-                                    <div className="relative w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
-                                        <Activity className="w-8 h-8 text-white" />
+                                    <div className="absolute inset-0 bg-blue-500/30 rounded-2xl blur-xl" />
+                                    <div className="relative w-16 h-16 bg-blue-500/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-blue-400/30">
+                                        <Activity className="w-8 h-8 text-blue-300" />
                                     </div>
                                 </div>
                                 <div>
                                     <h1 className="text-4xl font-bold text-white mb-1 tracking-tight">
                                         Alocações Ativas
                                     </h1>
-                                    <p className="text-blue-100 text-lg">
+                                    <p className="text-blue-200 text-lg">
                                         Monitore veículos em tempo real
                                     </p>
                                 </div>
@@ -208,71 +207,73 @@ function AllocationManagement() {
                             <div className="flex flex-wrap gap-3">
                                 <button
                                     onClick={() => updateAllocations()}
-                                    className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-xl text-white font-semibold px-5 py-3 rounded-xl transition-all border border-white/30 hover:scale-105"
+                                    className="flex items-center gap-2 bg-slate-700/50 hover:bg-slate-700/80 backdrop-blur-xl text-white font-semibold px-5 py-3 rounded-xl transition-all border border-slate-600/50 hover:scale-105"
                                 >
                                     <RefreshCw size={18} />
                                     Atualizar
                                 </button>
                                 <button
                                     onClick={handleRegister}
-                                    className="flex items-center gap-2 bg-white hover:bg-white/90 text-blue-600 font-semibold px-5 py-3 rounded-xl transition-all hover:scale-105 shadow-lg"
+                                    className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white font-semibold px-5 py-3 rounded-xl transition-all hover:scale-105 shadow-lg shadow-blue-500/30"
                                 >
                                     <Plus size={18} />
                                     Nova Alocação
                                 </button>
                                 <button
                                     onClick={() => navigate("/")}
-                                    className="flex items-center gap-2 bg-white hover:bg-white/90 text-blue-600 font-semibold px-5 py-3 rounded-xl transition-all hover:scale-105 shadow-lg"
+                                    className="flex items-center gap-2 bg-slate-700/50 hover:bg-slate-700/80 backdrop-blur-xl text-white font-semibold px-5 py-3 rounded-xl transition-all border border-slate-600/50 hover:scale-105"
                                 >
                                     <ChevronLeft size={18} />
                                     Voltar
                                 </button>
                             </div>
                         </div>
+
+                        {/* Stats Cards */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-                            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+                            <div className="bg-slate-700/30 backdrop-blur-xl rounded-2xl p-6 border border-slate-600/30">
                                 <div className="flex items-center justify-between mb-3">
-                                    <p className="text-blue-100 text-sm font-medium">Total Ativo</p>
-                                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                        <Car className="w-5 h-5 text-white" />
+                                    <p className="text-slate-300 text-sm font-medium">Total Ativo</p>
+                                    <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center border border-blue-400/30">
+                                        <Car className="w-5 h-5 text-blue-300" />
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
                                     {allocations.length}
                                 </p>
-                                <p className="text-blue-200 text-sm flex items-center gap-1">
+                                <p className="text-blue-300 text-sm flex items-center gap-1">
                                     <TrendingUp className="w-4 h-4" />
                                     +12% vs ontem
                                 </p>
                             </div>
 
-                            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+                            <div className="bg-slate-700/30 backdrop-blur-xl rounded-2xl p-6 border border-slate-600/30">
                                 <div className="flex items-center justify-between mb-3">
-                                    <p className="text-blue-100 text-sm font-medium">Tempo Médio</p>
-                                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                        <Clock className="w-5 h-5 text-white" />
+                                    <p className="text-slate-300 text-sm font-medium">Tempo Médio</p>
+                                    <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center border border-orange-400/30">
+                                        <Clock className="w-5 h-5 text-orange-300" />
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
                                     3h 20min
                                 </p>
-                                <p className="text-blue-200 text-sm flex items-center gap-1">
+                                <p className="text-slate-300 text-sm flex items-center gap-1">
                                     <Activity className="w-4 h-4" />
                                     Ocupação normal
                                 </p>
                             </div>
 
-                            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20">
+                            <div className="bg-slate-700/30 backdrop-blur-xl rounded-2xl p-6 border border-slate-600/30">
                                 <div className="flex items-center justify-between mb-3">
-                                    <p className="text-blue-100 text-sm font-medium">Receita Estimada</p>
-                                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                                        <DollarSign className="w-5 h-5 text-white" />
+                                    <p className="text-slate-300 text-sm font-medium">Receita Estimada</p>
+                                    <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center border border-emerald-400/30">
+                                        <DollarSign className="w-5 h-5 text-emerald-300" />
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
                                     R$ {allocations.reduce((acc, curr) => acc + curr.estimatedCost, 0).toFixed(2)}
                                 </p>
-                                <p className="text-emerald-200 text-sm flex items-center gap-1">
+                                <p className="text-emerald-300 text-sm flex items-center gap-1">
                                     <TrendingUp className="w-4 h-4" />
                                     +8% vs ontem
                                 </p>
@@ -282,7 +283,7 @@ function AllocationManagement() {
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
+                <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-6">
                     <div className="space-y-4">
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -290,7 +291,7 @@ function AllocationManagement() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Buscar por cliente, placa ou estacionamento..."
-                                className="w-full pl-12 pr-4 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-slate-700 placeholder:text-slate-400"
+                                className="w-full pl-12 pr-4 py-4 bg-slate-700/50 border-2 border-slate-600/50 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-white placeholder:text-slate-400"
                             />
                         </div>
 
@@ -298,7 +299,7 @@ function AllocationManagement() {
                         <div className="flex items-center justify-between">
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all"
+                                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-slate-700/50 text-slate-200 hover:bg-slate-700/80 transition-all"
                             >
                                 <Filter size={16} />
                                 Filtros
@@ -307,19 +308,19 @@ function AllocationManagement() {
                                 </span>
                             </button>
 
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-slate-400">
                                 {filteredAllocations.length} resultado{filteredAllocations.length !== 1 ? "s" : ""}
                             </p>
                         </div>
 
                         {/* Type Filters */}
                         {showFilters && (
-                            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200">
+                            <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-700">
                                 <button
                                     onClick={() => setFilterType("all")}
                                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "all"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                            : "bg-slate-700/50 text-slate-200 hover:bg-slate-700/80"
                                         }`}
                                 >
                                     Todos
@@ -328,7 +329,7 @@ function AllocationManagement() {
                                     onClick={() => setFilterType("carro")}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "carro"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                            : "bg-slate-700/50 text-slate-200 hover:bg-slate-700/80"
                                         }`}
                                 >
                                     <Car size={16} />
@@ -338,7 +339,7 @@ function AllocationManagement() {
                                     onClick={() => setFilterType("moto")}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "moto"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                            : "bg-slate-700/50 text-slate-200 hover:bg-slate-700/80"
                                         }`}
                                 >
                                     <Bike size={16} />
@@ -348,7 +349,7 @@ function AllocationManagement() {
                                     onClick={() => setFilterType("caminhonete")}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "caminhonete"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                            : "bg-slate-700/50 text-slate-200 hover:bg-slate-700/80"
                                         }`}
                                 >
                                     <Truck size={16} />
@@ -358,7 +359,7 @@ function AllocationManagement() {
                                     onClick={() => setFilterType("pcd")}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "pcd"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                            : "bg-slate-700/50 text-slate-200 hover:bg-slate-700/80"
                                         }`}
                                 >
                                     <User size={16} />
@@ -368,7 +369,7 @@ function AllocationManagement() {
                                     onClick={() => setFilterType("elderly")}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${filterType === "elderly"
                                             ? "bg-blue-600 text-white shadow-lg shadow-blue-500/30"
-                                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                            : "bg-slate-700/50 text-slate-200 hover:bg-slate-700/80"
                                         }`}
                                 >
                                     <UsersIcon size={16} />
@@ -381,24 +382,24 @@ function AllocationManagement() {
 
                 {/* Loading */}
                 {isLoading && (
-                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-16">
+                    <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-16">
                         <div className="flex flex-col items-center justify-center gap-4">
-                            <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-200 border-t-blue-600"></div>
-                            <p className="text-slate-600 font-medium">Carregando alocações...</p>
+                            <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-blue-600"></div>
+                            <p className="text-slate-300 font-medium">Carregando alocações...</p>
                         </div>
                     </div>
                 )}
 
                 {/* Empty State */}
                 {!isLoading && filteredAllocations.length === 0 && (
-                    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-16 text-center">
-                        <div className="w-20 h-20 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-16 text-center">
+                        <div className="w-20 h-20 bg-slate-700/50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                             <Car className="w-10 h-10 text-slate-400" />
                         </div>
-                        <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                            Nenhum alocação encontrado
+                        <h3 className="text-xl font-semibold text-slate-200 mb-2">
+                            Nenhuma alocação encontrada
                         </h3>
-                        <p className="text-slate-500 mb-6">
+                        <p className="text-slate-400 mb-6">
                             {searchTerm || filterType !== "all"
                                 ? "Tente ajustar sua busca ou limpar os filtros"
                                 : "Comece cadastrando seu primeiro veículo"
@@ -407,7 +408,7 @@ function AllocationManagement() {
                         {!searchTerm && filterType === "all" && (
                             <button
                                 onClick={handleRegister}
-                                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all hover:scale-105"
+                                className="inline-flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition-all hover:scale-105 shadow-lg shadow-blue-500/30"
                             >
                                 <Plus size={18} />
                                 Nova Alocação
@@ -421,14 +422,14 @@ function AllocationManagement() {
                     {!isLoading && (filteredAllocations.map((allocation) => (
                         <div
                             key={allocation.id}
-                            className="group bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6 hover:shadow-xl transition-all duration-300 hover:scale-[1.01]"
+                            className="group bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-6 hover:shadow-blue-500/20 hover:shadow-2xl transition-all duration-300 hover:scale-[1.01]"
                         >
                             <div className="flex flex-col lg:flex-row gap-6">
                                 <div className="flex-1 space-y-4">
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-2 flex-wrap">
-                                                <h3 className="text-xl font-bold text-slate-800">
+                                                <h3 className="text-xl font-bold text-white">
                                                     {allocation.clientName}
                                                 </h3>
                                                 <span
@@ -440,11 +441,11 @@ function AllocationManagement() {
                                                     {getVehicleTypeLabel(allocation.vehicleType)}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-2 text-slate-600">
+                                            <div className="flex items-center gap-2 text-slate-300">
                                                 <span className="font-mono font-semibold text-base">
                                                     {allocation.plate}
                                                 </span>
-                                                <span className="text-slate-400">•</span>
+                                                <span className="text-slate-500">•</span>
                                                 <span className="text-sm">
                                                     {allocation.brand}
                                                 </span>
@@ -455,70 +456,70 @@ function AllocationManagement() {
                                     {/* Info Grid */}
                                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-                                                <MapPin className="w-5 h-5 text-blue-600" />
+                                            <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center shrink-0 border border-blue-500/30">
+                                                <MapPin className="w-5 h-5 text-blue-400" />
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
                                                     Estacionamento
                                                 </p>
-                                                <p className="font-semibold text-slate-800 text-sm">
+                                                <p className="font-semibold text-slate-200 text-sm">
                                                     {allocation.parkingName}
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center shrink-0">
-                                                <Calendar className="w-5 h-5 text-purple-600" />
+                                            <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center shrink-0 border border-blue-500/30">
+                                                <Calendar className="w-5 h-5 text-blue-400" />
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
                                                     Entrada
                                                 </p>
-                                                <p className="font-semibold text-slate-800 text-sm">
+                                                <p className="font-semibold text-slate-200 text-sm">
                                                     {formatDateTime(allocation.entryDate)}
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center shrink-0">
-                                                <Clock className="w-5 h-5 text-orange-600" />
+                                            <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center shrink-0 border border-orange-500/30">
+                                                <Clock className="w-5 h-5 text-orange-400" />
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
                                                     Tempo decorrido
                                                 </p>
-                                                <p className="font-bold text-orange-600 text-lg">
+                                                <p className="font-bold text-orange-400 text-lg">
                                                     {formatMinutesToDaysHHMM(allocation.currentDuration)}
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
-                                                <DollarSign className="w-5 h-5 text-emerald-600" />
+                                            <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center shrink-0 border border-emerald-500/30">
+                                                <DollarSign className="w-5 h-5 text-emerald-400" />
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
                                                     Valor estimado
                                                 </p>
-                                                <p className="font-bold text-emerald-600 text-lg">
+                                                <p className="font-bold text-emerald-400 text-lg">
                                                     R$ {allocation.estimatedCost.toFixed(2)}
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div className="flex items-start gap-3 sm:col-span-2">
-                                            <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
-                                                <User className="w-5 h-5 text-slate-600" />
+                                            <div className="w-10 h-10 bg-slate-500/20 rounded-xl flex items-center justify-center shrink-0 border border-slate-500/30">
+                                                <User className="w-5 h-5 text-slate-300" />
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-500 font-medium mb-0.5">
+                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
                                                     Contato
                                                 </p>
-                                                <p className="font-semibold text-slate-800 text-sm">
+                                                <p className="font-semibold text-slate-200 text-sm">
                                                     {formatPhone(allocation.phone)}
                                                 </p>
                                             </div>
@@ -527,11 +528,11 @@ function AllocationManagement() {
 
                                     {/* Observations */}
                                     {allocation.observations && (
-                                        <div className="bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200/60 rounded-xl p-4">
-                                            <p className="text-xs text-blue-700 font-semibold mb-1 uppercase tracking-wide">
+                                        <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+                                            <p className="text-xs text-blue-300 font-semibold mb-1 uppercase tracking-wide">
                                                 Observações
                                             </p>
-                                            <p className="text-sm text-slate-700">
+                                            <p className="text-sm text-slate-300">
                                                 {allocation.observations}
                                             </p>
                                         </div>

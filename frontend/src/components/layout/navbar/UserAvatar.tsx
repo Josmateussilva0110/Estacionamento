@@ -13,7 +13,7 @@ export function UserAvatar({ user, size = "md" }: Props) {
 
   return (
     <div
-      className={`${sizes[size]} rounded-full bg-linear-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-semibold`}
+      className={`${sizes[size]} rounded-full bg-linear-to-br from-blue-600 to-blue-700 flex items-center justify-center text-white font-semibold border border-blue-400/30 shadow-lg shadow-blue-500/20`}
     >
       {user?.username?.charAt(0).toUpperCase() || "U"}
     </div>

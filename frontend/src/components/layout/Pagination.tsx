@@ -21,15 +21,15 @@ function Pagination({
   const endIndex = Math.min(page * limit, total)
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-6">
+    <div className="bg-gray-800 rounded-2xl shadow-lg border border-slate-900 p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-slate-600 text-center sm:text-left">
+        <p className="text-sm text-white text-center sm:text-left">
           Mostrando{" "}
-          <span className="font-semibold text-slate-800">
+          <span className="font-semibold text-white">
             {startIndex}-{endIndex}
           </span>{" "}
           de{" "}
-          <span className="font-semibold text-slate-800">
+          <span className="font-semibold text-white">
             {total}
           </span>{" "}
           {label}
@@ -80,7 +80,7 @@ function Pagination({
                     transition-all
                     ${
                       page === pageNum
-                        ? "bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
+                        ? "bg-linear-to-r from-blue-600 to-blue-600 text-white shadow-lg shadow-blue-500/30"
                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                     }
                   `}

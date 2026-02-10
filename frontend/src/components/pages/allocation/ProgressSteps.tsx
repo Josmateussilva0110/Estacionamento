@@ -54,8 +54,8 @@ export default function ProgressSteps({
                 <div
                   className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center border-2 transition-all ${
                     isCompleted || isActive
-                      ? "bg-blue-500 border-blue-500 text-white"
-                      : "bg-white border-gray-300 text-gray-400"
+                      ? "bg-blue-500 border-blue-500 text-white shadow-lg shadow-blue-500/30"
+                      : "bg-slate-700/50 border-slate-600/50 text-slate-400"
                   }`}
                 >
                   <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -64,10 +64,10 @@ export default function ProgressSteps({
                 <span
                   className={`text-xs sm:text-sm font-semibold text-center leading-tight px-1 ${
                     isActive
-                      ? "text-blue-600"
+                      ? "text-blue-400"
                       : isCompleted
-                      ? "text-gray-700"
-                      : "text-gray-400"
+                      ? "text-slate-200"
+                      : "text-slate-500"
                   }`}
                 >
                   {s.label}

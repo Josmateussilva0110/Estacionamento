@@ -22,10 +22,10 @@ function LayoutContainer({
 }: LayoutContainerProps) {
   
   const backgroundVariants = {
-    default: "bg-linear-to-br from-slate-50 via-blue-100 to-indigo-50",
-    centered: "bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50",
-    dark: "bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800",
-    custom: customBackground || "bg-linear-to-br from-slate-50 via-blue-50 to-indigo-50",
+    default: "bg-gray-900",
+    centered: "bg-slate-900",
+    dark: "bg-blue-900",
+    custom: customBackground || "bg-gray-900",
   }
 
 
