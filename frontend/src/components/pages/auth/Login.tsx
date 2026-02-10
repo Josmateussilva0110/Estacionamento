@@ -39,25 +39,26 @@ function LoginUser() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12">
       <div className="w-full max-w-md sm:max-w-lg">
 
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-slate-200/60 overflow-hidden">
+        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-700/50 overflow-hidden">
 
           {/* Header */}
-          <div className="relative overflow-hidden bg-linear-to-br from-blue-600 via-blue-700 to-indigo-800 px-6 sm:px-8 py-8 sm:py-10">
+          <div className="relative overflow-hidden bg-slate-800/80 backdrop-blur-xl px-6 sm:px-8 py-8 sm:py-10">
             
             {/* Background decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-400/20 rounded-full blur-3xl" />
+            <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 via-blue-600/20 to-blue-600/20" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
             
             <div className="relative">
               {/* Icon container */}
               <div className="flex justify-center mb-6">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-white/30 rounded-2xl blur-xl" />
-                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/30">
-                    <LogIn className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+                  <div className="absolute inset-0 bg-blue-500/30 rounded-2xl blur-xl" />
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-blue-500/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-blue-400/30">
+                    <LogIn className="w-8 h-8 sm:w-10 sm:h-10 text-blue-300" />
                   </div>
                 </div>
               </div>
@@ -65,7 +66,7 @@ function LoginUser() {
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 text-center tracking-tight">
                 Sistema de Estacionamento
               </h1>
-              <p className="text-blue-100 text-sm sm:text-base text-center">
+              <p className="text-blue-200 text-sm sm:text-base text-center">
                 Faça seu login para continuar
               </p>
             </div>
@@ -76,7 +77,7 @@ function LoginUser() {
 
             {/* Email */}
             <Input
-              label="E-mail"
+              label="E-mail *"
               type="email"
               placeholder="seu@email.com"
               leftIcon={<Mail size={18} />}
@@ -86,7 +87,7 @@ function LoginUser() {
 
             {/* Senha */}
             <Input
-              label="Senha"
+              label="Senha *"
               type="password"
               placeholder="Mínimo 6 caracteres"
               isPassword
@@ -102,12 +103,12 @@ function LoginUser() {
                 group
                 w-full 
                 flex items-center justify-center gap-2
-                bg-linear-to-r from-blue-600 to-indigo-600 
-                text-white font-bold 
+                bg-linear-to-r from-blue-600 to-blue-600 
+                hover:from-blue-700 hover:to-blue-700
+                text-white font-semibold 
                 py-3.5 sm:py-4 px-4 
                 rounded-xl 
-                hover:from-blue-700 hover:to-indigo-700 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-800
                 transform transition-all 
                 hover:scale-[1.02] active:scale-[0.98] 
                 shadow-lg hover:shadow-xl hover:shadow-blue-500/30
@@ -119,12 +120,12 @@ function LoginUser() {
             </button>
 
             {/* Link registrar */}
-            <div className="text-center pt-4 sm:pt-6 border-t border-slate-200">
-              <p className="text-sm text-slate-600 mb-3">
+            <div className="text-center pt-4 sm:pt-6 border-t border-slate-700/50">
+              <p className="text-sm text-slate-300 mb-3">
                 Não tem uma conta?{" "}
                 <a 
                   href="/register" 
-                  className="font-semibold text-blue-600 hover:text-blue-700 transition-colors hover:underline"
+                  className="font-semibold text-blue-400 hover:text-blue-300 transition-colors hover:underline"
                 >
                   Crie sua conta
                 </a>
@@ -135,8 +136,8 @@ function LoginUser() {
                 onClick={() => navigate("/")}
                 className="
                   inline-flex items-center justify-center gap-2
-                  text-sm text-slate-500 
-                  hover:text-slate-700 
+                  text-sm text-slate-400 
+                  hover:text-slate-200 
                   transition-colors
                   font-medium
                 "

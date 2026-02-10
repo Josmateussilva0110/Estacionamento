@@ -132,7 +132,7 @@ function ParkingAllocation() {
       <div className="max-w-7xl mx-auto">
         <Header onBack={() => navigate("/")} />
 
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-6">
+        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden mb-6">
           <ProgressSteps 
             step={step} 
             selectedClient={selectedClient} 
@@ -140,7 +140,7 @@ function ParkingAllocation() {
           />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden">
           <div className="p-8">
             {step === "search" && (
               <SearchClientStep

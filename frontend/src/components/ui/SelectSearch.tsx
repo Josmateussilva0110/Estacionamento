@@ -85,14 +85,14 @@ export function SearchSelect<T, V>({
   return (
     <div className="space-y-1" ref={containerRef}>
       {label && (
-        <label className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium text-white">
           {label}
         </label>
       )}
 
       <div className="relative">
         <Search
-          className={`absolute top-1/2 -translate-y-1/2 text-gray-400 ${styles.icon}`}
+          className={`absolute top-1/2 -translate-y-1/2 text-blue-300 ${styles.icon}`}
         />
 
         <input
@@ -107,17 +107,17 @@ export function SearchSelect<T, V>({
           }}
           className={`
             w-full ${styles.input}
-            border border-gray-300 rounded-xl
+            border border-blue-300 rounded-xl
             focus:ring-2 focus:ring-blue-500 focus:border-blue-500
             focus:outline-none
-            disabled:bg-gray-100 disabled:cursor-not-allowed
+            disabled:bg-blue-100 disabled:cursor-not-allowed
             transition
           `}
         />
 
         {isLoading && (
           <Loader2
-            className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-gray-400"
+            className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin text-blue-400"
             size={size === "lg" ? 20 : 16}
           />
         )}
@@ -127,13 +127,13 @@ export function SearchSelect<T, V>({
         <div
           className={`
             mt-1 max-h-60 overflow-auto
-            bg-white border border-blue-400
+            bg-blue border border-blue-400
             rounded-xl shadow-lg z-50
             ${styles.dropdown}
           `}
         >
           {filteredItems.length === 0 && !isLoading && (
-            <div className="px-4 py-3 text-gray-500">
+            <div className="px-4 py-3 text-blue-500">
               Nenhum resultado encontrado
             </div>
           )}
