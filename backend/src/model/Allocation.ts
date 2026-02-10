@@ -56,6 +56,7 @@ class Allocation extends Model<AllocationData> {
                        pp.night_rate as night_price_per_hour,
                        pp.night_period,
                        pp.daily_rate,
+                       pp.monthly_rate,
                        CASE
                             WHEN v.vehicle_type = 1 THEN pp.car_price
                             WHEN v.vehicle_type = 2 THEN pp.moto_price

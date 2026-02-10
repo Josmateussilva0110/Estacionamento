@@ -9,6 +9,7 @@ import { AllocationDetailDTO } from "../dtos/AllocationDetailDTO"
 import { type PaginatedAllocationsServiceResult } from "../types/allocation/paginatedAllocationServiceResult"
 import { calculateHourlyStayValue } from "../utils/calculateHourCost"
 import { calculateDailyStayValue } from "../utils/calculateDailyCost"
+import { calculateMonthlyStayValue } from "../utils/calculateMonthCost"
 import { parseOpeningHours } from "../utils/parseOpeningHours"
 
 
@@ -133,6 +134,13 @@ class AllocationService {
                         vehicleFixedPrice: row.vehicle_fixed_price,
                         nightPeriod,
                         }),
+                    
+                    month: () => calculateMonthlyStayValue({
+                        entryAt: new Date(row.entry_date),
+                        exitAt: new Date(),
+                        monthlyRate: row.monthly_rate,
+                        vehicleFixedPrice: row.vehicle_fixed_price
+                    }),
                     day: () =>
                         calculateDailyStayValue({
                         entryAt: new Date(row.entry_date),

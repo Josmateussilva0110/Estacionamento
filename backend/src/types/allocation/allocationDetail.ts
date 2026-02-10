@@ -14,6 +14,7 @@ export interface AllocationDetail {
     vehicle_fixed_price: number
     payment_type: string
     daily_rate: number
+    monthly_rate: number
     night_period?: string
     total: number
 }
