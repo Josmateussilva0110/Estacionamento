@@ -6,5 +6,6 @@ export interface VehiclesDetails {
   vehicleType: string
   brand: string
   color: string
+  isAllocated: boolean
   registrationDate: string
 }

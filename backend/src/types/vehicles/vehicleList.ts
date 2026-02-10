@@ -7,5 +7,6 @@ export interface VehicleList {
     brand: string
     color: string
     created_at: string
+    is_allocated: boolean
     total: number
 }
