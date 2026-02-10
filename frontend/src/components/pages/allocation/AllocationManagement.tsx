@@ -17,7 +17,8 @@ import {
     RefreshCw,
     TrendingUp,
     Activity,
-    Plus
+    Plus,
+    CreditCard,
 } from "lucide-react"
 import { useUser } from "../../../context/useUser"
 import { requestData } from "../../../services/requestApi"
@@ -27,6 +28,7 @@ import ConfirmDeleteModal from "../../layout/DeleteModal"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import Pagination from "../../layout/Pagination"
 import { formatDateTime, formatMinutesToDaysHHMM, formatPhone, } from "../../../utils/formatations"
+import { formatPayment } from "../../../utils/formatations"
 
 
 
@@ -54,6 +56,8 @@ function AllocationManagement() {
             { page, limit },
             true
         )
+
+        //console.log(response)
 
         if (response.success && response.data?.allocations) {
             setAllocations(response.data.allocations.rows)
@@ -126,6 +130,20 @@ function AllocationManagement() {
             elderly: "bg-pink-500/20 text-pink-300 border-pink-500/30"
         }
         return configs[type as keyof typeof configs] || configs.carro
+    }
+
+    
+    function getPaymentTextColor(paymentType: string ) {
+        switch (paymentType?.toLowerCase()) {
+            case 'hour':
+                return 'text-red-400';
+            case 'day':
+                return 'text-blue-400';
+            case 'month':
+                return 'text-emerald-400';
+            default:
+                return 'text-slate-200';
+        }
     }
 
 
@@ -436,7 +454,7 @@ function AllocationManagement() {
                                                     className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${getVehicleTypeBadge(
                                                         allocation.vehicleType
                                                     )}`}
-                                                >
+                                                >   
                                                     {getVehicleIcon(allocation.vehicleType)}
                                                     {getVehicleTypeLabel(allocation.vehicleType)}
                                                 </span>
@@ -460,7 +478,7 @@ function AllocationManagement() {
                                                 <MapPin className="w-5 h-5 text-blue-400" />
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
+                                                <p className="  text-xs text-slate-400 font-medium mb-0.5">
                                                     Estacionamento
                                                 </p>
                                                 <p className="font-semibold text-slate-200 text-sm">
@@ -511,7 +529,7 @@ function AllocationManagement() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-start gap-3 sm:col-span-2">
+                                        <div className="flex items-start gap-3">
                                             <div className="w-10 h-10 bg-slate-500/20 rounded-xl flex items-center justify-center shrink-0 border border-slate-500/30">
                                                 <User className="w-5 h-5 text-slate-300" />
                                             </div>
@@ -521,6 +539,21 @@ function AllocationManagement() {
                                                 </p>
                                                 <p className="font-semibold text-slate-200 text-sm">
                                                     {formatPhone(allocation.phone)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+
+                                        <div className="flex items-start gap-3 sm:col-span-1">
+                                            <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center shrink-0 border border-purple-500/30">
+                                                <CreditCard className="w-5 h-5 text-slate-300" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
+                                                    Tipo de Cobrança
+                                                </p>
+                                                <p className={`font-semibold text-sm ${getPaymentTextColor(allocation.paymentType)}`}>
+                                                    {formatPayment(allocation.paymentType)}
                                                 </p>
                                             </div>
                                         </div>

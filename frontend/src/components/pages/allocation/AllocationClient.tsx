@@ -102,7 +102,7 @@ function ParkingAllocation() {
     }
 
 
-    //console.log(payload)
+    console.log(payload)
 
     const response = await requestData<RegisterAllocationResponse>("/allocation", "POST", payload, true)
     //console.log(response)

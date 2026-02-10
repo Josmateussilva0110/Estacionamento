@@ -7,7 +7,8 @@ import { ParkingErrorCode } from "../types/code/parkingCode"
 import { type SpotResponse } from "../mappers/spots.mapper" 
 import { AllocationDetailDTO } from "../dtos/AllocationDetailDTO"
 import { type PaginatedAllocationsServiceResult } from "../types/allocation/paginatedAllocationServiceResult"
-import { calculateHourlyStayValue } from "../utils/calculateEstimatedCost"
+import { calculateHourlyStayValue } from "../utils/calculateHourCost"
+import { calculateDailyStayValue } from "../utils/calculateDailyCost"
 import { parseOpeningHours } from "../utils/parseOpeningHours"
 
 
@@ -122,16 +123,33 @@ class AllocationService {
                 throw new Error("Estacionamento sem período noturno")
                 }
 
-                const estimatedCost = calculateHourlyStayValue({
-                entryAt: new Date(row.entry_date),
-                exitAt: new Date(),
+                const calculators = {
+                    hour: () =>
+                        calculateHourlyStayValue({
+                        entryAt: new Date(row.entry_date),
+                        exitAt: new Date(),
+                        pricePerHour: row.price_per_hour,
+                        nightPricePerHour: row.night_price_per_hour,
+                        vehicleFixedPrice: row.vehicle_fixed_price,
+                        nightPeriod,
+                        }),
+                    day: () =>
+                        calculateDailyStayValue({
+                        entryAt: new Date(row.entry_date),
+                        exitAt: new Date(),
+                        dailyRate: row.daily_rate,
+                        vehicleFixedPrice: row.vehicle_fixed_price,
+                        }),
+                    } as const
 
-                pricePerHour: row.price_per_hour,
-                nightPricePerHour: row.night_price_per_hour,
-                vehicleFixedPrice: row.vehicle_fixed_price,
+                const calculator = calculators[row.payment_type as keyof typeof calculators]
 
-                nightPeriod,
-                })
+                if (!calculator) {
+                throw new Error(`Tipo de pagamento inválido: ${row.payment_type}`)
+                }
+
+                const estimatedCost = calculator()
+
 
                 return {
                     id: row.allocation_id,
@@ -143,12 +161,11 @@ class AllocationService {
                     vehicleType: row.vehicle_type,
                     entryDate: row.entry_date,
                     observations: row.observations,
+                    paymentType: row.payment_type,
                     currentDuration: row.current_duration,
                     estimatedCost,
                 }
             })
-
-
 
             return {status: true, data: {rows: mapped, total: result.total}}
 

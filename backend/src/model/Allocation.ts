@@ -41,7 +41,7 @@ class Allocation extends Model<AllocationData> {
             const result = await db.raw<PgRawResult<AllocationDetail>>(
                 `
                     select 
-                       a.id as allocation_id, a.entry_date, a.observations,
+                       a.id as allocation_id, a.entry_date, a.observations, a.payment_type,
                        c.username as client_name, c.phone,
                        v.plate, v.brand, 
                        CASE
@@ -55,6 +55,7 @@ class Allocation extends Model<AllocationData> {
                        pp.price_hour as price_per_hour,
                        pp.night_rate as night_price_per_hour,
                        pp.night_period,
+                       pp.daily_rate,
                        CASE
                             WHEN v.vehicle_type = 1 THEN pp.car_price
                             WHEN v.vehicle_type = 2 THEN pp.moto_price

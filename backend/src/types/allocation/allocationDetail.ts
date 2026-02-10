@@ -12,6 +12,8 @@ export interface AllocationDetail {
     price_per_hour: number
     night_price_per_hour: number
     vehicle_fixed_price: number
+    payment_type: string
+    daily_rate: number
     night_period?: string
     total: number
 }
