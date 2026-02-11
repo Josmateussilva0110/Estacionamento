@@ -3,6 +3,9 @@ import db from "../database/connection/connection"
 import { PgRawResult } from "../types/database/BdResult"
 import { type AllocationDetail } from "../types/allocation/allocationDetail"
 import { type PaginatedAllocationsResult } from "../types/allocation/paginatedAllocationsResult"
+import { type StatsAllocations } from "../types/allocation/statsAllocations"
+import { type StatsAllocationsResponse } from "../mappers/stats.mapper"
+import { mapStatsAllocations } from "../mappers/stats.mapper"
 
 export interface AllocationData {
   id?: number
@@ -93,6 +96,55 @@ class Allocation extends Model<AllocationData> {
 
         } catch(err) {
             console.log(`Erro ao buscar alocações na tabela ${this.tableName}:, err`)
+            return null
+        }
+    }
+
+    async getStats(user_id: string): Promise<StatsAllocationsResponse | null> {
+        try {   
+            const result = await db.raw<PgRawResult<StatsAllocations>>(
+                `
+                    with total_spots_cte as (
+                        select coalesce(sum(po.total_spots), 0) as total_spots
+                        from parking p
+                        inner join parking_operations po 
+                            on po.parking_id = p.id
+                        where p.created_by = ?
+                    ),
+                    active_allocations_cte as (
+                        select count(*) as actives
+                        from allocations a
+                        inner join parking p 
+                            on p.id = a.parking_id
+                        where p.created_by = ?
+                    )
+
+                    select
+                        t.total_spots,
+                        a.actives,                        
+                        case 
+                            when t.total_spots = 0 then 0
+                            else round((a.actives::decimal / t.total_spots) * 100, 2)
+                        end as occupancy_rate,
+
+                        (t.total_spots - a.actives) as available_spots
+
+                    from total_spots_cte t
+                    cross join active_allocations_cte a;
+                `,
+                [user_id, user_id]
+            )
+
+
+            if(!result.rows[0]) {
+                return null
+            }
+
+            return mapStatsAllocations(result.rows[0])
+
+
+        } catch(err) {
+            console.error(`Erro ao buscar estatísticas estacionamento tabela ${this.tableName}:, err`)
             return null
         }
     }

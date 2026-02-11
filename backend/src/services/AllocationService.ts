@@ -11,6 +11,7 @@ import { calculateHourlyStayValue } from "../utils/calculateHourCost"
 import { calculateDailyStayValue } from "../utils/calculateDailyCost"
 import { calculateMonthlyStayValue } from "../utils/calculateMonthCost"
 import { parseOpeningHours } from "../utils/parseOpeningHours"
+import { type StatsAllocationsResponse } from "../mappers/stats.mapper"
 
 
 class AllocationService {
@@ -116,7 +117,7 @@ class AllocationService {
                 }
             }
 
-
+            const now = new Date()
             const mapped: AllocationDetailDTO[] = result.rows.map((row) => {
                 const nightPeriod = parseOpeningHours(row.night_period ?? null)
 
@@ -128,7 +129,7 @@ class AllocationService {
                     hour: () =>
                         calculateHourlyStayValue({
                         entryAt: new Date(row.entry_date),
-                        exitAt: new Date(),
+                        exitAt: now,
                         pricePerHour: row.price_per_hour,
                         nightPricePerHour: row.night_price_per_hour,
                         vehicleFixedPrice: row.vehicle_fixed_price,
@@ -137,14 +138,14 @@ class AllocationService {
                     
                     month: () => calculateMonthlyStayValue({
                         entryAt: new Date(row.entry_date),
-                        exitAt: new Date(),
+                        exitAt: now,
                         monthlyRate: row.monthly_rate,
                         vehicleFixedPrice: row.vehicle_fixed_price
                     }),
                     day: () =>
                         calculateDailyStayValue({
                         entryAt: new Date(row.entry_date),
-                        exitAt: new Date(),
+                        exitAt: now,
                         dailyRate: row.daily_rate,
                         vehicleFixedPrice: row.vehicle_fixed_price,
                         }),
@@ -187,6 +188,33 @@ class AllocationService {
                 }
             }
         }
+    }
+
+    async allocationStats(user_id: string): Promise<ServiceResult<StatsAllocationsResponse>> {
+      try {
+        const statsAllocations = await Allocation.getStats(user_id)
+        if(!statsAllocations) {
+            return {
+                status: false,
+                error: {
+                    code: AllocationErrorCode.ALLOCATION_STATS_NOT_FOUND,
+                    message: "Nenhuma estatística encontrada"
+                }
+            }
+        }
+
+        return { status: true, data: statsAllocations}
+
+      } catch(error) {
+        console.error("AllocationService.getStats: ", error)
+        return {
+          status: false,
+          error: {
+            code: AllocationErrorCode.ALLOCATION_STATS_FAILED,
+            message: "Erro interno ao buscar Estatísticas de alocações",
+          }
+        }
+      }
     }
 }
 

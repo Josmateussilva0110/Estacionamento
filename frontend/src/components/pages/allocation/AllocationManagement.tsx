@@ -18,6 +18,7 @@ import {
     TrendingUp,
     Activity,
     Plus,
+    ParkingCircle,
     CreditCard,
 } from "lucide-react"
 import { useUser } from "../../../context/useUser"
@@ -259,27 +260,26 @@ function AllocationManagement() {
                                 <p className="text-4xl font-bold text-white mb-1">
                                     {allocations.length}
                                 </p>
-                                <p className="text-blue-300 text-sm flex items-center gap-1">
-                                    <TrendingUp className="w-4 h-4" />
-                                    +12% vs ontem
-                                </p>
                             </div>
 
                             <div className="bg-slate-700/30 backdrop-blur-xl rounded-2xl p-6 border border-slate-600/30">
                                 <div className="flex items-center justify-between mb-3">
-                                    <p className="text-slate-300 text-sm font-medium">Tempo Médio</p>
+                                    <p className="text-slate-300 text-sm font-medium">Ocupação Atual</p>
                                     <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center border border-orange-400/30">
-                                        <Clock className="w-5 h-5 text-orange-300" />
+                                    <ParkingCircle className="w-5 h-5 text-orange-300" />
                                     </div>
                                 </div>
+
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    3h 20min
+                                    3 / 10 vagas
                                 </p>
-                                <p className="text-slate-300 text-sm flex items-center gap-1">
+
+                                <p className="text-orange-300 text-sm flex items-center gap-1">
                                     <Activity className="w-4 h-4" />
-                                    Ocupação normal
+                                    30% ocupado
                                 </p>
                             </div>
+
 
                             <div className="bg-slate-700/30 backdrop-blur-xl rounded-2xl p-6 border border-slate-600/30">
                                 <div className="flex items-center justify-between mb-3">
@@ -290,10 +290,6 @@ function AllocationManagement() {
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
                                     R$ {allocations.reduce((acc, curr) => acc + curr.estimatedCost, 0).toFixed(2)}
-                                </p>
-                                <p className="text-emerald-300 text-sm flex items-center gap-1">
-                                    <TrendingUp className="w-4 h-4" />
-                                    +8% vs ontem
                                 </p>
                             </div>
                         </div>
