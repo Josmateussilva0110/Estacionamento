@@ -8,6 +8,7 @@ export interface AllocationDetailDTO {
     vehicleType: string
     entryDate: string
     observations?: string
+    paymentType: string
     currentDuration: number
     estimatedCost: number
 }

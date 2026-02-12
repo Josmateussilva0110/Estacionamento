@@ -48,6 +48,18 @@ function formatMinutesToDaysHHMM(minutes: number): string {
   return days > 0 ? `${days}d ${time}` : time
 }
 
+type PaymentType = "hour" | "day" | "month"
+
+const PAYMENT_LABELS: Record<PaymentType, string> = {
+  hour: "Por hora",
+  day: "Diária",
+  month: "Mensal",
+}
+
+function formatPayment(payment: PaymentType): string {
+  return PAYMENT_LABELS[payment]
+}
 
 
-export { formatDateTime, formatPhone, formatCPF, formatMinutesToDaysHHMM }
+
+export { formatDateTime, formatPhone, formatCPF, formatMinutesToDaysHHMM, formatPayment }

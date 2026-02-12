@@ -15,9 +15,10 @@ import {
     ChevronLeft,
     Filter,
     RefreshCw,
-    TrendingUp,
     Activity,
-    Plus
+    Plus,
+    ParkingCircle,
+    CreditCard,
 } from "lucide-react"
 import { useUser } from "../../../context/useUser"
 import { requestData } from "../../../services/requestApi"
@@ -27,7 +28,9 @@ import ConfirmDeleteModal from "../../layout/DeleteModal"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import Pagination from "../../layout/Pagination"
 import { formatDateTime, formatMinutesToDaysHHMM, formatPhone, } from "../../../utils/formatations"
-
+import { formatPayment } from "../../../utils/formatations"
+import { type StatsAllocations } from "../../../types/allocation/statsAllocation"
+import { type StatsResponse } from "../../../types/allocation/statsResponse"
 
 
 function AllocationManagement() {
@@ -42,6 +45,19 @@ function AllocationManagement() {
     const limit = 3
     const [allocations, setAllocations] = useState<AllocationDetail[]>([])
     const [showFilters, setShowFilters] = useState(false)
+    const [stats, setStats] = useState<StatsAllocations | null>(null)
+
+    const fetchStats = useCallback(async () => {
+            const response = await requestData<StatsResponse>(`/allocation/stats/${user?.id}`, "GET", {}, true)
+            //console.log(response)
+            if(response.success && response.data.stats) {
+                setStats(response.data.stats)
+            }
+            else {
+                setStats(null)
+            }
+        
+    }, [user])
 
     const fetchAllocations = useCallback(async () => {
         if (!user?.id) return
@@ -54,6 +70,8 @@ function AllocationManagement() {
             { page, limit },
             true
         )
+
+        //console.log(response)
 
         if (response.success && response.data?.allocations) {
             setAllocations(response.data.allocations.rows)
@@ -68,11 +86,13 @@ function AllocationManagement() {
 
     useEffect(() => {
         fetchAllocations()
-    }, [fetchAllocations])
+        fetchStats()
+    }, [fetchAllocations, fetchStats])
 
     
     function updateAllocations() {
         fetchAllocations()
+        fetchStats()
     }
 
     const [endModal, setEndModal] = useState<{
@@ -126,6 +146,20 @@ function AllocationManagement() {
             elderly: "bg-pink-500/20 text-pink-300 border-pink-500/30"
         }
         return configs[type as keyof typeof configs] || configs.carro
+    }
+
+    
+    function getPaymentTextColor(paymentType: string ) {
+        switch (paymentType?.toLowerCase()) {
+            case 'hour':
+                return 'text-red-400';
+            case 'day':
+                return 'text-blue-400';
+            case 'month':
+                return 'text-emerald-400';
+            default:
+                return 'text-slate-200';
+        }
     }
 
 
@@ -239,29 +273,28 @@ function AllocationManagement() {
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    {allocations.length}
-                                </p>
-                                <p className="text-blue-300 text-sm flex items-center gap-1">
-                                    <TrendingUp className="w-4 h-4" />
-                                    +12% vs ontem
+                                    {stats?.actives}
                                 </p>
                             </div>
 
                             <div className="bg-slate-700/30 backdrop-blur-xl rounded-2xl p-6 border border-slate-600/30">
                                 <div className="flex items-center justify-between mb-3">
-                                    <p className="text-slate-300 text-sm font-medium">Tempo Médio</p>
+                                    <p className="text-slate-300 text-sm font-medium">Ocupação Atual</p>
                                     <div className="w-10 h-10 bg-orange-500/20 rounded-xl flex items-center justify-center border border-orange-400/30">
-                                        <Clock className="w-5 h-5 text-orange-300" />
+                                    <ParkingCircle className="w-5 h-5 text-orange-300" />
                                     </div>
                                 </div>
+
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    3h 20min
+                                    {stats?.actives} / {stats?.totalSpots} vagas
                                 </p>
-                                <p className="text-slate-300 text-sm flex items-center gap-1">
+
+                                <p className="text-orange-300 text-sm flex items-center gap-1">
                                     <Activity className="w-4 h-4" />
-                                    Ocupação normal
+                                    {stats?.occupancyRate}% ocupado
                                 </p>
                             </div>
+
 
                             <div className="bg-slate-700/30 backdrop-blur-xl rounded-2xl p-6 border border-slate-600/30">
                                 <div className="flex items-center justify-between mb-3">
@@ -271,11 +304,7 @@ function AllocationManagement() {
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    R$ {allocations.reduce((acc, curr) => acc + curr.estimatedCost, 0).toFixed(2)}
-                                </p>
-                                <p className="text-emerald-300 text-sm flex items-center gap-1">
-                                    <TrendingUp className="w-4 h-4" />
-                                    +8% vs ontem
+                                    R$ {stats?.totalRevenue}
                                 </p>
                             </div>
                         </div>
@@ -436,7 +465,7 @@ function AllocationManagement() {
                                                     className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold border ${getVehicleTypeBadge(
                                                         allocation.vehicleType
                                                     )}`}
-                                                >
+                                                >   
                                                     {getVehicleIcon(allocation.vehicleType)}
                                                     {getVehicleTypeLabel(allocation.vehicleType)}
                                                 </span>
@@ -460,7 +489,7 @@ function AllocationManagement() {
                                                 <MapPin className="w-5 h-5 text-blue-400" />
                                             </div>
                                             <div>
-                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
+                                                <p className="  text-xs text-slate-400 font-medium mb-0.5">
                                                     Estacionamento
                                                 </p>
                                                 <p className="font-semibold text-slate-200 text-sm">
@@ -511,7 +540,7 @@ function AllocationManagement() {
                                             </div>
                                         </div>
 
-                                        <div className="flex items-start gap-3 sm:col-span-2">
+                                        <div className="flex items-start gap-3">
                                             <div className="w-10 h-10 bg-slate-500/20 rounded-xl flex items-center justify-center shrink-0 border border-slate-500/30">
                                                 <User className="w-5 h-5 text-slate-300" />
                                             </div>
@@ -521,6 +550,21 @@ function AllocationManagement() {
                                                 </p>
                                                 <p className="font-semibold text-slate-200 text-sm">
                                                     {formatPhone(allocation.phone)}
+                                                </p>
+                                            </div>
+                                        </div>
+
+
+                                        <div className="flex items-start gap-3 sm:col-span-1">
+                                            <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center shrink-0 border border-purple-500/30">
+                                                <CreditCard className="w-5 h-5 text-slate-300" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-slate-400 font-medium mb-0.5">
+                                                    Tipo de Cobrança
+                                                </p>
+                                                <p className={`font-semibold text-sm ${getPaymentTextColor(allocation.paymentType)}`}>
+                                                    {formatPayment(allocation.paymentType)}
                                                 </p>
                                             </div>
                                         </div>

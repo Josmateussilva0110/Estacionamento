@@ -8,9 +8,8 @@ type HourlyPricingParams = {
   nightPricePerHour: number  // P_n
   vehicleFixedPrice: number  // P_v
 
-  nightPeriod: OpeningHours
+  nightPeriod?: OpeningHours | null
 }
-
 
 export function calculateHourlyStayValue({
   entryAt,
@@ -20,17 +19,25 @@ export function calculateHourlyStayValue({
   vehicleFixedPrice,
   nightPeriod,
 }: HourlyPricingParams): number {
+
   if (exitAt <= entryAt) {
     throw new Error("exitAt must be greater than entryAt")
   }
 
   const MS_PER_HOUR = 1000 * 60 * 60
 
-  // Tempo total
   const totalHours =
     (exitAt.getTime() - entryAt.getTime()) / MS_PER_HOUR
 
-  // todos os dias envolvidos
+  
+  if (!nightPeriod) {
+    const totalValue =
+      vehicleFixedPrice + totalHours * pricePerHour
+
+    return Number(totalValue.toFixed(2))
+  }
+
+
   const days: Date[] = []
   const current = new Date(entryAt)
   current.setHours(0, 0, 0, 0)
@@ -43,17 +50,17 @@ export function calculateHourlyStayValue({
     current.setDate(current.getDate() + 1)
   }
 
-  // Converte período noturno
   const [nightStartHour, nightStartMinute] =
     nightPeriod.start.split(":").map(Number)
+
   const [nightEndHour, nightEndMinute] =
     nightPeriod.end.split(":").map(Number)
 
   const crossesMidnight =
     nightEndHour < nightStartHour ||
-    (nightEndHour === nightStartHour && nightEndMinute < nightStartMinute)
+    (nightEndHour === nightStartHour &&
+      nightEndMinute < nightStartMinute)
 
-  // Soma horas noturnas (caso geral)
   let nightHours = 0
 
   for (const day of days) {
@@ -61,24 +68,34 @@ export function calculateHourlyStayValue({
     nightStart.setHours(nightStartHour, nightStartMinute, 0, 0)
 
     const nightEnd = new Date(day)
+
     if (crossesMidnight) {
       nightEnd.setDate(nightEnd.getDate() + 1)
     }
+
     nightEnd.setHours(nightEndHour, nightEndMinute, 0, 0)
 
-    const start = Math.max(entryAt.getTime(), nightStart.getTime())
-    const end = Math.min(exitAt.getTime(), nightEnd.getTime())
+    const start = Math.max(
+      entryAt.getTime(),
+      nightStart.getTime()
+    )
+
+    const end = Math.min(
+      exitAt.getTime(),
+      nightEnd.getTime()
+    )
 
     if (end > start) {
       nightHours += (end - start) / MS_PER_HOUR
     }
   }
 
-  // Horas normais
   const normalHours = totalHours - nightHours
 
-  // Valor final
-  const totalValue = vehicleFixedPrice + normalHours * pricePerHour + nightHours * nightPricePerHour
+  const totalValue =
+    vehicleFixedPrice +
+    normalHours * pricePerHour +
+    nightHours * nightPricePerHour
 
   return Number(totalValue.toFixed(2))
 }

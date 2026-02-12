@@ -7,8 +7,12 @@ import { ParkingErrorCode } from "../types/code/parkingCode"
 import { type SpotResponse } from "../mappers/spots.mapper" 
 import { AllocationDetailDTO } from "../dtos/AllocationDetailDTO"
 import { type PaginatedAllocationsServiceResult } from "../types/allocation/paginatedAllocationServiceResult"
-import { calculateHourlyStayValue } from "../utils/calculateEstimatedCost"
+import { calculateHourlyStayValue } from "../utils/calculateHourCost"
+import { calculateDailyStayValue } from "../utils/calculateDailyCost"
+import { calculateMonthlyStayValue } from "../utils/calculateMonthCost"
 import { parseOpeningHours } from "../utils/parseOpeningHours"
+import { calculateAllocationValue } from "../utils/calculatePrices"
+import { type StatsAllocationCost } from "../types/allocation/allocationStatsWithCost"
 
 
 class AllocationService {
@@ -114,7 +118,7 @@ class AllocationService {
                 }
             }
 
-
+            const now = new Date()
             const mapped: AllocationDetailDTO[] = result.rows.map((row) => {
                 const nightPeriod = parseOpeningHours(row.night_period ?? null)
 
@@ -122,16 +126,40 @@ class AllocationService {
                 throw new Error("Estacionamento sem período noturno")
                 }
 
-                const estimatedCost = calculateHourlyStayValue({
-                entryAt: new Date(row.entry_date),
-                exitAt: new Date(),
+                const calculators = {
+                    hour: () =>
+                        calculateHourlyStayValue({
+                        entryAt: new Date(row.entry_date),
+                        exitAt: now,
+                        pricePerHour: row.price_per_hour,
+                        nightPricePerHour: row.night_price_per_hour,
+                        vehicleFixedPrice: row.vehicle_fixed_price,
+                        nightPeriod,
+                        }),
+                    
+                    month: () => calculateMonthlyStayValue({
+                        entryAt: new Date(row.entry_date),
+                        exitAt: now,
+                        monthlyRate: row.monthly_rate,
+                        vehicleFixedPrice: row.vehicle_fixed_price
+                    }),
+                    day: () =>
+                        calculateDailyStayValue({
+                        entryAt: new Date(row.entry_date),
+                        exitAt: now,
+                        dailyRate: row.daily_rate,
+                        vehicleFixedPrice: row.vehicle_fixed_price,
+                        }),
+                    } as const
 
-                pricePerHour: row.price_per_hour,
-                nightPricePerHour: row.night_price_per_hour,
-                vehicleFixedPrice: row.vehicle_fixed_price,
+                const calculator = calculators[row.payment_type as keyof typeof calculators]
 
-                nightPeriod,
-                })
+                if (!calculator) {
+                throw new Error(`Tipo de pagamento inválido: ${row.payment_type}`)
+                }
+
+                const estimatedCost = calculator()
+
 
                 return {
                     id: row.allocation_id,
@@ -143,12 +171,11 @@ class AllocationService {
                     vehicleType: row.vehicle_type,
                     entryDate: row.entry_date,
                     observations: row.observations,
+                    paymentType: row.payment_type,
                     currentDuration: row.current_duration,
                     estimatedCost,
                 }
             })
-
-
 
             return {status: true, data: {rows: mapped, total: result.total}}
 
@@ -162,6 +189,41 @@ class AllocationService {
                 }
             }
         }
+    }
+
+    async allocationStats(user_id: string): Promise<ServiceResult<StatsAllocationCost>> {
+      try {
+        const statsAllocations = await Allocation.getStats(user_id)
+        const allocationData = await Allocation.getAllocationData(user_id)
+        if(!statsAllocations || allocationData.length === 0) {
+            return {
+                status: false,
+                error: {
+                    code: AllocationErrorCode.ALLOCATION_STATS_NOT_FOUND,
+                    message: "Nenhuma estatística encontrada"
+                }
+            }
+        }
+
+        let total_revenue = 0
+
+        for(const allocation of allocationData) {
+            const value = calculateAllocationValue(allocation)
+            total_revenue += value
+        }
+
+        return { status: true, data: {...statsAllocations, totalRevenue: Number(total_revenue.toFixed(2))}}
+
+      } catch(error) {
+        console.error("AllocationService.getStats: ", error)
+        return {
+          status: false,
+          error: {
+            code: AllocationErrorCode.ALLOCATION_STATS_FAILED,
+            message: "Erro interno ao buscar Estatísticas de alocações",
+          }
+        }
+      }
     }
 }
 

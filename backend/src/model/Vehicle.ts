@@ -82,6 +82,11 @@ class Vehicle extends Model<VehicleData> {
                             when v.vehicle_type = 3 then 'caminhonete'
                             else 'desconhecido'
                         end as vehicle_type,
+                        exists (
+                            select 1
+                            from allocations a
+                            where a.vehicle_id = v.id
+                        ) as is_allocated,
                         count(*) over() as total
                     from vehicles v
                     inner join clients c
@@ -109,6 +114,7 @@ class Vehicle extends Model<VehicleData> {
                 vehicleType: row.vehicle_type,
                 brand: row.brand,
                 color: row.color,
+                isAllocated: row.is_allocated,
                 registrationDate: row.created_at
             }))
 

@@ -397,6 +397,18 @@ function VehicleList() {
                                                 </div>
                                             </div>
                                         </div>
+                                        {/* Chips */}
+                                        <div className="flex flex-wrap gap-2">
+                                            {vehicle.isAllocated ? (
+                                                <span className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                                                    {"Alocado"} 
+                                                </span>
+                                            ): (
+                                                <span className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-red-500/20 text-red-300 border border-red-500/30">
+                                                    {"Não alocado"} 
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     {/* Right side - Actions */}

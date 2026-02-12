@@ -33,7 +33,7 @@ export function ColorPicker({
 }: ColorPickerProps) {
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-semibold text-gray-700">
+      <label className="block text-sm font-semibold text-white">
         {label} *
       </label>
 
@@ -93,7 +93,7 @@ export function ColorPicker({
       </div>
 
       {value && (
-        <p className="text-sm text-gray-600 mt-2">
+        <p className="text-sm text-white mt-2">
           Cor selecionada: <span className="font-semibold">{value}</span>
         </p>
       )}
