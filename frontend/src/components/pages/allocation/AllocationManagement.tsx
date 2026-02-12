@@ -15,7 +15,6 @@ import {
     ChevronLeft,
     Filter,
     RefreshCw,
-    TrendingUp,
     Activity,
     Plus,
     ParkingCircle,
@@ -30,7 +29,8 @@ import useFlashMessage from "../../../hooks/useFlashMessage"
 import Pagination from "../../layout/Pagination"
 import { formatDateTime, formatMinutesToDaysHHMM, formatPhone, } from "../../../utils/formatations"
 import { formatPayment } from "../../../utils/formatations"
-
+import { type StatsAllocations } from "../../../types/allocation/statsAllocation"
+import { type StatsResponse } from "../../../types/allocation/statsResponse"
 
 
 function AllocationManagement() {
@@ -45,6 +45,19 @@ function AllocationManagement() {
     const limit = 3
     const [allocations, setAllocations] = useState<AllocationDetail[]>([])
     const [showFilters, setShowFilters] = useState(false)
+    const [stats, setStats] = useState<StatsAllocations | null>(null)
+
+    const fetchStats = useCallback(async () => {
+            const response = await requestData<StatsResponse>(`/allocation/stats/${user?.id}`, "GET", {}, true)
+            //console.log(response)
+            if(response.success && response.data.stats) {
+                setStats(response.data.stats)
+            }
+            else {
+                setStats(null)
+            }
+        
+    }, [user])
 
     const fetchAllocations = useCallback(async () => {
         if (!user?.id) return
@@ -73,11 +86,13 @@ function AllocationManagement() {
 
     useEffect(() => {
         fetchAllocations()
-    }, [fetchAllocations])
+        fetchStats()
+    }, [fetchAllocations, fetchStats])
 
     
     function updateAllocations() {
         fetchAllocations()
+        fetchStats()
     }
 
     const [endModal, setEndModal] = useState<{
@@ -258,7 +273,7 @@ function AllocationManagement() {
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    {allocations.length}
+                                    {stats?.actives}
                                 </p>
                             </div>
 
@@ -271,12 +286,12 @@ function AllocationManagement() {
                                 </div>
 
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    3 / 10 vagas
+                                    {stats?.actives} / {stats?.totalSpots} vagas
                                 </p>
 
                                 <p className="text-orange-300 text-sm flex items-center gap-1">
                                     <Activity className="w-4 h-4" />
-                                    30% ocupado
+                                    {stats?.occupancyRate}% ocupado
                                 </p>
                             </div>
 
@@ -289,7 +304,7 @@ function AllocationManagement() {
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    R$ {allocations.reduce((acc, curr) => acc + curr.estimatedCost, 0).toFixed(2)}
+                                    R$ {stats?.totalRevenue}
                                 </p>
                             </div>
                         </div>

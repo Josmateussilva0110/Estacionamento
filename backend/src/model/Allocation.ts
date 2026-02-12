@@ -5,6 +5,7 @@ import { type AllocationDetail } from "../types/allocation/allocationDetail"
 import { type PaginatedAllocationsResult } from "../types/allocation/paginatedAllocationsResult"
 import { type StatsAllocations } from "../types/allocation/statsAllocations"
 import { type StatsAllocationsResponse } from "../mappers/stats.mapper"
+import { type AllocationPrinces } from "../types/allocation/allocationData"
 import { mapStatsAllocations } from "../mappers/stats.mapper"
 
 export interface AllocationData {
@@ -146,6 +147,48 @@ class Allocation extends Model<AllocationData> {
         } catch(err) {
             console.error(`Erro ao buscar estatísticas estacionamento tabela ${this.tableName}:, err`)
             return null
+        }
+    }
+
+    async getAllocationData(user_id: string): Promise<AllocationPrinces[]> {
+        try {
+            const result = await db.raw<PgRawResult<AllocationPrinces>>(
+                `
+                    select 
+                       a.id as allocation_id, a.entry_date, a.payment_type,
+                       pp.price_hour as price_per_hour,
+                       pp.night_rate as night_price_per_hour,
+                       pp.night_period,
+                       pp.daily_rate,
+                       pp.monthly_rate,
+                       CASE
+                            WHEN v.vehicle_type = 1 THEN pp.car_price
+                            WHEN v.vehicle_type = 2 THEN pp.moto_price
+                            WHEN v.vehicle_type = 3 THEN pp.truck_price
+                            ELSE 0
+                        END AS vehicle_fixed_price
+                    from allocations a
+                    inner join vehicles v
+                        on v.id = a.vehicle_id
+                    inner join parking p
+                        on p.id = a.parking_id
+                    inner join parking_prices pp
+                        on pp.parking_id = p.id
+                    where p.created_by = ?
+                `,
+                [user_id]
+            )
+
+            const rows = result.rows
+            if(!rows.length) {
+                return []
+            }
+
+            return rows
+
+        } catch(err) {
+            console.log(`Erro ao buscar dados de alocações na tabela ${this.tableName}:, err`)
+            return []
         }
     }
 

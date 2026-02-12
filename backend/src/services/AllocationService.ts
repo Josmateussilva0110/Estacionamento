@@ -11,7 +11,8 @@ import { calculateHourlyStayValue } from "../utils/calculateHourCost"
 import { calculateDailyStayValue } from "../utils/calculateDailyCost"
 import { calculateMonthlyStayValue } from "../utils/calculateMonthCost"
 import { parseOpeningHours } from "../utils/parseOpeningHours"
-import { type StatsAllocationsResponse } from "../mappers/stats.mapper"
+import { calculateAllocationValue } from "../utils/calculatePrices"
+import { type StatsAllocationCost } from "../types/allocation/allocationStatsWithCost"
 
 
 class AllocationService {
@@ -190,10 +191,11 @@ class AllocationService {
         }
     }
 
-    async allocationStats(user_id: string): Promise<ServiceResult<StatsAllocationsResponse>> {
+    async allocationStats(user_id: string): Promise<ServiceResult<StatsAllocationCost>> {
       try {
         const statsAllocations = await Allocation.getStats(user_id)
-        if(!statsAllocations) {
+        const allocationData = await Allocation.getAllocationData(user_id)
+        if(!statsAllocations || allocationData.length === 0) {
             return {
                 status: false,
                 error: {
@@ -203,7 +205,14 @@ class AllocationService {
             }
         }
 
-        return { status: true, data: statsAllocations}
+        let total_revenue = 0
+
+        for(const allocation of allocationData) {
+            const value = calculateAllocationValue(allocation)
+            total_revenue += value
+        }
+
+        return { status: true, data: {...statsAllocations, totalRevenue: Number(total_revenue.toFixed(2))}}
 
       } catch(error) {
         console.error("AllocationService.getStats: ", error)
