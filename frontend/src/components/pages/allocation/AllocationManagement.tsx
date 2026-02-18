@@ -31,6 +31,8 @@ import { formatPayment } from "../../../utils/formations"
 import { type StatsAllocations } from "../../../types/allocation/statsAllocation"
 import { type StatsResponse } from "../../../types/allocation/statsResponse"
 import EndAllocationModal from "../../layout/EndAllocationModal"
+import { type RemoveAllocation } from "../../../types/allocation/removeAllocation"
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
 function AllocationManagement() {
@@ -167,13 +169,17 @@ function AllocationManagement() {
         setEndModal({ isOpen: false, allocation: null })
     }
 
-    function confirmEndAllocation() {
-        console.log(endModal.allocation)
-        setFlashMessage(
-            `Alocação encerrada com sucesso para ${endModal.allocation?.clientName}`,
-            "success"
-        )
-        closeEndModal()
+    async function confirmEndAllocation() {
+        const response = await requestData<RemoveAllocation>(`/allocation/${endModal.allocation?.id}`, "DELETE", {}, true)
+        if(response.success && response.data.allocationId) {
+            setFlashMessage(response.data.message, "success")
+            fetchAllocations()
+            fetchStats()
+            closeEndModal()
+        }
+        else {
+            setFlashMessage(getApiErrorMessage(response), "error")
+        }
     }
 
     function handleRegister() {
@@ -291,7 +297,7 @@ function AllocationManagement() {
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    R$ {stats?.totalRevenue}
+                                    R$ {stats?.totalRevenue.toFixed(2)}
                                 </p>
                             </div>
                         </div>
