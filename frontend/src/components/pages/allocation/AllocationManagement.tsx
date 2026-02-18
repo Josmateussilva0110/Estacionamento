@@ -168,6 +168,7 @@ function AllocationManagement() {
     }
 
     function confirmEndAllocation() {
+        console.log(endModal.allocation)
         setFlashMessage(
             `Alocação encerrada com sucesso para ${endModal.allocation?.clientName}`,
             "success"
@@ -615,7 +616,7 @@ function AllocationManagement() {
             <EndAllocationModal
                 isOpen={endModal.isOpen}
                 allocation={endModal.allocation}
-                isLoading={false} // substitua pelo seu estado de loading real
+                isLoading={false} 
                 onClose={closeEndModal}
                 onConfirm={confirmEndAllocation}
             />
