@@ -9,4 +9,5 @@ export const allocationErrorHttpStatusMap: Record<AllocationErrorCode, number> =
   [AllocationErrorCode.VEHICLE_ALREADY_EXISTS]: 409,
   [AllocationErrorCode.ALLOCATION_STATS_FAILED]: 500,
   [AllocationErrorCode.ALLOCATION_STATS_NOT_FOUND]: 404,
+  [AllocationErrorCode.ALLOCATION_DELETE_FAILED]: 500
 }

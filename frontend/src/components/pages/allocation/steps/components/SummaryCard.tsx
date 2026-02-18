@@ -11,7 +11,7 @@ import {
 import { type ClientVehicle } from "../../../../../types/client/clientVehicle"
 import { type VehicleType } from "../../utils/vehicleUtils"
 import { type SelectedSpotInfo } from "../../types/selectedSpot"
-import { formatPhone } from "../../../../../utils/formatations"
+import { formatPhone } from "../../../../../utils/formations"
 import { type PaymentType } from "../../types/paymentType" 
 import { PAYMENT_TYPE_LABEL } from "../../utils/paymentLabel"
 import { getVehicleLabel } from "../../utils/vehicleUtils"

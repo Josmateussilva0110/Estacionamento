@@ -66,6 +66,23 @@ class AllocationController {
 
         return response.status(200).json({status: true, stats: result.data})
     }
+
+    async removeAllocation(request: Request, response: Response) {
+        const { id } = request.params
+        const result = await AllocationService.removeAllocation(id)
+        if(!result.status) {
+            const httpStatus = getHttpStatusFromError(
+            result.error!.code,
+            allocationErrorHttpStatusMap
+            )
+            return response.status(httpStatus).json({
+                status: false,
+                message: result.error?.message,
+            })
+        }
+
+        return response.status(200).json({status: true, message: "Alocação removido com sucesso", allocationId: result.data?.allocation_id})
+    }
 }
 
 

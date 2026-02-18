@@ -24,13 +24,15 @@ import { useUser } from "../../../context/useUser"
 import { requestData } from "../../../services/requestApi"
 import { type AllocationDetail } from "../../../types/allocation/allocationDetail"
 import { type ListPaginationAllocationData } from "../../../types/allocation/listAllocations"
-import ConfirmDeleteModal from "../../layout/DeleteModal"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import Pagination from "../../layout/Pagination"
-import { formatDateTime, formatMinutesToDaysHHMM, formatPhone, } from "../../../utils/formatations"
-import { formatPayment } from "../../../utils/formatations"
+import { formatDateTime, formatMinutesToDaysHHMM, formatPhone, } from "../../../utils/formations"
+import { formatPayment } from "../../../utils/formations"
 import { type StatsAllocations } from "../../../types/allocation/statsAllocation"
 import { type StatsResponse } from "../../../types/allocation/statsResponse"
+import EndAllocationModal from "../../layout/EndAllocationModal"
+import { type RemoveAllocation } from "../../../types/allocation/removeAllocation"
+import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
 function AllocationManagement() {
@@ -97,14 +99,10 @@ function AllocationManagement() {
 
     const [endModal, setEndModal] = useState<{
         isOpen: boolean
-        allocationId: number | null
-        clientName: string
-        vehiclePlate: string
+        allocation: AllocationDetail | null
     }>({
         isOpen: false,
-        allocationId: null,
-        clientName: "",
-        vehiclePlate: ""
+        allocation: null,
     })
 
     function getVehicleIcon(type: string) {
@@ -163,30 +161,25 @@ function AllocationManagement() {
     }
 
 
-    function openEndModal(id: number, clientName: string, vehiclePlate: string) {
-        setEndModal({
-            isOpen: true,
-            allocationId: id,
-            clientName,
-            vehiclePlate
-        })
+    function openEndModal(allocation: AllocationDetail) {
+        setEndModal({ isOpen: true, allocation })
     }
 
     function closeEndModal() {
-        setEndModal({
-            isOpen: false,
-            allocationId: null,
-            clientName: "",
-            vehiclePlate: ""
-        })
+        setEndModal({ isOpen: false, allocation: null })
     }
 
-    function confirmEndAllocation() {
-        setFlashMessage(
-            `Alocação encerrada com sucesso para ${endModal.clientName}`,
-            "success"
-        )
-        closeEndModal()
+    async function confirmEndAllocation() {
+        const response = await requestData<RemoveAllocation>(`/allocation/${endModal.allocation?.id}`, "DELETE", {}, true)
+        if(response.success && response.data.allocationId) {
+            setFlashMessage(response.data.message, "success")
+            fetchAllocations()
+            fetchStats()
+            closeEndModal()
+        }
+        else {
+            setFlashMessage(getApiErrorMessage(response), "error")
+        }
     }
 
     function handleRegister() {
@@ -304,7 +297,7 @@ function AllocationManagement() {
                                     </div>
                                 </div>
                                 <p className="text-4xl font-bold text-white mb-1">
-                                    R$ {stats?.totalRevenue}
+                                    R$ {stats?.totalRevenue.toFixed(2)}
                                 </p>
                             </div>
                         </div>
@@ -587,11 +580,7 @@ function AllocationManagement() {
                                 <div className="flex lg:flex-col items-center justify-center gap-3 lg:min-w-[180px]">
                                     <button
                                         onClick={() =>
-                                            openEndModal(
-                                                allocation.id,
-                                                allocation.clientName,
-                                                allocation.plate
-                                            )
+                                            openEndModal(allocation)
                                         }
                                         className="
                                                 group/btn
@@ -630,13 +619,12 @@ function AllocationManagement() {
                 )}
             </div>
 
-            <ConfirmDeleteModal
+            <EndAllocationModal
                 isOpen={endModal.isOpen}
+                allocation={endModal.allocation}
+                isLoading={false} 
                 onClose={closeEndModal}
                 onConfirm={confirmEndAllocation}
-                itemName={`a vaga de ${endModal.clientName} (${endModal.vehiclePlate})`}
-                isLoading={false}
-                title="Encerrar Alocação"
             />
         </div>
     )

@@ -8,7 +8,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
       TZ: America/Sao_Paulo
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     env_file:
@@ -23,7 +23,7 @@ services:
       - ./backend:/app
       - /app/node_modules
     ports:
-      - "8080:8080"
+      - "3000:3000"
     environment:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
@@ -37,7 +37,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
     ports:
-      - "5173:5173"
+      - "4000:4000"
     environment:
       - CHOKIDAR_USEPOLLING=true
     depends_on:

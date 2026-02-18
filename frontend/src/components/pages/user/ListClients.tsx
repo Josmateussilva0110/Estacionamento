@@ -22,7 +22,7 @@ import { type ClientsDetails } from "../../../types/client/clientsDetail"
 import { type RemoveClientResponse } from "../../../types/client/clientResponse" 
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import Pagination from "../../layout/Pagination"
-import { formatPhone, formatCPF } from "../../../utils/formatations"
+import { formatPhone, formatCPF } from "../../../utils/formations"
 
 
 function ClientList() {

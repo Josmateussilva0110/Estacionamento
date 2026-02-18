@@ -225,6 +225,32 @@ class AllocationService {
         }
       }
     }
+
+    async removeAllocation(allocation_id: string): Promise<ServiceResult<{allocation_id: string}>> {
+        try {
+            const allocationId = await Allocation.delete(allocation_id)
+            if(!allocationId) {
+                return {
+                    status: false,
+                    error: {
+                        code: AllocationErrorCode.ALLOCATION_NOT_FOUND,
+                        message: "Alocação não encontrada"
+                    }
+                }
+            }
+
+            return { status: true, data: {allocation_id}}
+        } catch(error) {
+            console.error("AllocationService.removeAllocation: ", error)
+            return {
+                status: false,
+                error: {
+                    code: AllocationErrorCode.ALLOCATION_DELETE_FAILED,
+                    message: "Erro interno ao remover a alocação"
+                }
+            }
+        }
+    }
 }
 
 export default new AllocationService()
