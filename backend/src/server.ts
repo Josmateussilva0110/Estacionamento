@@ -25,7 +25,7 @@ const pgPool = new Pool({
 const PostgresSession = PgSession(session)
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "http://localhost:4000",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -62,7 +62,7 @@ app.get("/", (request: Request, response: Response) => {
 
 app.use("/", router)
 
-const PORT = 8080
+const PORT = 3000
 
 app.listen(PORT, () => {
   console.log(`🔥 Servidor rodando na porta ${PORT}`)

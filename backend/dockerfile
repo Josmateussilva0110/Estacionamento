@@ -21,7 +21,7 @@ COPY . .
 # deixa scripts executáveis
 RUN chmod +x start.sh wait-for-it.sh
 
-EXPOSE 8080
+EXPOSE 3000
 
 # ENTRYPOINT roda só uma vez, ANTES do CMD
 ENTRYPOINT ["sh", "./start.sh"]
