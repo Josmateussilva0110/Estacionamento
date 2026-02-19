@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom"
 import PublicRoutes from "./PublicRoutes"
-import Home from "../components/pages/public/Home"
+import ParkingHome from "../components/pages/home/Dashboard"
+import LandingPage from "../components/pages/home/LandingPage"
 import RegisterUser from "../components/pages/auth/Register"
 import LoginUser from "../components/pages/auth/Login"
 import Profile from "../components/pages/user/Profile"
@@ -16,7 +17,8 @@ export default function AppRoutes() {
 
       {/* Rotas públicas */}
       <Route element={<PublicRoutes />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<ParkingHome />} />
+        <Route path="/landing" element={<LandingPage />} />
         <Route path="/register" element={<RegisterUser />} />
         <Route path="/login" element={<LoginUser />} />
       </Route>
