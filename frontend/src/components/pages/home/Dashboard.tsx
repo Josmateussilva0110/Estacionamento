@@ -170,7 +170,6 @@ const revenueByType: RevenueByType[] = [
   },
 ]
 
-const totalRevenue = revenueByType.reduce((acc, r) => acc + r.revenue, 0)
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function VehicleIcon({ type, className = "w-4 h-4" }: VehicleIconProps) {
@@ -268,7 +267,7 @@ export default function ParkingHome() {
 
         {/* ── HEADER ──────────────────────────────────────────────────────────── */}
         <div className="relative overflow-hidden bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-blue-600/10 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 via-blue-600/10 to-transparent" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -305,7 +304,7 @@ export default function ParkingHome() {
                   Atualizar
                 </button>
 
-                <button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-5 py-3 rounded-xl transition-all hover:scale-105 shadow-lg shadow-blue-500/30">
+                <button className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-5 py-3 rounded-xl transition-all hover:scale-105 shadow-lg shadow-blue-500/30">
                   <Plus size={18} />
                   Nova Alocação
                 </button>

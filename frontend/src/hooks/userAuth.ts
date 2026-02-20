@@ -1,6 +1,6 @@
 import { useCallback } from "react"
 import { requestData } from "../services/requestApi"
-import type { ApiResponse } from "../types/api"
+import type { ApiPayload } from "../types/api"
 import type { User } from "../types/client/user"
 import type {
   RegisterResponse,
@@ -27,9 +27,9 @@ export interface LoginData {
 }
 
 export interface UseAuthReturn {
-  register: (data: RegisterFormData) => Promise<ApiResponse<RegisterResponse>>
-  login: (data: LoginData) => Promise<ApiResponse<LoginResponse>>
-  logout: () => Promise<ApiResponse<LogoutResponse>>
+  register: (data: RegisterFormData) => Promise<ApiPayload<RegisterResponse>>
+  login: (data: LoginData) => Promise<ApiPayload<LoginResponse>>
+  logout: () => Promise<ApiPayload<LogoutResponse>>
 }
 
 
