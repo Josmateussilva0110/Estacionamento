@@ -5,8 +5,11 @@ import {
   ChevronDown,
   DollarSign,
 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+
 
 export function HeroSection() {
+  const navigate = useNavigate()
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background */}
@@ -42,7 +45,7 @@ export function HeroSection() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-          <button className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-4 rounded-xl transition-all hover:scale-105 shadow-2xl shadow-blue-500/30 text-lg">
+          <button onClick={() => navigate("/register")}  className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-4 rounded-xl transition-all hover:scale-105 shadow-2xl shadow-blue-500/30 text-lg">
             Começar gratuitamente
             <ArrowRight className="w-5 h-5" />
           </button>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   ArrowRight,
   ParkingCircle,
@@ -9,6 +10,7 @@ import {
 export function NavBar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     function onScroll() { setScrolled(window.scrollY > 30) }
@@ -16,11 +18,18 @@ export function NavBar() {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
+  const handleScrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    })
+  }
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? "bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 shadow-2xl" : "bg-transparent"}`}>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-3">
+        <div onClick={handleScrollToTop}  className="flex items-center gap-3 cursor-pointer">
           <div className="w-9 h-9 bg-blue-500/20 rounded-xl flex items-center justify-center border border-blue-400/30">
             <ParkingCircle className="w-5 h-5 text-blue-300" />
           </div>
@@ -39,10 +48,10 @@ export function NavBar() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <button className="text-sm text-slate-300 hover:text-white transition-colors px-4 py-2">
+          <button onClick={() => navigate("/login")} className="text-sm text-slate-300 hover:text-white transition-colors px-4 py-2">
             Entrar
           </button>
-          <button className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all hover:scale-105 shadow-lg shadow-blue-500/30">
+          <button onClick={() => navigate("/register")} className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all hover:scale-105 shadow-lg shadow-blue-500/30">
             Começar grátis
             <ArrowRight className="w-4 h-4" />
           </button>

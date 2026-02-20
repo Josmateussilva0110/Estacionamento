@@ -9,6 +9,7 @@ import { TestimonialsSection } from "./components/Testimonials"
 import { PricingSection } from "./components/Pricing"
 import { CtaSection } from "./components/Cta"
 import { AnimatedSection } from "../../layout/AnimatedSection"
+import { ScrollToTopButton } from "../../ui/ScrollToTopButton"
 
 
 
@@ -17,7 +18,6 @@ export default function LandingPage() {
     <div className="bg-slate-900 min-h-screen">
       <NavBar />
       <HeroSection />
-
       <AnimatedSection Component={StatsSection} />
       <AnimatedSection Component={FeaturesSection} />
       <AnimatedSection Component={HowItWorksSection} />
@@ -26,6 +26,7 @@ export default function LandingPage() {
       <AnimatedSection Component={TestimonialsSection} />
       <AnimatedSection Component={PricingSection} />
       <AnimatedSection Component={CtaSection} />
+      <ScrollToTopButton />
     </div>
   )
 }
