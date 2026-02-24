@@ -5,7 +5,7 @@ import {
     ArrowRight,
 } from "lucide-react"
 
-import { type ModelSectionProps } from "../../../../types/landingPage/sections"
+import { type ModelSectionProps } from "../../../../../types/landingPage/sections"
 
 export function CtaSection({ sectionRef, inView }: ModelSectionProps) {
   const navigate = useNavigate()

@@ -2,8 +2,8 @@ import {
   Users,
   Star,
 } from "lucide-react"
-import { type ModelSectionProps } from "../../../../types/landingPage/sections"
-import { testimonials } from "../../../../configs/feedbacks"
+import { type ModelSectionProps } from "../../../../../types/landingPage/sections"
+import { testimonials } from "../../../../../configs/feedbacks"
 
 export function TestimonialsSection({ sectionRef, inView }: ModelSectionProps) {
   return (

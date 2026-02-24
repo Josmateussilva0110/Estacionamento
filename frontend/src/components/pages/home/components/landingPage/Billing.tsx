@@ -3,8 +3,8 @@ import {
   DollarSign,
   TrendingUp,
 } from "lucide-react"
-import { type ModelSectionProps } from "../../../../types/landingPage/sections"
-import { paymentTypes } from "../../../../configs/payments"
+import { type ModelSectionProps } from "../../../../../types/landingPage/sections"
+import { paymentTypes } from "../../../../../configs/payments"
 
 export function BillingSection({ sectionRef, inView }: ModelSectionProps) {
 

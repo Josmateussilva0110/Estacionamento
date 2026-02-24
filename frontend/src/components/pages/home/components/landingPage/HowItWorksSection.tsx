@@ -2,8 +2,8 @@ import {
   RefreshCw,
 } from "lucide-react"
 
-import { steps } from "../../../../configs/steps"
-import { type ModelSectionProps } from "../../../../types/landingPage/sections"
+import { steps } from "../../../../../configs/steps"
+import { type ModelSectionProps } from "../../../../../types/landingPage/sections"
 
 
 export function HowItWorksSection({ sectionRef, inView }: ModelSectionProps) {

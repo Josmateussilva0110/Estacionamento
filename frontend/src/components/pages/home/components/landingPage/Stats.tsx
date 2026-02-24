@@ -1,5 +1,5 @@
-import { stats } from "../../../../configs/stats"
-import { type ModelSectionProps } from "../../../../types/landingPage/sections"
+import { stats } from "../../../../../configs/stats"
+import { type ModelSectionProps } from "../../../../../types/landingPage/sections"
 
 export function StatsSection({ sectionRef, inView }: ModelSectionProps) {
   return (

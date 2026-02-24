@@ -3,8 +3,8 @@ import {
   CheckCircle2,
 } from "lucide-react"
 
-import { carTypes } from "../../../../configs/carTypes"
-import { type ModelSectionProps } from "../../../../types/landingPage/sections"
+import { carTypes } from "../../../../../configs/carTypes"
+import { type ModelSectionProps } from "../../../../../types/landingPage/sections"
 
 export function VehicleTypesSection({ sectionRef, inView }: ModelSectionProps) {
 
