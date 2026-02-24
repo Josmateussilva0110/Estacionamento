@@ -2,8 +2,8 @@ import {
   Zap,
 } from "lucide-react"
 
-import { features } from "../../../../configs/features"
-import { type ModelSectionProps } from "../../../../types/landingPage/sections"
+import { features } from "../../../../../configs/features"
+import { type ModelSectionProps } from "../../../../../types/landingPage/sections"
 
 
 export function FeaturesSection({ sectionRef, inView }: ModelSectionProps) {

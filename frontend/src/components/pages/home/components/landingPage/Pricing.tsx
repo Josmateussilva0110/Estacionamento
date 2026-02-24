@@ -3,8 +3,8 @@ import {
   Lock,
 } from "lucide-react"
 
-import { type ModelSectionProps } from "../../../../types/landingPage/sections"
-import { plans } from "../../../../configs/pricing"
+import { type ModelSectionProps } from "../../../../../types/landingPage/sections"
+import { plans } from "../../../../../configs/pricing"
 
 
 export function PricingSection({ sectionRef, inView }: ModelSectionProps) {
