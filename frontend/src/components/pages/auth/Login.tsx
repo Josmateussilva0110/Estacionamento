@@ -30,11 +30,11 @@ function LoginUser() {
   async function onSubmit(form: LoginFormData) {
     const response = await loginUser(form)
 
-    if (response.success && response.data?.status) {
-      setFlashMessage(response.data.message, "success")
+    if (response.success && response.status) {
+      setFlashMessage("success", response.message)
       navigate("/")      
     } else {
-      setFlashMessage(response.message || "Erro ao fazer login", "error")
+      setFlashMessage("error", response.message || "Erro ao fazer login")
     }
   }
 

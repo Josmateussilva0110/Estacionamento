@@ -56,7 +56,7 @@ function SelectSpotStep({
 
   useEffect(() => {
     if (!user) {
-      setFlashMessage("Usuário não autenticado", "error")
+      setFlashMessage("error", "Usuário não autenticado")
       return
     }
     
@@ -68,7 +68,7 @@ function SelectSpotStep({
         setSpotsData(response.data.spots[0])
       } else {
         setSpotsData(null)
-        setFlashMessage("Nenhuma vaga disponível no momento", "warning")
+        setFlashMessage("warning", "Nenhuma vaga disponível no momento")
       }
       
       setIsLoadingSpots(false)
@@ -79,7 +79,7 @@ function SelectSpotStep({
 
   useEffect(() => {
     if (!user) {
-      setFlashMessage("Usuário não autenticado", "error")
+      setFlashMessage("error", "Usuário não autenticado")
       return
     }
     

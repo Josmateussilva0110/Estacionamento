@@ -23,7 +23,7 @@ class ClientController {
         return response.status(201).json({
             status: true,
             message: "Cliente cadastrado com sucesso",
-            user: result.data,
+            data: result.data,
         })
     }
 
@@ -132,7 +132,7 @@ class ClientController {
           return response.status(httpStatus).json({status: false, message: result.error?.message})
         }
     
-        return response.status(200).json({status: true, user: result.data})
+        return response.status(200).json({status: true, data: result.data})
     }
 }
 

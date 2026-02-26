@@ -30,7 +30,7 @@ function ParkingAllocation() {
 
   useEffect(() => {
     if (!user) {
-      setFlashMessage("Usuário não autenticado", "error")
+      setFlashMessage("error", "Usuário não autenticado")
       return
     }
     async function fetchClientVehicle() {
@@ -107,13 +107,13 @@ function ParkingAllocation() {
     const response = await requestData<RegisterAllocationResponse>("/allocation", "POST", payload, true)
     //console.log(response)
     if(response.success && response.data?.status) {
-      setFlashMessage(response.data.message, "success")
+      setFlashMessage("success", response.data.message)
       navigate('/parking/management')
     }
     else {
       setFlashMessage(
-        getApiErrorMessage(response),
-        "error"
+        "error",
+        getApiErrorMessage(response)
       )
     }
     resetAllocation()

@@ -107,7 +107,7 @@ function ParkingList() {
         )
 
         if (response.success && response.data?.status) {
-            setFlashMessage(response.data.message, "success")
+            setFlashMessage("success", response.data.message)
 
             setParkings((prev) => prev.filter((p) => p.id !== deleteModal.parkingId))
             setTotal((prev) => Math.max(prev - 1, 0))
@@ -116,7 +116,7 @@ function ParkingList() {
                 setPage((p) => p - 1)
             }
         } else {
-            setFlashMessage(getApiErrorMessage(response), "error")
+            setFlashMessage("error", getApiErrorMessage(response))
         }
 
         setIsDeleting(false)

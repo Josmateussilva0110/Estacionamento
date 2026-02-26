@@ -22,8 +22,10 @@ export default function AppRoutes() {
 
       {/* Públicas */}
       <Route element={<PublicRoutes />}>
-        <Route path="/register" element={<RegisterUser />} />
-        <Route path="/login" element={<LoginUser />} />
+        <Route element={<FullWidthLayout />}>
+          <Route path="/register" element={<RegisterUser />} />
+          <Route path="/login" element={<LoginUser />} />
+        </Route>
       </Route>
 
       {/* Landing pública com layout próprio */}

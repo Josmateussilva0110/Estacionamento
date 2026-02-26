@@ -28,9 +28,10 @@ function NavBar() {
         {},
         true
       )
+      console.log("navBar: ", response)
 
-      if (response.success && response.data?.user) {
-        setRequestUser(response.data.user)
+      if (response.success && response.data?.data) {
+        setRequestUser(response.data.data)
       }
     }
 
@@ -48,10 +49,10 @@ function NavBar() {
     const response = await logout()
 
     if (response.success && response.data?.status) {
-      setFlashMessage(response.data.message, "success")
+      setFlashMessage("success", response.data.message)
       navigate("/")
     } else {
-      setFlashMessage(response.message || "Erro ao fazer logout", "error")
+      setFlashMessage("error", response.message || "Erro ao fazer logout")
     }
   }
 

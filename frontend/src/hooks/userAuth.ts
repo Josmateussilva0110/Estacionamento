@@ -1,10 +1,10 @@
 import { useCallback } from "react"
 import { requestData } from "../services/requestApi"
-import type { ApiPayload } from "../types/api"
+import type { ApiPayload } from "../types/api" 
 import type { User } from "../types/client/user"
+import type { LoginResponse } from "../types/client/loginResponse"
+import type { AuthUserResponse } from "../types/auth"
 import type {
-  RegisterResponse,
-  LoginResponse,
   LogoutResponse,
 } from "../types/authResponses"
  
@@ -27,8 +27,8 @@ export interface LoginData {
 }
 
 export interface UseAuthReturn {
-  register: (data: RegisterFormData) => Promise<ApiPayload<RegisterResponse>>
-  login: (data: LoginData) => Promise<ApiPayload<LoginResponse>>
+  register: (data: RegisterFormData) => Promise<ApiPayload<AuthUserResponse>>
+  login: (data: LoginData) => Promise<ApiPayload<AuthUserResponse>>
   logout: () => Promise<ApiPayload<LogoutResponse>>
 }
 
@@ -40,41 +40,33 @@ export default function useAuth({
 
 
   const register = useCallback(async (data: RegisterFormData) => {
-    const payload = {
-      username: data.username,
-      email: data.email,
-      password: data.password,
-      confirmPassword: data.confirmPassword,
-    }
-
-    const response = await requestData<RegisterResponse>(
+    const response = await requestData<AuthUserResponse>(
       "/register",
       "POST",
-      payload,
+      data,
       true
     )
 
-    if (response.success && response.data?.status) {
+    if (response.success && response.data) {
       setAuthenticated(true)
-      setUser(response.data.user ?? null)
+      setUser(response.data)
     }
 
     return response
-  }, [])
-
+  }, [setAuthenticated, setUser])
 
 
   const login = useCallback(async (data: LoginData) => {
-    const response = await requestData<LoginResponse>(
+    const response = await requestData<AuthUserResponse>(
       "/login",
       "POST",
       data,
       true
     )
 
-    if (response.success && response.data?.status) {
+    if (response.success && response.data) {
       setAuthenticated(true)
-      setUser(response.data.user ?? null)
+      setUser(response.data)
     }
 
     return response

@@ -94,7 +94,7 @@ function VehicleList() {
 
         const response = await requestData<RemoveVehicleResponse>(`/vehicle/${deleteModal.vehicleId}`, "DELETE", {}, true)
         if(response.success && response.data?.status) {
-            setFlashMessage(response.data.message, "success")
+            setFlashMessage("success", response.data.message)
             setVehicles((prev) => prev.filter((p) => p.id !== deleteModal.vehicleId))
             setTotal((prev) => Math.max(prev - 1, 0))
             
@@ -104,7 +104,7 @@ function VehicleList() {
             closeDeleteModal()
         }
         else {
-            setFlashMessage(getApiErrorMessage(response), "error")
+            setFlashMessage("error", getApiErrorMessage(response))
         }
         setIsDeleting(false)
     }

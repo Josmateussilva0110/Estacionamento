@@ -9,14 +9,13 @@ import useAuth from "../hooks/userAuth"
 import { requestData } from "../services/requestApi"
 
 import type { LoginData, RegisterFormData } from "../hooks/userAuth"
-import type { ApiResponse } from "../types/api"
+import type { AuthUserResponse } from "../types/auth"
 import type {
-  RegisterResponse,
-  LoginResponse,
   LogoutResponse,
 } from "../types/authResponses"
 import type { User } from "../types/client/user"
 import type { ApiPayload } from "../types/api"
+import type { SessionResponse } from "../types/client/userSession"
 
 
 
@@ -29,13 +28,13 @@ interface UserContextType {
 
   register: (
     data: RegisterFormData
-  ) => Promise<ApiResponse<RegisterResponse>>
+  ) => Promise<ApiPayload<AuthUserResponse>>
 
   login: (
     data: LoginData
-  ) => Promise<ApiResponse<LoginResponse>>
+  ) => Promise<ApiPayload<AuthUserResponse>>
 
-  logout: () => Promise<ApiResponse<LogoutResponse>>
+  logout: () => Promise<ApiPayload<LogoutResponse>>
 }
 
 export const UserContext = createContext<UserContextType | null>(null)
@@ -65,12 +64,13 @@ export function UserProvider({ children }: ProviderProps) {
 
   useEffect(() => {
     async function checkSession() {
-      const response = await requestData<ApiPayload<User>>(
+      const response = await requestData<SessionResponse>(
         "/user/session",
         "GET",
         {},
         true
       )
+      console.log("user contexto: ", response)
 
       if (response.success && response.data?.status) {
         setAuthenticated(true)

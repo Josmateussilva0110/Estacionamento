@@ -4,7 +4,7 @@ import { userErrorHttpStatusMap } from "../errors/userErrorHttpMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
 class UserController {
-  async register(request: Request, response: Response): Promise<Response> {
+  /*async register(request: Request, response: Response): Promise<Response> {
     const result = await UserService.register(request.body)
 
     if (!result.status) {
@@ -19,14 +19,14 @@ class UserController {
       })
     }
 
-    request.session.user = result.data!
+    request.session.user = result.data
 
     return response.status(201).json({
       status: true,
       message: "Usuário cadastrado com sucesso",
-      user: result.data,
+      data: result.data,
     })
-  }
+  }*/
 
   async login(request: Request, response: Response): Promise<Response> {
     const { email, password } = request.body
@@ -42,12 +42,12 @@ class UserController {
       })
     }
 
-    request.session.user = result.data!
+    request.session.user = result.data
 
     return response.status(200).json({
       status: true,
       message: "Login Realizado com sucesso",
-      user: result.data,
+      data: result.data,
     })
   }
 
@@ -63,7 +63,7 @@ class UserController {
       return response.status(httpStatus).json({status: false, message: result.error?.message})
     }
 
-    return response.status(200).json({status: true, user: result.data})
+    return response.status(200).json({status: true, data: result.data})
   }
 
   async session(request: Request, response: Response): Promise<Response> {

@@ -1,13 +1,13 @@
 import api from "./api"
 import { type AxiosRequestConfig, type Method } from "axios"
-import { type ApiResponse } from "../types/api"
+import { type ApiPayload } from "../types/api" 
 
 export async function requestData<T>(
   endpoint: string,
   method: Method = "get",
   data: Record<string, any> | FormData = {},
   withCredentials: boolean = false
-): Promise<ApiResponse<T>> {
+): Promise<ApiPayload<T>> {
   try {
     const config: AxiosRequestConfig = {
       method: method.toLowerCase() as Method,
@@ -42,7 +42,7 @@ export async function requestData<T>(
     if (err.response?.status === 401) {
       window.dispatchEvent(new Event("SESSION_EXPIRED"))
     }
-
+    
     return {
       success: false,
       status: err.response?.status ?? 500,

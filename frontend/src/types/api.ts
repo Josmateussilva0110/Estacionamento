@@ -1,5 +1,6 @@
-export interface ApiPayload<T = undefined> {
-  status: boolean          
-  message: string
-  user?: T                
+export interface ApiPayload<T = unknown> {
+  success: boolean
+  status: number
+  message?: string
+  data?: T
 }

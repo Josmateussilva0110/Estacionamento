@@ -52,7 +52,7 @@ function AllocationManagement() {
     const fetchStats = useCallback(async () => {
             const response = await requestData<StatsResponse>(`/allocation/stats/${user?.id}`, "GET", {}, true)
             //console.log(response)
-            if(response.success && response.data.stats) {
+            if(response.success && response.data?.stats) {
                 setStats(response.data.stats)
             }
             else {
@@ -171,14 +171,14 @@ function AllocationManagement() {
 
     async function confirmEndAllocation() {
         const response = await requestData<RemoveAllocation>(`/allocation/${endModal.allocation?.id}`, "DELETE", {}, true)
-        if(response.success && response.data.allocationId) {
-            setFlashMessage(response.data.message, "success")
+        if(response.success && response.data?.allocationId) {
+            setFlashMessage("success", response.message)
             fetchAllocations()
             fetchStats()
             closeEndModal()
         }
         else {
-            setFlashMessage(getApiErrorMessage(response), "error")
+            setFlashMessage("error", getApiErrorMessage(response))
         }
     }
 

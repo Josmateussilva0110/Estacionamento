@@ -1,11 +1,8 @@
 import "express-session"
+import type { SafeUser } from "../user/userSafe"
 
 declare module "express-session" {
   interface SessionData {
-    user?: {
-      id: number
-      username: string
-    }
-    visits?: number
+    user?: SafeUser
   }
 }
