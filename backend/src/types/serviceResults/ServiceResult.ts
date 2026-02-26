@@ -1,8 +1,8 @@
-export interface ServiceResult<T = void> {
+export interface ServiceResult<T = void, E extends string = string> {
   status: boolean
   data?: T
   error?: {
-    code: string
+    code: E
     message?: string
   }
 }

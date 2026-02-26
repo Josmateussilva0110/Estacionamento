@@ -72,9 +72,9 @@ export function UserProvider({ children }: ProviderProps) {
       )
       console.log("user contexto: ", response)
 
-      if (response.success && response.data?.status) {
+      if (response.success && response.data) {
         setAuthenticated(true)
-        setUser(response.data.user ?? null)
+        setUser(response.data)
       } else {
         setAuthenticated(false)
         setUser(null)

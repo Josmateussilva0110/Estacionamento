@@ -9,7 +9,7 @@ class UserService {
         username: string
         email: string
         password: string
-    }): Promise<ServiceResult<{ id: number; username: string }>> {
+    }): Promise<ServiceResult<{ id: number; username: string }, UserErrorCode>> {
         try {
             const emailExists = await User.emailExists(data.email)
             if (emailExists) {
@@ -60,10 +60,7 @@ class UserService {
         }
     }
 
-    async login(
-        email: string,
-        password: string
-    ): Promise<ServiceResult<SafeUser>> {
+    async login(email: string, password: string): Promise<ServiceResult<{ id: number; username: string }, UserErrorCode>> {
         try {
             const user = await User.findByEmail(email)
 
@@ -72,7 +69,7 @@ class UserService {
                     status: false,
                     error: {
                         code: UserErrorCode.USER_NOT_FOUND,
-                        message: "Email não encontrado",
+                        message: "Usuário ou senha incorreta",
                     },
                 }
             }
@@ -84,7 +81,7 @@ class UserService {
                     status: false,
                     error: {
                         code: UserErrorCode.INVALID_PASSWORD,
-                        message: "Senha incorreta",
+                        message: "Usuário ou senha incorreta",
                     },
                 }
             }
@@ -108,7 +105,7 @@ class UserService {
         }
     }
 
-    async findById(id: string): Promise<ServiceResult<UserData>> {
+    async findById(id: string): Promise<ServiceResult<UserData, UserErrorCode>> {
         try {
             const user = await User.findById(id)
             if (!user) {

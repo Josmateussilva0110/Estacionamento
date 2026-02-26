@@ -38,9 +38,8 @@ export default function useAuth({
   setUser,
 }: AuthHookParams): UseAuthReturn {
 
-
   const register = useCallback(async (data: RegisterFormData) => {
-    const response = await requestData<AuthUserResponse>(
+    const response = await requestData<RegisterResponse>(
       "/register",
       "POST",
       data,
@@ -82,15 +81,13 @@ export default function useAuth({
       true
     )
 
-    if (response.success && response.data?.status) {
+    if (response.success) {
       setAuthenticated(false)
       setUser(null)
     }
 
     return response
   }, [setAuthenticated, setUser])
-
-
 
   return { register, login, logout }
 }

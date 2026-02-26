@@ -1,8 +1,9 @@
 import "express-session"
-import type { SafeUser } from "../user/userSafe"
+import { UserSessionData } from "../session/UserSessionData"
 
 declare module "express-session" {
   interface SessionData {
-    user?: SafeUser
+    user?: UserSessionData
+    visits?: number
   }
 }

@@ -1,20 +1,21 @@
 import api from "./api"
-import { type AxiosRequestConfig, type Method } from "axios"
-import { type ApiPayload } from "../types/api" 
+import axios, { type AxiosRequestConfig, type Method } from "axios"
+import { type ApiResponse } from "../types/api"
 
-export async function requestData<T>(
+export async function requestData<TResponse, TRequest = unknown>(
   endpoint: string,
   method: Method = "get",
-  data: Record<string, any> | FormData = {},
+  data?: TRequest,
   withCredentials: boolean = false
-): Promise<ApiPayload<T>> {
+): Promise<ApiResponse<TResponse>> {
   try {
     const config: AxiosRequestConfig = {
       method: method.toLowerCase() as Method,
       url: endpoint,
+      withCredentials,
     }
 
-    if (config.method === "get") {
+    if (method.toLowerCase() === "get") {
       config.params = data
     } else {
       config.data = data
@@ -26,28 +27,27 @@ export async function requestData<T>(
       }
     }
 
-    if (withCredentials) {
-      config.withCredentials = true
-    }
+    const response = await api<ApiResponse<TResponse>>(config)
 
-    const response = await api<T>(config)
+    return response.data
 
-    return {
-      success: true,
-      status: response.status,
-      data: response.data, 
-      message: (response.data as any)?.message,
-    }
-  } catch (err: any) {
-    if (err.response?.status === 401) {
-      window.dispatchEvent(new Event("SESSION_EXPIRED"))
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      if (err.response?.status === 401) {
+        window.dispatchEvent(new Event("SESSION_EXPIRED"))
+      }
+
+      return {
+        success: false,
+        message:
+          err.response?.data?.message ??
+          "Erro inesperado. Tente novamente.",
+      }
     }
     
     return {
       success: false,
-      status: err.response?.status ?? 500,
-      data: err.response?.data, 
-      message: err.response?.data?.message ?? err.message,
+      message: "Erro inesperado. Tente novamente.",
     }
   }
 }
