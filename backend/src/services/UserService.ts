@@ -2,7 +2,6 @@ import bcrypt from "bcrypt"
 import User, { UserData } from "../model/User"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
 import { UserErrorCode } from "../types/code/userCode"
-import { type SafeUser } from "../types/user/userSafe"
 
 class UserService {
     async register(data: {
@@ -35,18 +34,16 @@ class UserService {
                 return {
                     status: false,
                     error: {
-                        code: UserErrorCode.USER_CREATE_FAILED,
-                        message: "Erro ao cadastrar usuário",
+                    code: UserErrorCode.USER_CREATE_FAILED,
+                    message: "Erro ao cadastrar usuário",
                     },
                 }
             }
 
-            return {
-                status: true, data: {
-                    id: success,
-                    username: newUser.username
-                }
-            }
+            return { status: true, data: {
+                id: success,
+                username: newUser.username
+            }}
         } catch (error) {
             console.error("UserService.register error:", error)
 
@@ -63,34 +60,33 @@ class UserService {
     async login(email: string, password: string): Promise<ServiceResult<{ id: number; username: string }, UserErrorCode>> {
         try {
             const user = await User.findByEmail(email)
-
             if (!user) {
                 return {
                     status: false,
                     error: {
                         code: UserErrorCode.USER_NOT_FOUND,
-                        message: "Usuário ou senha incorreta",
+                        message: "Email ou senha incorreto",
                     },
                 }
             }
 
             const validPassword = await bcrypt.compare(password, user.password)
-
             if (!validPassword) {
                 return {
                     status: false,
                     error: {
                         code: UserErrorCode.INVALID_PASSWORD,
-                        message: "Usuário ou senha incorreta",
+                        message: "Email ou senha incorreto",
                     },
                 }
             }
 
-            const { password: _, ...safeUser } = user
-
             return {
                 status: true,
-                data: safeUser,
+                data: {
+                    id: user.id!,
+                    username: user.username,
+                },
             }
         } catch (error) {
             console.error("UserService.login error:", error)

@@ -1,10 +1,10 @@
 import { useCallback } from "react"
 import { requestData } from "../services/requestApi"
-import type { ApiPayload } from "../types/api" 
+import type { ApiResponse } from "../types/api"
 import type { User } from "../types/client/user"
-import type { LoginResponse } from "../types/client/loginResponse"
-import type { AuthUserResponse } from "../types/auth"
 import type {
+  RegisterResponse,
+  LoginResponse,
   LogoutResponse,
 } from "../types/authResponses"
  
@@ -27,9 +27,9 @@ export interface LoginData {
 }
 
 export interface UseAuthReturn {
-  register: (data: RegisterFormData) => Promise<ApiPayload<AuthUserResponse>>
-  login: (data: LoginData) => Promise<ApiPayload<AuthUserResponse>>
-  logout: () => Promise<ApiPayload<LogoutResponse>>
+  register: (data: RegisterFormData) => Promise<ApiResponse<RegisterResponse>>
+  login: (data: LoginData) => Promise<ApiResponse<LoginResponse>>
+  logout: () => Promise<ApiResponse<LogoutResponse>>
 }
 
 
@@ -38,34 +38,43 @@ export default function useAuth({
   setUser,
 }: AuthHookParams): UseAuthReturn {
 
+
   const register = useCallback(async (data: RegisterFormData) => {
+    const payload = {
+      username: data.username,
+      email: data.email,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+    }
+
     const response = await requestData<RegisterResponse>(
       "/register",
       "POST",
-      data,
+      payload,
       true
     )
 
-    if (response.success && response.data) {
+    if (response.success) {
       setAuthenticated(true)
-      setUser(response.data)
+      setUser(response.data ?? null)
     }
 
     return response
-  }, [setAuthenticated, setUser])
+  }, [])
+
 
 
   const login = useCallback(async (data: LoginData) => {
-    const response = await requestData<AuthUserResponse>(
+    const response = await requestData<LoginResponse>(
       "/login",
       "POST",
       data,
       true
     )
 
-    if (response.success && response.data) {
+    if (response.success) {
       setAuthenticated(true)
-      setUser(response.data)
+      setUser(response.data ?? null)
     }
 
     return response
@@ -88,6 +97,8 @@ export default function useAuth({
 
     return response
   }, [setAuthenticated, setUser])
+
+
 
   return { register, login, logout }
 }

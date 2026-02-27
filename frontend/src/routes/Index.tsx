@@ -30,13 +30,13 @@ export default function AppRoutes() {
 
       {/* Landing pública com layout próprio */}
       <Route element={<FullWidthLayout />}>
-        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/" element={<LandingPage />} />
       </Route>
 
       {/* Privadas com layout principal */}
       <Route element={<PrivateRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<ParkingHome />} />
+          <Route path="/dashboard" element={<ParkingHome />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/client/*" element={<ClientRoutes />} />
           <Route path="/vehicle/*" element={<VehicleRoutes />} />

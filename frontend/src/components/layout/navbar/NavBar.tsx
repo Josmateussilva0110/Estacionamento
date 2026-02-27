@@ -5,7 +5,6 @@ import { useUser } from "../../../context/useUser"
 import { requestData } from "../../../services/requestApi"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import type { User } from "../../../types/client/user"
-import type { ApiPayload } from "../../../types/api"
 
 import { DesktopUserMenu } from "./DesktopUserMenu"
 import { MobileDrawerMenu } from "./MobileDrawerMenu"
@@ -22,7 +21,7 @@ function NavBar() {
     if (!user?.id) return
 
     async function fetchUser() {
-      const response = await requestData<ApiPayload<User>>(
+      const response = await requestData<User>(
         `/user/${user?.id}`,
         "GET",
         {},
@@ -30,8 +29,8 @@ function NavBar() {
       )
       console.log("navBar: ", response)
 
-      if (response.success && response.data?.data) {
-        setRequestUser(response.data.data)
+      if (response.success && response.data) {
+        setRequestUser(response.data)
       }
     }
 
@@ -48,8 +47,8 @@ function NavBar() {
   async function handleLogout() {
     const response = await logout()
 
-    if (response.success && response.data?.status) {
-      setFlashMessage("success", response.data.message)
+    if (response.success) {
+      setFlashMessage("success", response.message)
       navigate("/")
     } else {
       setFlashMessage("error", response.message || "Erro ao fazer logout")

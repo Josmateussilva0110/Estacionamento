@@ -4,7 +4,7 @@ import { userErrorHttpStatusMap } from "../errors/userErrorHttpMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
 class UserController {
-  /*async register(request: Request, response: Response): Promise<Response> {
+  async register(request: Request, response: Response): Promise<Response> {
     const result = await UserService.register(request.body)
 
     if (!result.status) {
@@ -26,7 +26,7 @@ class UserController {
       message: "Usuário cadastrado com sucesso",
       data: result.data,
     })
-  }*/
+  }
 
   async login(request: Request, response: Response): Promise<Response> {
     const { email, password } = request.body
@@ -68,15 +68,9 @@ class UserController {
 
   async session(request: Request, response: Response): Promise<Response> {
     if (request.session && request.session.user) {
-        return response.status(200).json({
-          success: true,
-          data: request.session.user,
-        })
+        return response.status(200).json({ success: true, data: request.session.user })
     } else {
-        return response.status(401).json({
-          success: false,
-          message: "Usuário não autenticado",
-      })
+        return response.status(401).json({ success: false, message: "Usuário não autenticado" })
     }
   }
 

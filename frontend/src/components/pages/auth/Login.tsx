@@ -30,9 +30,9 @@ function LoginUser() {
   async function onSubmit(form: LoginFormData) {
     const response = await loginUser(form)
 
-    if (response.success && response.status) {
+    if (response.success) {
       setFlashMessage("success", response.message)
-      navigate("/")      
+      navigate("/dashboard")      
     } else {
       setFlashMessage("error", response.message || "Erro ao fazer login")
     }

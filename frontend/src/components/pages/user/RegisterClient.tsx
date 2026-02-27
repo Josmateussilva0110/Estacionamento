@@ -110,7 +110,7 @@ function RegisterClient({ mode }: RegisterClientProps) {
       true
     )
 
-    if (response.success && response.status) {
+    if (response.success && response.data) {
       setFlashMessage(
         "success",
         isEditMode ? "Cliente atualizado com sucesso" : response.message,

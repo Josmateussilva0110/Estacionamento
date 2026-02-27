@@ -135,7 +135,7 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
       true,
     )
 
-    if (response.success && response.data?.status) {
+    if (response.success && response.data) {
       setFlashMessage(
         "success",
         isEditMode ? "Veículo atualizado com sucesso" : response.data.message,
