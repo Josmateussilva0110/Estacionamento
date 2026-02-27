@@ -120,8 +120,8 @@ function ParkingForm({ mode }: ParkingFormProps) {
           reset(formData)
         } else {
           setFlashMessage(
-            getApiErrorMessage(response),
-            "error"
+            "error",
+            getApiErrorMessage(response)
           )
           navigate("/parking/list")
         }
@@ -207,16 +207,16 @@ function ParkingForm({ mode }: ParkingFormProps) {
 
     if (response.success && response.data?.status) {
       setFlashMessage(
-        mode === 'edit' 
+        "success",
+          mode === 'edit' 
           ? "Estacionamento atualizado com sucesso!" 
           : response.data.message,
-        "success"
       )
       navigate("/parking/list")
     } else {
       setFlashMessage(
+        "error",
         getApiErrorMessage(response),
-        "error"
       )
     }
   }

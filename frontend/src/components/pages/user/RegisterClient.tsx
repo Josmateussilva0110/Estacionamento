@@ -53,7 +53,7 @@ function RegisterClient({ mode }: RegisterClientProps) {
     }
 
     if (!id) {
-      setFlashMessage("Cliente inválido", "error")
+      setFlashMessage("error", "Cliente inválido")
       navigate("/client/list/clients")
       return
     }
@@ -77,7 +77,7 @@ function RegisterClient({ mode }: RegisterClientProps) {
             email: response.data.user.email,
           })
         } else {
-          setFlashMessage(getApiErrorMessage(response), "error")
+          setFlashMessage("error", getApiErrorMessage(response))
           navigate("/client/list/clients")
         }
       } finally {
@@ -90,7 +90,7 @@ function RegisterClient({ mode }: RegisterClientProps) {
 
   async function onSubmit(form: RegisterClientFormInput) {
     if (!user) {
-      setFlashMessage("Usuário não autenticado", "error")
+      setFlashMessage("error", "Usuário não autenticado")
       return
     }
 
@@ -110,14 +110,14 @@ function RegisterClient({ mode }: RegisterClientProps) {
       true
     )
 
-    if (response.success && response.data?.status) {
+    if (response.success && response.data) {
       setFlashMessage(
-        isEditMode ? "Cliente atualizado com sucesso" : response.data.message,
-        "success"
+        "success",
+        isEditMode ? "Cliente atualizado com sucesso" : response.message,
       )
       navigate("/client/list/clients")
     } else {
-      setFlashMessage(getApiErrorMessage(response), "error")
+      setFlashMessage("error", getApiErrorMessage(response))
     }
   }
 

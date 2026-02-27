@@ -36,11 +36,11 @@ function RegisterUser() {
   async function onSubmit(form: RegisterFormData) {
     const response = await registerUser(form)
 
-    if (response.success && response.data?.status) {
-      setFlashMessage(response.data.message, "success")
-      navigate("/")      
+    if (response.success) {
+      setFlashMessage("success", response.message)
+      navigate("/dashboard")      
     } else {
-      setFlashMessage(response.message || "Erro ao registrar usuário", "error")
+      setFlashMessage("error", response.message || "Erro ao registrar usuário")
     }
   }
 

@@ -90,7 +90,7 @@ function ClientList() {
 
         const response = await requestData<RemoveClientResponse>(`/client/${deleteModal.clientId}`, "DELETE", {}, true)
         if(response.success && response.data?.status) {
-            setFlashMessage(response.data.message, "success")
+            setFlashMessage("success", response.data.message)
             setClients((prev) => prev.filter((p) => p.id !== deleteModal.clientId))
             setTotal((prev) => Math.max(prev - 1, 0))
             
@@ -100,7 +100,7 @@ function ClientList() {
             closeDeleteModal()
         }
         else {
-            setFlashMessage(getApiErrorMessage(response), "error")
+            setFlashMessage("error", getApiErrorMessage(response))
         }
         setIsDeleting(false)
     }

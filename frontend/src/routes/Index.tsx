@@ -4,6 +4,7 @@ import PrivateRoute from "./PrivateRouter"
 
 import AppLayout from "./layout/AppLayout"
 import FullWidthLayout from "./layout/FullWidthLayout"
+import HomeRedirect from "./layout/HomeRedirect"
 
 import ParkingHome from "../components/pages/home/Dashboard"
 import LandingPage from "../components/pages/home/LandingPage"
@@ -22,19 +23,22 @@ export default function AppRoutes() {
 
       {/* Públicas */}
       <Route element={<PublicRoutes />}>
-        <Route path="/register" element={<RegisterUser />} />
-        <Route path="/login" element={<LoginUser />} />
+        <Route element={<FullWidthLayout />}>
+          <Route path="/register" element={<RegisterUser />} />
+          <Route path="/login" element={<LoginUser />} />
+        </Route>
       </Route>
 
       {/* Landing pública com layout próprio */}
       <Route element={<FullWidthLayout />}>
-        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/" element={<HomeRedirect />} />
+        <Route path="/about" element={<LandingPage />} />
       </Route>
 
       {/* Privadas com layout principal */}
       <Route element={<PrivateRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<ParkingHome />} />
+          <Route path="/dashboard" element={<ParkingHome />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/client/*" element={<ClientRoutes />} />
           <Route path="/vehicle/*" element={<VehicleRoutes />} />

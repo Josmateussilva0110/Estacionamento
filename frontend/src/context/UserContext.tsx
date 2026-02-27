@@ -16,7 +16,7 @@ import type {
   LogoutResponse,
 } from "../types/authResponses"
 import type { User } from "../types/client/user"
-import type { ApiPayload } from "../types/api"
+
 
 
 
@@ -65,16 +65,16 @@ export function UserProvider({ children }: ProviderProps) {
 
   useEffect(() => {
     async function checkSession() {
-      const response = await requestData<ApiPayload<User>>(
+      const response = await requestData<User>(
         "/user/session",
         "GET",
         {},
         true
       )
 
-      if (response.success && response.data?.status) {
+      if (response.success) {
         setAuthenticated(true)
-        setUser(response.data.user ?? null)
+        setUser(response.data ?? null)
       } else {
         setAuthenticated(false)
         setUser(null)

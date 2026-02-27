@@ -59,7 +59,7 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
 
   useEffect(() => {
     if (!user) {
-      setFlashMessage("Usuário não autenticado", "error")
+      setFlashMessage("error", "Usuário não autenticado")
       return
     }
 
@@ -87,7 +87,7 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
     }
 
     if (!id) {
-      setFlashMessage("Veículo inválido", "error")
+      setFlashMessage("error", "Veículo inválido")
       navigate("/vehicle/list/vehicles")
       return
     }
@@ -112,7 +112,7 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
             client_id: response.data.vehicle.clientId,
           })
         } else {
-          setFlashMessage(getApiErrorMessage(response), "error")
+          setFlashMessage("error", getApiErrorMessage(response))
           navigate("/vehicle/list/vehicles")
         }
       } finally {
@@ -135,14 +135,14 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
       true,
     )
 
-    if (response.success && response.data?.status) {
+    if (response.success && response.data) {
       setFlashMessage(
-        isEditMode ? "Veículo atualizado com sucesso" : response.data.message,
         "success",
+        isEditMode ? "Veículo atualizado com sucesso" : response.data.message,
       )
       navigate("/vehicle/list/vehicles")
     } else {
-      setFlashMessage(getApiErrorMessage(response), "error")
+      setFlashMessage("error", getApiErrorMessage(response))
     }
   }
 

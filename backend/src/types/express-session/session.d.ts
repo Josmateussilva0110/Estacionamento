@@ -1,11 +1,9 @@
 import "express-session"
+import { UserSessionData } from "../session/UserSessionData"
 
 declare module "express-session" {
   interface SessionData {
-    user?: {
-      id: number
-      username: string
-    }
+    user?: UserSessionData
     visits?: number
   }
 }
