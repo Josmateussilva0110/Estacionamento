@@ -16,7 +16,7 @@ class ParkingService {
   async register(
     data: ParkingRegisterDTO,
     userId: number
-  ): Promise<ServiceResult<{ parkingId: number }>> {
+  ): Promise<ServiceResult<{ parkingId: number }, ParkingErrorCode>> {
 
     const emailExist = await Contact.emailExist(data.contacts.email)
     if(emailExist) {
@@ -119,7 +119,7 @@ class ParkingService {
     }
   }
 
-  async list(id: string, page: number, limit: number): Promise<ServiceResult<PaginatedParkingResult | null>> {
+  async list(id: string, page: number, limit: number): Promise<ServiceResult<PaginatedParkingResult | null, ParkingErrorCode>> {
     try {
       const parking = await Parking.findByIdUser(id, page, limit)
       if (parking?.total === 0) {
@@ -149,7 +149,7 @@ class ParkingService {
     }
   }
 
-  async delete(id: string): Promise<ServiceResult<{id: string }>> {
+  async delete(id: string): Promise<ServiceResult<{id: string }, ParkingErrorCode>> {
     try {
       const parkingExist = await Parking.findById(id) 
       if(!parkingExist) {
@@ -188,7 +188,7 @@ class ParkingService {
     }
   }
 
-  async getById(id: string): Promise<ServiceResult<ParkingEditDTO | null>> {
+  async getById(id: string): Promise<ServiceResult<ParkingEditDTO | null, ParkingErrorCode>> {
     try {
       const parking = await Parking.getParkingById(id)
       if (!parking) {
@@ -220,7 +220,7 @@ class ParkingService {
   data: ParkingRegisterDTO,
   userId: number,
   id: string
-): Promise<ServiceResult<{ parkingId: number }>> {
+): Promise<ServiceResult<{ parkingId: number }, ParkingErrorCode>> {
 
   const emailExist = await Contact.emailExist(
     data.contacts.email, id
@@ -300,7 +300,7 @@ class ParkingService {
 
     return {
       status: true,
-      data: { parkingId: Number(id) },
+      data: {parkingId: Number(id)},
     }
 
   } catch (error) {
@@ -316,7 +316,7 @@ class ParkingService {
   }
 }
 
-  async parkingNames(user_id: string): Promise<ServiceResult<ParkingResponse[]>> {
+  async parkingNames(user_id: string): Promise<ServiceResult<ParkingResponse[], ParkingErrorCode>> {
     try {
       const parking = await Parking.getNames(user_id)
       if (parking.length === 0) {

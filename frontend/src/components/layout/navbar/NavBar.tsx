@@ -27,7 +27,6 @@ function NavBar() {
         {},
         true
       )
-      console.log("navBar: ", response)
 
       if (response.success && response.data) {
         setRequestUser(response.data)

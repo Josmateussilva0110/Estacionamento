@@ -11,7 +11,7 @@ class ParkingController {
       const userId = request.session.user?.id
       if (!userId) {
         return response.status(401).json({
-          status: false,
+          success: false,
           message: "Usuário não autenticado",
         })
       }
@@ -24,14 +24,15 @@ class ParkingController {
             ParkingErrorHttpStatusMap
           )
         return response.status(httpStatus).json({
-          status: false,
+          success: false,
           message: result.error!.message ?? "Erro ao processar requisição",
         })
       }
 
       return response.status(201).json({
-        status: true,
-        message: "Estacionamento cadastrado com sucesso"
+        success: true,
+        message: "Estacionamento cadastrado com sucesso",
+        data: {parkingId: result.data?.parkingId}
       })
   }
 
@@ -47,14 +48,14 @@ class ParkingController {
             ParkingErrorHttpStatusMap
           )
         return response.status(httpStatus).json({
-          status: false,
+          success: false,
           message: result.error?.message,
         })
       }
 
       return response.status(200).json({
-        status: true,
-        parking: result.data
+        success: true,
+        data: result.data
       })
   }
 
@@ -67,15 +68,15 @@ class ParkingController {
         ParkingErrorHttpStatusMap
       )
       return response.status(httpStatus).json({
-        status: false,
+        success: false,
         message: result.error?.message,
       })
     }
     
     return response.status(200).json({
-      status: true,
+      success: true,
       message: "Estacionamento removido com sucesso",
-      parkingId: result.data?.id
+      data: {parkingId: result.data?.id}
     })
   }
 
@@ -88,13 +89,13 @@ class ParkingController {
         ParkingErrorHttpStatusMap
       )
       return response.status(httpStatus).json({
-        status: false,
+        success: false,
         message: result.error?.message,
       })
     }
     return response.status(200).json({
-      status: true,
-      parking: result.data
+      success: true,
+      data: result.data
     })
   }
 
@@ -105,7 +106,7 @@ class ParkingController {
     const userId = request.session.user?.id
     if (!userId) {
       return response.status(401).json({
-        status: false,
+        success: false,
         message: "Usuário não autenticado",
       })
     }
@@ -118,14 +119,15 @@ class ParkingController {
           ParkingErrorHttpStatusMap
         )
       return response.status(httpStatus).json({
-        status: false,
+        success: false,
         message: result.error!.message ?? "Erro ao processar requisição",
       })
     }
 
     return response.status(201).json({
-      status: true,
-      message: "Estacionamento editado com sucesso"
+      success: true,
+      message: "Estacionamento editado com sucesso",
+      data: {parkingId: result.data?.parkingId}
     })
   }
 
@@ -139,14 +141,14 @@ class ParkingController {
             ParkingErrorHttpStatusMap
           )
         return response.status(httpStatus).json({
-          status: false,
+          success: false,
           message: result.error?.message,
         })
       }
 
       return response.status(200).json({
-        status: true,
-        parking: result.data
+        success: true,
+        data: result.data
       })
   }
 }

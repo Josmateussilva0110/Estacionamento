@@ -1,5 +1,4 @@
-import type { ApiPayload } from "../api"
-import type { ParkingRemove } from "./parkingRemove"
+import type { ParkingId } from "./parkingRemove"
 
-export type RegisterParkingResponse = ApiPayload
-export type RemoveParkingResponse = ApiPayload<ParkingRemove>
+export type RegisterParkingResponse = ParkingId
+export type RemoveParkingResponse = ParkingId

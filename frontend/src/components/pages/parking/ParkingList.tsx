@@ -15,7 +15,6 @@ import {
     Camera,
     Bike,
 } from "lucide-react"
-import { type ListParkingData } from "../../../types/parking/listParking"
 import { type ParkingDetails } from "../../../types/parking/parkingDetail"
 import { type RemoveParkingResponse } from "../../../types/parking/parkingResponses"
 import ConfirmDeleteModal from "../../layout/DeleteModal"
@@ -24,6 +23,7 @@ import { useUser } from "../../../context/useUser"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import Pagination from "../../layout/Pagination"
+import { type PaginatedParkingResult } from "../../../types/parking/PaginatedParkingResult"
 
 
 
@@ -57,16 +57,16 @@ function ParkingList() {
         async function fetchParking() {
             setIsLoading(true)
 
-            const response = await requestData<ListParkingData>(
+            const response = await requestData<PaginatedParkingResult>(
                 `/parking/list/${user?.id}`,
                 "GET",
                 { page, limit },
                 true
             )
 
-            if (response.success && response.data?.parking) {
-                setParkings(response.data.parking.rows)
-                setTotal(response.data.parking.total)
+            if (response.success && response.data?.rows) {
+                setParkings(response.data.rows)
+                setTotal(response.data.total)
             } else {
                 setParkings([])
                 setTotal(0)
@@ -106,8 +106,8 @@ function ParkingList() {
             true
         )
 
-        if (response.success && response.data?.status) {
-            setFlashMessage("success", response.data.message)
+        if (response.success && response.data?.parkingId) {
+            setFlashMessage("success", response.message)
 
             setParkings((prev) => prev.filter((p) => p.id !== deleteModal.parkingId))
             setTotal((prev) => Math.max(prev - 1, 0))
@@ -406,7 +406,7 @@ function ParkingList() {
                 isOpen={deleteModal.isOpen}
                 onClose={closeDeleteModal}
                 onConfirm={confirmDelete}
-                itemName={deleteModal.parkingName}
+                itemName={`Estacionamento ${deleteModal.parkingName}`}
                 isLoading={isDeleting}
             />
         </div>

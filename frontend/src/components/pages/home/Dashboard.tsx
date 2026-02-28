@@ -43,53 +43,63 @@ export default function ParkingHome() {
       <div className="max-w-7xl mx-auto space-y-6">
 
         {/* ── HEADER ──────────────────────────────────────────────────────────── */}
-        <div className="relative overflow-hidden bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-700/50">
+        <div className="relative overflow-hidden bg-slate-800/80 backdrop-blur-xl rounded-2xl md:rounded-3xl shadow-2xl border border-slate-700/50">
           <div className="absolute inset-0 bg-linear-to-br from-blue-600/20 via-blue-600/10 to-transparent" />
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-64 md:w-96 h-64 md:h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative px-8 py-10">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-              <div className="flex items-center gap-5">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-blue-500/30 rounded-2xl blur-xl" />
-                  <div className="relative w-16 h-16 bg-blue-500/20 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-blue-400/30">
-                    <BarChart3 className="w-8 h-8 text-blue-300" />
+          <div className="relative px-4 sm:px-6 md:px-8 py-5 md:py-10">
+
+            {/* ── Top row: icon + title / status + actions ── */}
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 md:gap-6">
+
+              {/* Left: icon + title */}
+              <div className="flex items-center gap-3 md:gap-5">
+                <div className="relative shrink-0">
+                  <div className="absolute inset-0 bg-blue-500/30 rounded-xl md:rounded-2xl blur-xl" />
+                  <div className="relative w-12 h-12 md:w-16 md:h-16 bg-blue-500/20 backdrop-blur-xl rounded-xl md:rounded-2xl flex items-center justify-center border border-blue-400/30">
+                    <BarChart3 className="w-6 h-6 md:w-8 md:h-8 text-blue-300" />
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold text-white mb-1 tracking-tight">Dashboard</h1>
-                  <p className="text-blue-200 text-lg">Visão geral do estacionamento</p>
+                  <h1 className="text-2xl md:text-4xl font-bold text-white mb-0.5 tracking-tight">Dashboard</h1>
+                  <p className="text-blue-200 text-sm md:text-lg">Visão geral do estacionamento</p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="text-right mr-2">
-                  <p className="text-xs text-slate-500">Última atualização</p>
-                  <p className="text-sm text-blue-300 tabular-nums font-semibold">
+              {/* Right: status + buttons */}
+              <div className="w-full lg:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-3">
+
+                {/* Status pill */}
+                <div className="flex items-center gap-2 bg-slate-700/40 border border-slate-600/40 rounded-xl px-3 py-2 sm:mr-1">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                  <span className="text-xs text-emerald-400 font-semibold tracking-wide">ONLINE</span>
+                  <span className="text-slate-500 text-xs">·</span>
+                  <p className="text-xs text-blue-300 tabular-nums font-semibold">
                     {now.toLocaleTimeString("pt-BR")}
                   </p>
                 </div>
-                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs text-emerald-400 mr-2">ONLINE</span>
 
-                <button
-                  onClick={handleRefresh}
-                  className="flex items-center gap-2 bg-slate-700/50 hover:bg-slate-700/80 backdrop-blur-xl text-white font-semibold px-5 py-3 rounded-xl transition-all border border-slate-600/50 hover:scale-105"
-                >
-                  <RefreshCw size={18} className={refreshed ? "animate-spin" : ""} />
-                  Atualizar
-                </button>
+                {/* Action buttons — full-width on mobile */}
+                <div className="flex w-full sm:w-auto gap-2">
+                  <button
+                    onClick={handleRefresh}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-700/50 hover:bg-slate-700/80 backdrop-blur-xl text-white font-semibold px-4 py-2.5 rounded-xl transition-all border border-slate-600/50 active:scale-95 hover:scale-105 text-sm"
+                  >
+                    <RefreshCw size={16} className={refreshed ? "animate-spin" : ""} />
+                    <span>Atualizar</span>
+                  </button>
 
-                <button className="flex items-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-5 py-3 rounded-xl transition-all hover:scale-105 shadow-lg shadow-blue-500/30">
-                  <Plus size={18} />
-                  Nova Alocação
-                </button>
+                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 py-2.5 rounded-xl transition-all active:scale-95 hover:scale-105 shadow-lg shadow-blue-500/30 text-sm">
+                    <Plus size={16} />
+                    <span>Nova Alocação</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* KPI row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+            {/* ── KPI row ── */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-5 md:mt-8">
               <KpiCard
                 icon={Car} iconBg="bg-blue-500/20" iconColor="text-blue-300"
                 label="Vagas Ocupadas" value={totalOcupadas}

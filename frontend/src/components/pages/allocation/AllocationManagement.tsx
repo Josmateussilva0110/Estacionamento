@@ -35,6 +35,14 @@ import { type RemoveAllocation } from "../../../types/allocation/removeAllocatio
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
+const initialStats: StatsAllocations = {
+    actives: 0,
+    totalSpots: 0,
+    occupancyRate: 0,
+    availableSpots: 0,
+    totalRevenue: 0,
+}
+
 function AllocationManagement() {
     const navigate = useNavigate()
     const { user } = useUser()
@@ -47,7 +55,8 @@ function AllocationManagement() {
     const limit = 3
     const [allocations, setAllocations] = useState<AllocationDetail[]>([])
     const [showFilters, setShowFilters] = useState(false)
-    const [stats, setStats] = useState<StatsAllocations | null>(null)
+    
+    const [stats, setStats] = useState<StatsAllocations>(initialStats)
 
     const fetchStats = useCallback(async () => {
             const response = await requestData<StatsResponse>(`/allocation/stats/${user?.id}`, "GET", {}, true)
@@ -56,7 +65,7 @@ function AllocationManagement() {
                 setStats(response.data.stats)
             }
             else {
-                setStats(null)
+                setStats(initialStats)
             }
         
     }, [user])
