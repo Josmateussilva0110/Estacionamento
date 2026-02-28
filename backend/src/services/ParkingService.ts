@@ -300,7 +300,7 @@ class ParkingService {
 
     return {
       status: true,
-      data: { parkingId: Number(id) },
+      data: {parkingId: Number(id)},
     }
 
   } catch (error) {

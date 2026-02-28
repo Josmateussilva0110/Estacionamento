@@ -16,7 +16,7 @@ import { ParkingSchema } from "../../../schemas/parkingSchema"
 import { type ParkingFormData } from "../../../types/parking/parkingTypes"
 import { requestData } from "../../../services/requestApi"
 import { type RegisterParkingResponse } from "../../../types/parking/parkingResponses"
-import type { ParkingData } from "../../../types/parking/parkingEditResponse"
+import { type ParkingEdit } from "../../../types/parking/parkingEdit"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import { StepProgress } from "./components/StepProgress"
 import { transformApiToForm, transformFormToApi } from "../../../utils/transformParkingData"
@@ -101,14 +101,15 @@ function ParkingForm({ mode }: ParkingFormProps) {
     if (mode === "edit" && parkingId) {
       async function loadParking() {
         setIsLoading(true)
-        const response = await requestData<ParkingData>(
+        const response = await requestData<ParkingEdit>(
           `/parking/${parkingId}`,
           "GET",
           {},
           true
         )
-        if (response.success && response.data?.parking) {
-          const formData = transformApiToForm(response.data.parking)
+
+        if (response.success && response.data) {
+          const formData = transformApiToForm(response.data)
           reset(formData)
         } else {
           setFlashMessage("error", getApiErrorMessage(response))
@@ -160,7 +161,6 @@ function ParkingForm({ mode }: ParkingFormProps) {
     const method = mode === "edit" ? "PUT" : "POST"
 
     const response = await requestData<RegisterParkingResponse>(endpoint, method, payload, true)
-    console.log(response)
 
     if (response.success && response.data?.parkingId) {
       setFlashMessage(

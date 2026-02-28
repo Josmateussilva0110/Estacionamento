@@ -106,8 +106,6 @@ function ParkingList() {
             true
         )
 
-        console.log('d: ', response)
-
         if (response.success && response.data?.parkingId) {
             setFlashMessage("success", response.message)
 
@@ -408,7 +406,7 @@ function ParkingList() {
                 isOpen={deleteModal.isOpen}
                 onClose={closeDeleteModal}
                 onConfirm={confirmDelete}
-                itemName={deleteModal.parkingName}
+                itemName={`Estacionamento ${deleteModal.parkingName}`}
                 isLoading={isDeleting}
             />
         </div>

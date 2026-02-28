@@ -76,7 +76,7 @@ class ParkingController {
     return response.status(200).json({
       success: true,
       message: "Estacionamento removido com sucesso",
-      data: result.data?.id
+      data: {parkingId: result.data?.id}
     })
   }
 
@@ -95,7 +95,7 @@ class ParkingController {
     }
     return response.status(200).json({
       success: true,
-      parking: result.data
+      data: result.data
     })
   }
 
@@ -126,7 +126,8 @@ class ParkingController {
 
     return response.status(201).json({
       success: true,
-      message: "Estacionamento editado com sucesso"
+      message: "Estacionamento editado com sucesso",
+      data: {parkingId: result.data?.parkingId}
     })
   }
 
@@ -147,7 +148,7 @@ class ParkingController {
 
       return response.status(200).json({
         success: true,
-        parking: result.data
+        data: result.data
       })
   }
 }
