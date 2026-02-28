@@ -35,23 +35,26 @@ app.use(cors({
 
 app.use(express.json())
 
+
+const TIME_IN_SECONDS = 60 * 60 * 24 * 5 // 5 dias 
+const TIME_IN_MS = TIME_IN_SECONDS * 1000 // 5 dias
+
 app.use(
   session({
     store: new PostgresSession({
       pool: pgPool,
       tableName: "session",
       createTableIfMissing: true,
-      ttl: 60 * 60 * 2,
+      ttl: TIME_IN_SECONDS,
       pruneSessionInterval: 60 * 30,
     }),
     secret: process.env.SECRET || "fallback_secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false, 
+      secure: false,
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 2, // 2 horas
-      //maxAge: 1000 * 15, // 15 segundos
+      maxAge: TIME_IN_MS,
     },
   })
 )

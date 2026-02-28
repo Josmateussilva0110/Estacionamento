@@ -12,7 +12,7 @@ import {
   Loader2,
 } from "lucide-react"
 
-import { SummaryCard } from "../../layout/SumaryCard"
+import { SummaryCard } from "../../layout/SummaryCard"
 import { requestData } from "../../../services/requestApi"
 import type { ParkingData } from "../../../types/parking/parkingEditResponse"
 import type { ParkingEdit as ParkingEditType } from "../../../types/parking/parkingEdit"

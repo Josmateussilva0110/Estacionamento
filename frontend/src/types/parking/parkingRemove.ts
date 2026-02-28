@@ -1,3 +1,3 @@
-export interface ParkingRemove {
+export interface ParkingId {
   parkingId: string
 }
