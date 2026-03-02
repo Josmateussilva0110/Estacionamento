@@ -23,7 +23,7 @@ import { type RegisterResponse } from "../../../types/authResponses"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import { useUser } from "../../../context/useUser"
-import { type ClientResponseDetail } from "../../../types/client/clientResponseDetail"
+import { type ClientDetails } from "../../../types/client/clientDetail"
 
 interface RegisterClientProps {
   mode: "create" | "edit"
@@ -62,19 +62,19 @@ function RegisterClient({ mode }: RegisterClientProps) {
       try {
         setIsLoading(true)
 
-        const response = await requestData<ClientResponseDetail>(
+        const response = await requestData<ClientDetails>(
           `/client/${id}`,
           "GET",
           {},
           true
         )
 
-        if (response.success && response.data?.user) {
+        if (response.success && response.data) {
           reset({
-            username: response.data.user.username,
-            cpf: response.data.user.cpf,
-            phone: response.data.user.phone,
-            email: response.data.user.email,
+            username: response.data.username,
+            cpf: response.data.cpf,
+            phone: response.data.phone,
+            email: response.data.email,
           })
         } else {
           setFlashMessage("error", getApiErrorMessage(response))

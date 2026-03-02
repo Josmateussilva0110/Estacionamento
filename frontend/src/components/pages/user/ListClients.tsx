@@ -17,7 +17,7 @@ import ConfirmDeleteModal from "../../layout/DeleteModal"
 import { requestData } from "../../../services/requestApi"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { useUser } from "../../../context/useUser"
-import { type ListPaginationClientsData } from "../../../types/client/listClients"
+import { type PaginatedClientsResult } from "../../../types/client/paginationClients"
 import { type ClientsDetails } from "../../../types/client/clientsDetail"
 import { type RemoveClientResponse } from "../../../types/client/clientResponse" 
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
@@ -42,11 +42,11 @@ function ClientList() {
         if (!user?.id) return
         async function fetchClients() {
             setIsLoading(true)
-            const response = await requestData<ListPaginationClientsData>(`/clients/pagination/${user?.id}`, "GET", {page, limit}, true)
-            console.log(response)
-            if(response.success && response.data?.clients) {
-                setClients(response.data.clients.rows)
-                setTotal(response.data.clients.total)
+            const response = await requestData<PaginatedClientsResult>(`/clients/pagination/${user?.id}`, "GET", {page, limit}, true)
+            //console.log(response)
+            if(response.success && response.data?.rows) {
+                setClients(response.data.rows)
+                setTotal(response.data.total)
             }   
             else {
                 setClients([])
@@ -89,8 +89,8 @@ function ClientList() {
         setIsDeleting(true)
 
         const response = await requestData<RemoveClientResponse>(`/client/${deleteModal.clientId}`, "DELETE", {}, true)
-        if(response.success && response.data?.status) {
-            setFlashMessage("success", response.data.message)
+        if(response.success && response.data?.clientId) {
+            setFlashMessage("success", response.message)
             setClients((prev) => prev.filter((p) => p.id !== deleteModal.clientId))
             setTotal((prev) => Math.max(prev - 1, 0))
             
@@ -124,8 +124,6 @@ function ClientList() {
     function handleRegister() {
         navigate("/client/register")
     }
-
-
 
 
     return (
@@ -367,7 +365,7 @@ function ClientList() {
                 isOpen={deleteModal.isOpen}
                 onClose={closeDeleteModal}
                 onConfirm={confirmDelete}
-                itemName={deleteModal.clientName}
+                itemName={`Cliente ${deleteModal.clientName}`}
                 isLoading={isDeleting}
             />
         </div>

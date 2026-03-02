@@ -15,13 +15,13 @@ class ClientController {
             )
 
             return response.status(httpStatus).json({
-            status: false,
+            success: false,
             message: result.error?.message,
             })
         }
 
         return response.status(201).json({
-            status: true,
+            success: true,
             message: "Cliente cadastrado com sucesso",
             data: result.data,
         })
@@ -38,12 +38,12 @@ class ClientController {
             )
 
             return response.status(httpStatus).json({
-            status: false,
+            success: false,
             message: result.error?.message,
             })
         }
 
-        return response.status(200).json({status: true, clients: result.data})   
+        return response.status(200).json({success: true, data: result.data})   
     }
 
     async getClientAndVehicle(request: Request, response: Response): Promise<Response> {
@@ -56,12 +56,12 @@ class ClientController {
             )
 
             return response.status(httpStatus).json({
-            status: false,
+            success: false,
             message: result.error?.message,
             })
         }
 
-        return response.status(200).json({status: true, clients: result.data})
+        return response.status(200).json({success: true, data: result.data})
     }
 
     async listClients(request: Request, response: Response): Promise<Response> {
@@ -75,14 +75,14 @@ class ClientController {
             userErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
 
         return response.status(200).json({
-            status: true,
-            clients: result.data
+            success: true,
+            data: result.data
         })
     }
 
@@ -96,11 +96,11 @@ class ClientController {
             userErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
-        return response.status(200).json({status: true, message: "Cliente removido com sucesso", clientId: result.data?.client_id})
+        return response.status(200).json({success: true, message: "Cliente removido com sucesso", data: {clientId: result.data?.client_id}})
     }
 
 
@@ -114,11 +114,11 @@ class ClientController {
             userErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
-        return response.status(200).json({status: true, message: "Cliente atualizado com sucesso", client_id: result.data?.client_id})
+        return response.status(200).json({success: true, message: "Cliente atualizado com sucesso", data: {ClientId: result.data?.client_id}})
     }
 
     async getById(request: Request, response: Response): Promise<Response> {
@@ -129,10 +129,10 @@ class ClientController {
             result.error!.code,
             userErrorHttpStatusMap
           )
-          return response.status(httpStatus).json({status: false, message: result.error?.message})
+          return response.status(httpStatus).json({success: false, message: result.error?.message})
         }
     
-        return response.status(200).json({status: true, data: result.data})
+        return response.status(200).json({success: true, data: result.data})
     }
 }
 
