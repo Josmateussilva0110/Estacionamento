@@ -16,7 +16,7 @@ class ClientService {
         cpf: string
         phone: string
         user_id: number
-    }): Promise<ServiceResult<{ id: number; username: string }>> {
+    }): Promise<ServiceResult<{ id: number; username: string }, UserErrorCode>> {
         try {
             const emailExists = await Client.emailExists(data.email)
             if (emailExists) {
@@ -90,7 +90,7 @@ class ClientService {
         }
     } 
 
-    async findClientsByIdUser(user_id: string): Promise<ServiceResult<ClientResponse[]>> {
+    async findClientsByIdUser(user_id: string): Promise<ServiceResult<ClientResponse[], UserErrorCode>> {
         try {
             const clients = await Client.getClientsByUser(user_id)
             if (clients.length === 0) {
@@ -119,7 +119,7 @@ class ClientService {
         }
     }
 
-    async findClientsAndVehicle(user_id: string): Promise<ServiceResult<ClientVehicleResponse[]>> {
+    async findClientsAndVehicle(user_id: string): Promise<ServiceResult<ClientVehicleResponse[], UserErrorCode>> {
         try {
             const clients = await Client.clientAndVehicle(user_id)
             if(clients.length === 0) {
@@ -145,7 +145,7 @@ class ClientService {
         }
     }
 
-    async listClients(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedClientListResult | null>> {
+    async listClients(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedClientListResult | null, UserErrorCode>> {
         try {
             const clients = await Client.list(user_id, page, limit)
             if(clients?.total === 0) {
@@ -172,7 +172,7 @@ class ClientService {
     }
 
 
-    async removeClient(client_id: string): Promise<ServiceResult<{client_id: string }>> {
+    async removeClient(client_id: string): Promise<ServiceResult<{client_id: string }, UserErrorCode>> {
         try {
             const clientExist = await Client.findById(client_id)
             if(!clientExist) {
@@ -207,7 +207,7 @@ class ClientService {
     }
 
 
-    async edit(client_id: string, data: ClientEditDTO): Promise<ServiceResult<{ client_id: string }>> {
+    async edit(client_id: string, data: ClientEditDTO): Promise<ServiceResult<{ client_id: string }, UserErrorCode>> {
         try {
             const clientExist = await Client.findById(client_id)
             if(!clientExist) {
@@ -272,7 +272,7 @@ class ClientService {
         }
     }
 
-    async findById(id: string): Promise<ServiceResult<ClientRow>> {
+    async findById(id: string): Promise<ServiceResult<ClientRow, UserErrorCode>> {
         try {
             const user = await Client.findById(id)
             if (!user) {

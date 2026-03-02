@@ -11,10 +11,10 @@ export function StepSpots({ register, errors, watch, setValue }: FormStepProps<P
   if (!operations || !setValue) return null
 
   const spotTypes = [
-    { label: "Total de vagas",    field: "operations.totalSpots",   icon: Package,      color: "text-blue-400",   iconBg: "bg-blue-500/20 border-blue-400/30" },
-    { label: "Vagas — Carro",     field: "operations.carSpots",     icon: Car,          color: "text-blue-400",   iconBg: "bg-blue-500/20 border-blue-400/30" },
-    { label: "Vagas — Moto",      field: "operations.motoSpots",    icon: Bike,         color: "text-emerald-400",iconBg: "bg-emerald-500/20 border-emerald-400/30" },
-    { label: "Vagas — Caminhonete",field: "operations.truckSpots",  icon: Truck,        color: "text-orange-400", iconBg: "bg-orange-500/20 border-orange-400/30" },
+    { label: "Total de vagas *",    field: "operations.totalSpots",   icon: Package,      color: "text-blue-400",   iconBg: "bg-blue-500/20 border-blue-400/30" },
+    { label: "Vagas — Carro *",     field: "operations.carSpots",     icon: Car,          color: "text-blue-400",   iconBg: "bg-blue-500/20 border-blue-400/30" },
+    { label: "Vagas — Moto *",      field: "operations.motoSpots",    icon: Bike,         color: "text-emerald-400",iconBg: "bg-emerald-500/20 border-emerald-400/30" },
+    { label: "Vagas — Caminhonete *",field: "operations.truckSpots",  icon: Truck,        color: "text-orange-400", iconBg: "bg-orange-500/20 border-orange-400/30" },
     { label: "Vagas — PCD",       field: "operations.pcdSpots",     icon: Accessibility,color: "text-violet-400", iconBg: "bg-violet-500/20 border-violet-400/30" },
     { label: "Vagas — Idoso",     field: "operations.elderlySpots", icon: HeartPulse,   color: "text-pink-400",   iconBg: "bg-pink-500/20 border-pink-400/30" },
   ] as const
