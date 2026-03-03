@@ -14,15 +14,15 @@ class VehicleController {
             )
 
             return response.status(httpStatus).json({
-            status: false,
+            success: false,
             message: result.error?.message,
             })
         }
 
         return response.status(201).json({
-            status: true,
+            success: true,
             message: "Veiculo cadastrado com sucesso",
-            plate: result.data
+            data: result.data
         })
     }
 
@@ -38,11 +38,11 @@ class VehicleController {
             vehicleErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
-        return response.status(200).json({status: true, vehicles: result.data})
+        return response.status(200).json({success: true, data: result.data})
     }
 
 
@@ -55,11 +55,11 @@ class VehicleController {
             vehicleErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
-        return response.status(200).json({status: true, message: "Veículo removido com sucesso", vehicleId: result.data?.vehicle_id})
+        return response.status(200).json({success: true, message: "Veículo removido com sucesso", data: {vehicleId: result.data?.vehicle_id}})
     }
 
 
@@ -71,9 +71,9 @@ class VehicleController {
             result.error!.code,
             vehicleErrorHttpStatusMap
           )
-          return response.status(httpStatus).json({status: false, message: result.error?.message})
+          return response.status(httpStatus).json({success: false, message: result.error?.message})
         }
-        return response.status(200).json({status: true, vehicle: result.data})
+        return response.status(200).json({success: true, data: result.data})
     }
 
     async editVehicle(request: Request, response: Response): Promise<Response> {
@@ -86,11 +86,11 @@ class VehicleController {
             vehicleErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
-        return response.status(200).json({status: true, message: "Veículo atualizado com sucesso", vehicle_id: result.data?.vehicle_id})
+        return response.status(200).json({success: true, message: "Veículo atualizado com sucesso", data: {vehicleId: result.data?.vehicle_id}})
     }
 }
 
