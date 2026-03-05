@@ -18,7 +18,7 @@ export function TestimonialsSection({ sectionRef, inView }: ModelSectionProps) {
             Quem usa, aprova
           </h2>
           <p className="text-slate-400 max-w-xl mx-auto">
-            Veja o que nossos clientes dizem depois de adotar o Estacionamento.
+            Veja o que nossos clientes dizem depois de adotar o ParkFlow.
           </p>
         </div>
 

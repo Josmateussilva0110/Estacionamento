@@ -64,7 +64,7 @@ function LoginUser() {
               </div>
 
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2 text-center tracking-tight">
-                Sistema de Estacionamento
+                ParkFlow
               </h1>
               <p className="text-blue-200 text-sm sm:text-base text-center">
                 Faça seu login para continuar

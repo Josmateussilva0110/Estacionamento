@@ -74,7 +74,7 @@ function NavBar() {
               </div>
 
               <span className="text-lg font-semibold text-white">
-                Estacionamento
+                ParkFlow
               </span>
             </Link>
 

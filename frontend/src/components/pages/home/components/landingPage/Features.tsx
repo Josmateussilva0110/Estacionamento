@@ -20,7 +20,7 @@ export function FeaturesSection({ sectionRef, inView }: ModelSectionProps) {
             Tudo que você precisa<br />em um só lugar
           </h2>
           <p className="text-lg text-slate-400 max-w-xl mx-auto">
-            Do cadastro de clientes ao fechamento do caixa, o Estacionamento cobre todas as etapas da operação.
+            Do cadastro de clientes ao fechamento do caixa, o ParkFlow cobre todas as etapas da operação.
           </p>
         </div>
 
