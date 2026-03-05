@@ -18,10 +18,10 @@ import { useNavigate } from "react-router-dom"
 
 import ConfirmDeleteModal from "../../layout/DeleteModal"
 import { requestData } from "../../../services/requestApi"
-import { useUser } from "../../../context/useUser"
-import { type ListPaginationVehiclesData } from "../../../types/vehicle/listVehicles" 
+import { useUser } from "../../../context/useUser" 
 import { type VehiclesDetails } from "../../../types/vehicle/vehiclesDetail"
-import { type RemoveVehicleResponse } from "../../../types/client/clientResponse"
+import { type PaginatedVehiclesResult } from "../../../types/vehicle/paginationVehicles"
+import { type VehicleId } from "../../../types/vehicle/vehicleId"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 import Pagination from "../../layout/Pagination"
@@ -44,13 +44,12 @@ function VehicleList() {
 
     useEffect(() => {
         if (!user?.id) return
-        async function fetchClients() {
+        async function fetchVehicles() {
             setIsLoading(true)
-            const response = await requestData<ListPaginationVehiclesData>(`/vehicles/pagination/${user?.id}`, "GET", {page, limit}, true)
-            console.log(response)
-            if(response.success && response.data?.vehicles) {
-                setVehicles(response.data.vehicles.rows)
-                setTotal(response.data.vehicles.total)
+            const response = await requestData<PaginatedVehiclesResult>(`/vehicles/pagination/${user?.id}`, "GET", {page, limit}, true)
+            if(response.success && response.data?.rows) {
+                setVehicles(response.data.rows)
+                setTotal(response.data.total)
             }   
             else {
                 setVehicles([])
@@ -58,7 +57,7 @@ function VehicleList() {
             }
             setIsLoading(false)
         }
-        fetchClients()
+        fetchVehicles()
     }, [user?.id, page, limit])
 
     const [deleteModal, setDeleteModal] = useState<{
@@ -92,9 +91,9 @@ function VehicleList() {
 
         setIsDeleting(true)
 
-        const response = await requestData<RemoveVehicleResponse>(`/vehicle/${deleteModal.vehicleId}`, "DELETE", {}, true)
-        if(response.success && response.data?.status) {
-            setFlashMessage("success", response.data.message)
+        const response = await requestData<VehicleId>(`/vehicle/${deleteModal.vehicleId}`, "DELETE", {}, true)
+        if(response.success && response.data?.vehicleId) {
+            setFlashMessage("success", response.message)
             setVehicles((prev) => prev.filter((p) => p.id !== deleteModal.vehicleId))
             setTotal((prev) => Math.max(prev - 1, 0))
             
@@ -477,7 +476,7 @@ function VehicleList() {
                 isOpen={deleteModal.isOpen}
                 onClose={closeDeleteModal}
                 onConfirm={confirmDelete}
-                itemName={deleteModal.plate}
+                itemName={`Veículo ${deleteModal.plate}`}
                 isLoading={isDeleting}
             />
         </div>

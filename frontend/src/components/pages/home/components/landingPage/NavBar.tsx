@@ -33,7 +33,7 @@ export function NavBar() {
           <div className="w-9 h-9 bg-blue-500/20 rounded-xl flex items-center justify-center border border-blue-400/30">
             <ParkingCircle className="w-5 h-5 text-blue-300" />
           </div>
-          <span className="text-xl font-bold text-white tracking-tight">Estacionamento</span>
+          <span className="text-xl font-bold text-white tracking-tight">ParkFlow</span>
         </div>
 
         {/* Desktop Links */}

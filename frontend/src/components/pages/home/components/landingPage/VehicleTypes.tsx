@@ -22,7 +22,7 @@ export function VehicleTypesSection({ sectionRef, inView }: ModelSectionProps) {
               Suporte a todos os<br />tipos de veículo
             </h2>
             <p className="text-slate-400 leading-relaxed mb-8">
-              O Estacionamento identifica e classifica automaticamente cada tipo de veículo, 
+              O ParkFlow identifica e classifica automaticamente cada tipo de veículo, 
               aplicando a tarifa correta e controlando vagas especiais como PCD e idosos.
             </p>
             <ul className="space-y-3">

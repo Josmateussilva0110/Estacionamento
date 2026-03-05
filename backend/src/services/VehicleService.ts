@@ -12,7 +12,7 @@ class ClientService {
         color: string
         vehicle_type: number
         client_id: string
-    }): Promise<ServiceResult<{ id: number; plate: string }>> {
+    }): Promise<ServiceResult<{ vehicleId: number }, VehicleErrorCode>> {
         try {
             const plateExists = await Vehicle.plateExists(data.plate)
             if (plateExists) {
@@ -37,8 +37,7 @@ class ClientService {
             }
 
             return { status: true, data: {
-                id: success,
-                plate: data.plate
+                vehicleId: success
             }}
         } catch (error) {
             console.error("ClientService.registerVehicle error:", error)
@@ -54,7 +53,7 @@ class ClientService {
     } 
 
 
-    async listVehicles(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedVehicleListResult | null>> {
+    async listVehicles(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedVehicleListResult | null, VehicleErrorCode>> {
         try {
             const result = await Vehicle.listPagination(user_id, page, limit)
             if(result?.total === 0) {
@@ -80,7 +79,7 @@ class ClientService {
         }
     }
 
-    async removeVehicle(vehicle_id: string): Promise<ServiceResult<{vehicle_id: string }>> {
+    async removeVehicle(vehicle_id: string): Promise<ServiceResult<{vehicle_id: string }, VehicleErrorCode>> {
         try {
             const vehicleExist = await Vehicle.findById(vehicle_id)
             if(!vehicleExist) {
@@ -115,7 +114,7 @@ class ClientService {
     }
 
 
-    async vehicleDetail(vehicle_id: string): Promise<ServiceResult<VehicleEditDTO>> {
+    async vehicleDetail(vehicle_id: string): Promise<ServiceResult<VehicleEditDTO, VehicleErrorCode>> {
         try {
             const vehicle = await Vehicle.vehicleDetail(vehicle_id)
             if(!vehicle) {
@@ -141,7 +140,7 @@ class ClientService {
         }
     }
 
-    async editVehicle(vehicle_id: string, data: VehicleEditDTO): Promise<ServiceResult<{ vehicle_id: string }>> {
+    async editVehicle(vehicle_id: string, data: VehicleEditDTO): Promise<ServiceResult<{ vehicle_id: string }, VehicleErrorCode>> {
         try {
             const vehicleExist = await Vehicle.findById(vehicle_id)
             if(!vehicleExist) {

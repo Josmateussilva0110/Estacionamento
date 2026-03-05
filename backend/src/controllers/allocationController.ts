@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import AllocationService from "../services/AllocationService"
 import { allocationErrorHttpStatusMap } from "../errors/allocationErrorHttpMapper" 
+import { SpotServiceErrorHttpStatusMap } from "../errors/allocationParkingErrorMapper"
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
 class AllocationController {
@@ -10,16 +11,16 @@ class AllocationController {
         if (!result.status) {
             const httpStatus = getHttpStatusFromError(
             result.error!.code,
-            allocationErrorHttpStatusMap
+            SpotServiceErrorHttpStatusMap
             )
 
             return response.status(httpStatus).json({
-            status: false,
+            success: false,
             message: result.error?.message,
             })
         }
 
-        return response.status(200).json({status: true, spots: result.data})   
+        return response.status(200).json({success: true, data: result.data})   
     }
 
     async allocation(request: Request, response: Response): Promise<Response> {

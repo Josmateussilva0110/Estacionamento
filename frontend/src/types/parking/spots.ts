@@ -1,6 +1,5 @@
 export interface Spots {
-    parking_id: string
-    totalSpots: number
+    parking_id: number
     carSpots: number
     motoSpots: number
     truckSpots: number

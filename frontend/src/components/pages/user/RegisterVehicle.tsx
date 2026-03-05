@@ -15,13 +15,13 @@ import { VEHICLE_TYPE_LABEL } from "../../../utils/mapVehicleType"
 import { RegisterVehicleSchema } from "../../../schemas/VehicleSchema"
 import { type RegisterVehicleFormData } from "../../../types/client/ClientTypes"
 import { type ClientDetails } from "../../../types/client/clientDetail"
-import { type ListClientsData } from "../../../types/client/listClientsData"
+import { type VehicleDetail } from "../../../types/vehicle/vehicleDetail"
+import { type VehicleId } from "../../../types/vehicle/vehicleId" 
 import { requestData } from "../../../services/requestApi"
 import { useUser } from "../../../context/useUser"
 import useFlashMessage from "../../../hooks/useFlashMessage"
-import { type RegisterVehicleResponse } from "../../../types/client/clientResponse"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
-import { type VehicleResponseDetail } from "../../../types/vehicle/vehicleResponseDetail"
+
 
 interface RegisterVehicleProps {
   mode: "create" | "edit"
@@ -64,14 +64,15 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
     }
 
     async function fetchClients() {
-      const response = await requestData<ListClientsData>(
+      const response = await requestData<ClientDetails[]>(
         `/clients/${user?.id}`,
         "GET",
         {},
         true,
       )
-      if (response.success && response.data?.clients) {
-        setClients(response.data.clients)
+
+      if (response.success && response.data) {
+        setClients(response.data)
       } else {
         setClients([])
       }
@@ -96,20 +97,20 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
       try {
         setIsLoading(true)
 
-        const response = await requestData<VehicleResponseDetail>(
+        const response = await requestData<VehicleDetail>(
           `/vehicle/${id}`,
           "GET",
           {},
           true,
         )
 
-        if (response.success && response.data?.vehicle) {
+        if (response.success && response.data) {
           reset({
-            plate: response.data.vehicle.plate,
-            brand: response.data.vehicle.brand,
-            color: response.data.vehicle.color,
-            vehicle_type: response.data.vehicle.vehicleType,
-            client_id: response.data.vehicle.clientId,
+            plate: response.data.plate,
+            brand: response.data.brand,
+            color: response.data.color,
+            vehicle_type: response.data.vehicleType,
+            client_id: response.data.clientId,
           })
         } else {
           setFlashMessage("error", getApiErrorMessage(response))
@@ -128,17 +129,17 @@ function RegisterVehicle({ mode }: RegisterVehicleProps) {
 
     const method = isEditMode ? "PUT" : "POST"
 
-    const response = await requestData<RegisterVehicleResponse>(
+    const response = await requestData<VehicleId>(
       endpoint,
       method,
       data,
       true,
     )
 
-    if (response.success && response.data) {
+    if (response.success && response.data?.vehicleId) {
       setFlashMessage(
         "success",
-        isEditMode ? "Veículo atualizado com sucesso" : response.data.message,
+        isEditMode ? "Veículo atualizado com sucesso" : response.message,
       )
       navigate("/vehicle/list/vehicles")
     } else {
