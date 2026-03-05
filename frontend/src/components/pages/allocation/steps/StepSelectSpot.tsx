@@ -13,7 +13,6 @@ import { useUser } from "../../../../context/useUser"
 import { requestData } from "../../../../services/requestApi"
 import useFlashMessage from "../../../../hooks/useFlashMessage"
 import { type Spots } from "../../../../types/parking/spots"
-import { type ListSpotsData } from "../../../../types/parking/spotsList"
 import { type Parking } from "../../../../types/parking/parking"
 import { type ListParkingsData } from "../../../../types/parking/listParkingData"
 import { SearchSelect } from "../../../ui/SelectSearch"
@@ -62,10 +61,10 @@ function SelectSpotStep({
     
     async function fetchParkingSpots() {
       setIsLoadingSpots(true)
-      const response = await requestData<ListSpotsData>(`/allocation/spots/${user?.id}`, "GET", {}, true)
+      const response = await requestData<Spots[]>(`/allocation/spots/${user?.id}`, "GET", {}, true)
       
-      if (response.success && response.data?.spots && response.data.spots.length > 0) {
-        setSpotsData(response.data.spots[0])
+      if (response.success && response.data) {
+        setSpotsData(response.data[0])
       } else {
         setSpotsData(null)
         setFlashMessage("warning", "Nenhuma vaga disponível no momento")

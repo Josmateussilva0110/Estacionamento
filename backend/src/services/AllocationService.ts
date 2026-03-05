@@ -13,11 +13,11 @@ import { calculateMonthlyStayValue } from "../utils/calculateMonthCost"
 import { parseOpeningHours } from "../utils/parseOpeningHours"
 import { calculateAllocationValue } from "../utils/calculatePrices"
 import { type StatsAllocationCost } from "../types/allocation/allocationStatsWithCost"
-
+import { type SpotServiceError } from "../types/allocation/SpotsService"
 
 class AllocationService {
 
-    async findSpots(user_id: string): Promise<ServiceResult<SpotResponse[]>> {
+    async findSpots(user_id: string): Promise<ServiceResult<SpotResponse[], SpotServiceError>> {
         try {
             const parking = await Parking.findById(user_id, "created_by")
             if (!parking || !parking.id) {

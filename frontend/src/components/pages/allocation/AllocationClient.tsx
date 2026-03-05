@@ -11,7 +11,6 @@ import { useUser } from "../../../context/useUser"
 import { type ClientVehicle } from "../../../types/client/clientVehicle"
 import { requestData } from "../../../services/requestApi"
 import useFlashMessage from "../../../hooks/useFlashMessage"
-import { type ListClientsVehicleData } from "../../../types/client/listClientVehicle"
 import { mapVehicleTypeToApi } from "../allocation/utils/vehicleUtils"
 import { type SelectedSpotInfo } from "./types/selectedSpot"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
@@ -35,11 +34,11 @@ function ParkingAllocation() {
     }
     async function fetchClientVehicle() {
       setIsLoading(true)
-      const response = await requestData<ListClientsVehicleData>(`/clients/vehicle/${user?.id}`, "GET", {}, true)
+      const response = await requestData<ClientVehicle[]>(`/clients/vehicle/${user?.id}`, "GET", {}, true)
       console.log(response)
 
-      if (response.success && response.data?.clients) {
-        setClients(response.data.clients)
+      if (response.success && response.data) {
+        setClients(response.data)
       }
       else {
         setClients([])

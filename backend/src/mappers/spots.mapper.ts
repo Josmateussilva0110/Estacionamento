@@ -2,7 +2,6 @@ import { type SpotsRow } from "../types/allocation/spots"
 
 export interface SpotResponse {
     parking_id?: number
-    totalSpots: number
     carSpots: number
     motoSpots: number
     truckSpots: number
@@ -12,12 +11,11 @@ export interface SpotResponse {
 
 export function mapSpotsList(rows: SpotsRow[]): SpotResponse[] {
     return rows.map((row) => ({
-        parking_id: row.parking_id,
-        totalSpots: row.total_spots,
-        carSpots: row.car_spots,
-        motoSpots: row.moto_spots,
-        truckSpots: row.truck_spots,
-        pcdSpots: row.pcd_spots,
-        elderlySpots: row.elderly_spots
+        parking_id: Number(row.parking_id),
+        carSpots: Number(row.car_spots),
+        motoSpots: Number(row.moto_spots),
+        truckSpots: Number(row.truck_spots),
+        pcdSpots: Number(row.pcd_spots),
+        elderlySpots: Number(row.elderly_spots),
     }))
 }
