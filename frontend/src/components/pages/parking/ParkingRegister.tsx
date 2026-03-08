@@ -50,10 +50,10 @@ export const defaultValues: ParkingFormData = {
   operations: {
     totalSpots: 0,
     carSpots: 0,
-    motoSpots: "",
-    truckSpots: "",
-    pcdSpots: "",
-    elderlySpots: "",
+    motoSpots: 0,
+    truckSpots: 0,
+    pcdSpots: 0,
+    elderlySpots: 0,
     hasCameras: false,
     hasWashing: false,
     areaType: "coberta",
@@ -61,13 +61,13 @@ export const defaultValues: ParkingFormData = {
   prices: {
     priceHour: 0,
     priceExtraHour: 0,
-    dailyRate: "",
-    nightPeriod: { start: "", end: "" },
-    nightRate: "",
-    monthlyRate: "",
-    carPrice: "",
-    motoPrice: "",
-    truckPrice: "",
+    dailyRate: undefined,
+    nightPeriod: undefined,
+    nightRate: 0,
+    monthlyRate: undefined,
+    carPrice: undefined,
+    motoPrice: undefined,
+    truckPrice: undefined,
   },
 }
 
@@ -159,8 +159,10 @@ function ParkingForm({ mode }: ParkingFormProps) {
     const payload = transformFormToApi(data)
     const endpoint = mode === "edit" ? `/parking/${parkingId}` : "/parking/register"
     const method = mode === "edit" ? "PUT" : "POST"
+    console.log(payload)
 
     const response = await requestData<RegisterParkingResponse>(endpoint, method, payload, true)
+    console.log(response)
 
     if (response.success && response.data?.parkingId) {
       setFlashMessage(

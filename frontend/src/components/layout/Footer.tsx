@@ -12,7 +12,7 @@ function Footer() {
           
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <Image src={Logo} height={50} scale={2} />
+            <Image src={Logo} height={48} scale={2} />
           </div>
 
           {/* Copyright */}

@@ -25,7 +25,7 @@ export function StepPrices({ register, errors, control }: FormStepProps<ParkingF
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
-            label="Valor hora"
+            label="Valor hora *"
             type="number"
             step="0.01"
             placeholder="0,00"
@@ -34,7 +34,7 @@ export function StepPrices({ register, errors, control }: FormStepProps<ParkingF
             error={errors.prices?.priceHour?.message}
           />
           <Input
-            label="Hora adicional"
+            label="Hora adicional *"
             type="number"
             step="0.01"
             placeholder="0,00"
@@ -43,7 +43,7 @@ export function StepPrices({ register, errors, control }: FormStepProps<ParkingF
             error={errors.prices?.priceExtraHour?.message}
           />
           <Input
-            label="Diária"
+            label="Diária *"
             type="number"
             step="0.01"
             placeholder="0,00"
@@ -52,7 +52,7 @@ export function StepPrices({ register, errors, control }: FormStepProps<ParkingF
             error={errors.prices?.dailyRate?.message}
           />
           <Input
-            label="Mensalidade"
+            label="Mensalidade *"
             type="number"
             step="0.01"
             placeholder="0,00"
@@ -98,7 +98,7 @@ export function StepPrices({ register, errors, control }: FormStepProps<ParkingF
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Input
-            label="Valor carro"
+            label="Valor carro *"
             type="number"
             step="0.01"
             placeholder="0,00"
@@ -107,7 +107,7 @@ export function StepPrices({ register, errors, control }: FormStepProps<ParkingF
             error={errors.prices?.carPrice?.message}
           />
           <Input
-            label="Valor moto"
+            label="Valor moto *"
             type="number"
             step="0.01"
             placeholder="0,00"
@@ -116,7 +116,7 @@ export function StepPrices({ register, errors, control }: FormStepProps<ParkingF
             error={errors.prices?.motoPrice?.message}
           />
           <Input
-            label="Valor caminhonete"
+            label="Valor caminhonete *"
             type="number"
             step="0.01"
             placeholder="0,00"
