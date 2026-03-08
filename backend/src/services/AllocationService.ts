@@ -65,7 +65,7 @@ class AllocationService {
         payment_type: string,
         entry_date: string,
         observations: string
-    }): Promise<ServiceResult<{ id: number}>> {
+    }): Promise<ServiceResult<{ id: number}, AllocationErrorCode>> {
         try {
             const vehicleExist = await Allocation.vehicleExists(data.vehicle_id)
             if(vehicleExist) {
@@ -105,7 +105,7 @@ class AllocationService {
         }
     }
 
-    async getAllocations(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedAllocationsServiceResult | null>> {
+    async getAllocations(user_id: string, page: number, limit: number): Promise<ServiceResult<PaginatedAllocationsServiceResult | null, AllocationErrorCode>> {
         try {
             const result = await Allocation.getAllocationByUser(user_id, page, limit)
             if(!result || result.total === 0) {
@@ -191,7 +191,7 @@ class AllocationService {
         }
     }
 
-    async allocationStats(user_id: string): Promise<ServiceResult<StatsAllocationCost>> {
+    async allocationStats(user_id: string): Promise<ServiceResult<StatsAllocationCost, AllocationErrorCode>> {
       try {
         const statsAllocations = await Allocation.getStats(user_id)
         const allocationData = await Allocation.getAllocationData(user_id)
@@ -226,7 +226,7 @@ class AllocationService {
       }
     }
 
-    async removeAllocation(allocation_id: string): Promise<ServiceResult<{allocation_id: string}>> {
+    async removeAllocation(allocation_id: string): Promise<ServiceResult<{allocation_id: string}, AllocationErrorCode>> {
         try {
             const allocationId = await Allocation.delete(allocation_id)
             if(!allocationId) {

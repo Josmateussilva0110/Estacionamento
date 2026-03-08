@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import {
   Car,
   Activity,
@@ -23,6 +24,7 @@ import { StatsOverview } from "./components/dashboard/StatsOverview"
 export default function ParkingHome() {
   const [now, setNow] = useState<Date>(new Date())
   const [refreshed, setRefreshed] = useState<boolean>(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000)
@@ -32,6 +34,10 @@ export default function ParkingHome() {
   function handleRefresh(): void {
     setRefreshed(true)
     setTimeout(() => setRefreshed(false), 1000)
+  }
+
+  function handleRegister() {
+        navigate("/parking/allocation")
   }
 
   const totalVagas = 200
@@ -90,7 +96,7 @@ export default function ParkingHome() {
                     <span>Atualizar</span>
                   </button>
 
-                  <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 py-2.5 rounded-xl transition-all active:scale-95 hover:scale-105 shadow-lg shadow-blue-500/30 text-sm">
+                  <button onClick={() => handleRegister() } className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 py-2.5 rounded-xl transition-all active:scale-95 hover:scale-105 shadow-lg shadow-blue-500/30 text-sm">
                     <Plus size={16} />
                     <span>Nova Alocação</span>
                   </button>
