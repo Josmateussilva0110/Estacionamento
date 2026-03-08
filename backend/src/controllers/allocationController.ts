@@ -27,10 +27,10 @@ class AllocationController {
         const result = await AllocationService.allocation(request.body)
         if(!result.status) {
             const httpStatus = getHttpStatusFromError(result.error!.code, allocationErrorHttpStatusMap)
-            return response.status(httpStatus).json({status: false, message: result.error?.message})
+            return response.status(httpStatus).json({success: false, message: result.error?.message})
         }
 
-        return response.status(201).json({status: true, allocation_id: result.data, message: "Alocação cadastrada com sucesso",})
+        return response.status(201).json({success: true, data: {allocationId: result.data?.id}, message: "Alocação cadastrada com sucesso"})
     }
 
     async listAllocations(request: Request, response: Response): Promise<Response> {
@@ -44,11 +44,11 @@ class AllocationController {
             allocationErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
-        return response.status(200).json({status: true, allocations: result.data})
+        return response.status(200).json({success: true, data: result.data})
     }
 
     async getStats(request: Request, response: Response) {
@@ -60,12 +60,12 @@ class AllocationController {
             allocationErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
 
-        return response.status(200).json({status: true, stats: result.data})
+        return response.status(200).json({success: true, data: result.data})
     }
 
     async removeAllocation(request: Request, response: Response) {
@@ -77,12 +77,12 @@ class AllocationController {
             allocationErrorHttpStatusMap
             )
             return response.status(httpStatus).json({
-                status: false,
+                success: false,
                 message: result.error?.message,
             })
         }
 
-        return response.status(200).json({status: true, message: "Alocação removido com sucesso", allocationId: result.data?.allocation_id})
+        return response.status(200).json({success: true, message: "Alocação removido com sucesso", data: {allocationId: result.data?.allocation_id}})
     }
 }
 

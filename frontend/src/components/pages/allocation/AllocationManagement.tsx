@@ -23,15 +23,14 @@ import {
 import { useUser } from "../../../context/useUser"
 import { requestData } from "../../../services/requestApi"
 import { type AllocationDetail } from "../../../types/allocation/allocationDetail"
-import { type ListPaginationAllocationData } from "../../../types/allocation/listAllocations"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import Pagination from "../../layout/Pagination"
 import { formatDateTime, formatMinutesToDaysHHMM, formatPhone, } from "../../../utils/formations"
 import { formatPayment } from "../../../utils/formations"
 import { type StatsAllocations } from "../../../types/allocation/statsAllocation"
-import { type StatsResponse } from "../../../types/allocation/statsResponse"
 import EndAllocationModal from "../../layout/EndAllocationModal"
 import { type RemoveAllocation } from "../../../types/allocation/removeAllocation"
+import { type PaginationAllocations } from "../../../types/allocation/paginationAllocation"
 import { getApiErrorMessage } from "../../../utils/getApiErrorMessage"
 
 
@@ -59,10 +58,9 @@ function AllocationManagement() {
     const [stats, setStats] = useState<StatsAllocations>(initialStats)
 
     const fetchStats = useCallback(async () => {
-            const response = await requestData<StatsResponse>(`/allocation/stats/${user?.id}`, "GET", {}, true)
-            //console.log(response)
-            if(response.success && response.data?.stats) {
-                setStats(response.data.stats)
+            const response = await requestData<StatsAllocations>(`/allocation/stats/${user?.id}`, "GET", {}, true)
+            if(response.success && response.data) {
+                setStats(response.data)
             }
             else {
                 setStats(initialStats)
@@ -75,18 +73,16 @@ function AllocationManagement() {
 
         setIsLoading(true)
 
-        const response = await requestData<ListPaginationAllocationData>(
+        const response = await requestData<PaginationAllocations>(
             `/allocations/pagination/${user.id}`,
             "GET",
             { page, limit },
             true
         )
 
-        //console.log(response)
-
-        if (response.success && response.data?.allocations) {
-            setAllocations(response.data.allocations.rows)
-            setTotal(response.data.allocations.total)
+        if (response.success && response.data) {
+            setAllocations(response.data.rows)
+            setTotal(response.data.total)
         } else {
             setAllocations([])
             setTotal(0)

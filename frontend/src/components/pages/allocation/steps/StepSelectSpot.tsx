@@ -14,7 +14,6 @@ import { requestData } from "../../../../services/requestApi"
 import useFlashMessage from "../../../../hooks/useFlashMessage"
 import { type Spots } from "../../../../types/parking/spots"
 import { type Parking } from "../../../../types/parking/parking"
-import { type ListParkingsData } from "../../../../types/parking/listParkingData"
 import { SearchSelect } from "../../../ui/SelectSearch"
 import { type SelectedSpotInfo } from "../types/selectedSpot"
 import PaymentTypeSelector from "./components/PaymentTypeSelector"
@@ -84,10 +83,10 @@ function SelectSpotStep({
     
     async function fetchParking() {
       setIsLoadingParkings(true)
-      const response = await requestData<ListParkingsData>(`/parking/names/${user?.id}`, "GET", {}, true)
+      const response = await requestData<Parking[]>(`/parking/names/${user?.id}`, "GET", {}, true)
       
-      if (response.success && response.data?.parking) {
-        setParkings(response.data.parking)
+      if (response.success && response.data) {
+        setParkings(response.data)
       } else {
         setParkings([])
       }

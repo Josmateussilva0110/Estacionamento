@@ -35,7 +35,6 @@ function ParkingAllocation() {
     async function fetchClientVehicle() {
       setIsLoading(true)
       const response = await requestData<ClientVehicle[]>(`/clients/vehicle/${user?.id}`, "GET", {}, true)
-      console.log(response)
 
       if (response.success && response.data) {
         setClients(response.data)
@@ -101,12 +100,11 @@ function ParkingAllocation() {
     }
 
 
-    console.log(payload)
+    //console.log(payload)
 
     const response = await requestData<RegisterAllocationResponse>("/allocation", "POST", payload, true)
-    //console.log(response)
-    if(response.success && response.data?.status) {
-      setFlashMessage("success", response.data.message)
+    if(response.success && response.data?.allocationId) {
+      setFlashMessage("success", response.message)
       navigate('/parking/management')
     }
     else {
@@ -129,7 +127,7 @@ function ParkingAllocation() {
 
   return (
       <div className="max-w-7xl mx-auto">
-        <Header onBack={() => navigate("/")} />
+        <Header onBack={() => navigate("/parking/management")} />
 
         <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden mb-6">
           <ProgressSteps 

@@ -1,3 +1,3 @@
-import type { ApiPayload } from "../api"
+import { type AllocationId } from "./AllocationId"
 
-export type RegisterAllocationResponse = ApiPayload
+export type RegisterAllocationResponse = AllocationId
