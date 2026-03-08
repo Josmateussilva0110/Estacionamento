@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { Menu as MenuIcon, X, Calendar } from "lucide-react"
+import { Menu as MenuIcon, X } from "lucide-react"
 import { useUser } from "../../../context/useUser"
 import { requestData } from "../../../services/requestApi"
 import useFlashMessage from "../../../hooks/useFlashMessage"
 import type { User } from "../../../types/client/user"
+import Logo from "../../../assets/logo.png" 
+import { Image } from "../../ui/Image"
 
 import { DesktopUserMenu } from "./DesktopUserMenu"
 import { MobileDrawerMenu } from "./MobileDrawerMenu"
@@ -67,15 +69,8 @@ function NavBar() {
               className="flex items-center gap-3 group"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-blue-500/30 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity" />
-                <div className="relative bg-linear-to-br from-blue-600 to-blue-700 p-2.5 rounded-xl shadow-md group-hover:shadow-lg group-hover:scale-105 transition border border-blue-400/30">
-                  <Calendar className="w-5 h-5 text-white" strokeWidth={2.5} />
-                </div>
+                <Image src={Logo} height={70} scale={2} />
               </div>
-
-              <span className="text-lg font-semibold text-white">
-                ParkFlow
-              </span>
             </Link>
 
             {/* Mobile Toggle */}
