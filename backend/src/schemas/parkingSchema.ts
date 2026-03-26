@@ -48,7 +48,7 @@ export const ParkingRegisterSchema = z.object({
         message: "WhatsApp deve conter 11 dígitos (DDD + número)",
       }),
 
-    email: z.string().email("Email inválido"),
+    email: z.email("Email inválido"),
 
     openingHours: HoursSchema,
   }),
