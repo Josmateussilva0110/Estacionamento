@@ -71,9 +71,5 @@ export function transformApiToForm(apiData: ParkingEdit): ParkingFormData {
 export function transformFormToApi(formData: ParkingFormData): any {
   return {
     ...formData,
-    operations: {
-      ...formData.operations,
-      areaType: mapAreaTypeToNumber(formData.operations.areaType),
-    },
   }
 }

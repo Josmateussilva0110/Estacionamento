@@ -1,128 +1,151 @@
 import { z } from "zod"
 import { HoursSchema } from "./hourSchema"
 
+const numberRequired = (label: string) =>
+  z.coerce
+    .number({ message: `Informe ${label}` })
+    .nonnegative(`${label} deve ser zero ou maior`)
+
+const numberOptional = z
+  .union([z.literal(""), z.coerce.number().nonnegative()])
+  .optional()
+
 export const ParkingRegisterSchema = z.object({
-    parkingName: z.string().min(3, "Nome do estacionamento deve ter mais de 3 caracteres"),
-    managerName: z.string().min(3, "Nome do responsável deve ter mais de 3 caracteres"),
 
-    address: z.object({
-        street: z.string().min(1, "Rua é obrigatória"),
-        number: z.string().min(1, "Número é obrigatório"),
-        district: z.string().min(1, "Bairro é obrigatório"),
-        city: z.string().min(1, "Cidade é obrigatória"),
-        state: z.string().length(2, "Estado deve ter 2 caracteres"),
-        zipCode: z
-            .string()
-            .transform(value => value.replace(/\D/g, ""))
-            .refine(value => value.length === 8, {
-                message: "CEP deve conter exatamente 8 dígitos",
-            }),
-        complement: z.string().optional(),
+  parkingName: z.string().min(3, "Nome do estacionamento deve ter mais de 3 caracteres"),
+
+  managerName: z.string().min(3, "Nome do responsável deve ter mais de 3 caracteres"),
+
+  address: z.object({
+    street: z.string().min(1, "Rua é obrigatória"),
+    number: z.string().min(1, "Número é obrigatório"),
+    district: z.string().min(1, "Bairro é obrigatório"),
+    city: z.string().min(1, "Cidade é obrigatória"),
+    state: z.string().length(2, "Estado deve ter 2 caracteres"),
+
+    zipCode: z
+      .string()
+      .transform(value => value.replace(/\D/g, ""))
+      .refine(value => value.length === 8, {
+        message: "CEP deve conter exatamente 8 dígitos",
+      }),
+
+    complement: z.string().optional(),
+  }),
+
+  contacts: z.object({
+    phone: z
+      .string()
+      .transform(value => value.replace(/\D/g, ""))
+      .refine(value => value.length >= 10 && value.length <= 11, {
+        message: "Telefone deve conter 10 ou 11 dígitos",
+      }),
+
+    whatsapp: z
+      .string()
+      .transform(value => value.replace(/\D/g, ""))
+      .refine(value => value.length === 11, {
+        message: "WhatsApp deve conter 11 dígitos (DDD + número)",
+      }),
+
+    email: z.email("Email inválido"),
+
+    openingHours: HoursSchema,
+  }),
+
+  operations: z
+    .object({
+
+      totalSpots: z
+        .coerce
+        .number()
+        .int("Total de vagas deve ser inteiro")
+        .positive("Total de vagas deve ser maior que zero"),
+
+      carSpots: numberRequired("vagas de carro"),
+
+      motoSpots: numberOptional,
+
+      truckSpots: numberOptional,
+
+      pcdSpots: numberOptional,
+
+      elderlySpots: numberOptional,
+
+      hasCameras: z.boolean(),
+
+      hasWashing: z.boolean(),
+
+      areaType: z.enum(["coberta", "descoberta", "mista"]),
+    })
+    .refine((data) => {
+
+      const moto = Number(data.motoSpots || 0)
+      const truck = Number(data.truckSpots || 0)
+      const pcd = Number(data.pcdSpots || 0)
+      const elderly = Number(data.elderlySpots || 0)
+
+      return (
+        data.carSpots +
+        moto +
+        truck +
+        pcd +
+        elderly ===
+        data.totalSpots
+      )
+    }, {
+      message: "A soma das vagas deve ser igual ao total de vagas",
+      path: ["totalSpots"],
     }),
 
-    contacts: z.object({
-        phone: z
-            .string()
-            .transform(value => value.replace(/\D/g, ""))
-            .refine(value => value.length >= 10 && value.length <= 11, {
-                message: "Telefone deve conter 10 ou 11 dígitos",
-            }),
+  prices: z
+    .object({
 
-        whatsapp: z
-            .string()
-            .transform(value => value.replace(/\D/g, ""))
-            .refine(value => value.length === 11, {
-                message: "WhatsApp deve conter 11 dígitos (DDD + número)",
-            }),
-        email: z.string().email("Email inválido"),
-        openingHours: HoursSchema,
+      priceHour: numberRequired("valor da hora"),
+
+      priceExtraHour: numberRequired("valor da hora extra"),
+
+      dailyRate: numberOptional,
+
+      monthlyRate: numberOptional,
+
+      carPrice: numberOptional,
+
+      motoPrice: numberOptional,
+
+      truckPrice: numberOptional,
+
+      nightRate: numberOptional,
+
+      nightPeriod: HoursSchema.optional(),
+    })
+
+    .superRefine((data, ctx) => {
+
+      const hasNightRate =
+        data.nightRate !== undefined &&
+        data.nightRate !== "" &&
+        data.nightRate !== 0
+
+      const hasNightPeriod =
+        data.nightPeriod &&
+        data.nightPeriod.start !== "" &&
+        data.nightPeriod.end !== ""
+
+      if (hasNightRate && !hasNightPeriod) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Informe o período noturno ao definir a tarifa noturna",
+          path: ["nightPeriod"],
+        })
+      }
+
+      if (hasNightPeriod && !hasNightRate) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Informe a tarifa noturna ao definir o período noturno",
+          path: ["nightRate"],
+        })
+      }
     }),
-
-    operations: z.object({
-        totalSpots: z
-            .coerce
-            .number()
-            .int("Total de vagas deve ser um número inteiro")
-            .positive("Total de vagas deve ser maior que zero"),
-
-        carSpots: z
-            .coerce
-            .number()
-            .int("Vagas de carro deve ser inteiro")
-            .nonnegative("Vagas de carro não pode ser negativo"),
-
-        motoSpots: z
-            .coerce
-            .number()
-            .int("Vagas de moto deve ser inteiro")
-            .nonnegative("Vagas de moto não pode ser negativo"),
-
-        truckSpots: z
-            .coerce
-            .number()
-            .int("Vagas de caminhão deve ser inteiro")
-            .nonnegative("Vagas de caminhão não pode ser negativo"),
-
-        pcdSpots: z
-            .coerce
-            .number()
-            .int("Vagas PCD deve ser inteiro")
-            .nonnegative("Vagas PCD não pode ser negativo"),
-
-        elderlySpots: z
-            .coerce
-            .number()
-            .int("Vagas para idosos deve ser inteiro")
-            .nonnegative("Vagas para idosos não pode ser negativo"),
-
-        hasCameras: z.boolean(),
-
-        hasWashing: z.boolean(),
-
-        areaType: z
-            .coerce
-            .number()
-            .int("Tipo da área inválido"),
-    })
-        .refine(
-            (data) =>
-                data.carSpots +
-                data.motoSpots +
-                data.truckSpots +
-                data.pcdSpots +
-                data.elderlySpots ===
-                data.totalSpots,
-            {
-                message: "A soma das vagas deve ser igual ao total de vagas",
-                path: ["totalSpots"],
-            }
-        ),
-
-    prices: z.object({
-        carPrice: z.coerce.number()
-            .positive("Preço do carro deve ser maior que zero"),
-
-        motoPrice: z.coerce.number()
-            .positive("Preço da moto deve ser maior que zero"),
-
-        truckPrice: z.coerce.number()
-            .positive("Preço do caminhão deve ser maior que zero"),
-
-        priceHour: z.coerce.number()
-            .positive("Preço por hora deve ser maior que zero"),
-
-        priceExtraHour: z.coerce.number()
-            .positive("Preço da hora extra deve ser maior que zero"),
-
-        dailyRate: z.coerce.number()
-            .positive("Diária deve ser maior que zero"),
-
-        monthlyRate: z.coerce.number()
-            .positive("Mensalidade deve ser maior que zero"),
-
-        nightRate: z.coerce.number()
-            .positive("Tarifa noturna deve ser maior que zero"),
-
-        nightPeriod: HoursSchema,
-    })
 })

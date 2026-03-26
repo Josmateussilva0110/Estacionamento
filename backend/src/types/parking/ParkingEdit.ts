@@ -16,7 +16,7 @@ export interface ParkingEditRow {
   phone: string
   whatsapp: string
   email: string
-  open_hours: OpeningHours
+  open_hours: string
 
   total_spots: number
   car_spots: number
@@ -31,7 +31,7 @@ export interface ParkingEditRow {
   price_hour: number
   price_extra_hour: number
   daily_rate: number
-  night_period: OpeningHours
+  night_period: string
   night_rate: number
   monthly_rate: number
   car_price: number

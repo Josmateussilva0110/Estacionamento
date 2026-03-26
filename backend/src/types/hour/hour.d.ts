@@ -1,4 +1,4 @@
 export default interface OpeningHours {
-  start: string
-  end: string
+  start: string | null
+  end: string | null
 }

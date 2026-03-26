@@ -8,7 +8,6 @@ const numberOptional = z
   .union([z.literal(""), z.coerce.number().nonnegative()])
   .optional()
 
-
 export const ParkingSchema = z.object({
   parkingName: z.string().min(3, "Informe o nome do estacionamento"),
   managerName: z.string().min(3, "Informe o responsável ou gerente"),
@@ -48,18 +47,50 @@ export const ParkingSchema = z.object({
     }),
   }),
 
-  prices: z.object({
-    priceHour: numberRequired("valor hora"),
-    priceExtraHour: numberRequired("hora adicional"),
-    dailyRate: numberOptional,
-    nightPeriod: z.object({
-      start: z.string().min(1, "Informe o horário inicial"),
-      end: z.string().min(1, "Informe o horário final"),
-    }),
-    nightRate: numberOptional,
-    monthlyRate: numberOptional,
-    carPrice: numberOptional,
-    motoPrice: numberOptional,
-    truckPrice: numberOptional,
-  }),
+  prices: z
+    .object({
+      priceHour: numberRequired("valor hora"),
+      priceExtraHour: numberRequired("hora adicional"),
+      dailyRate: numberOptional,
+
+      nightPeriod: z
+        .object({
+          start: z.string().min(1, "Informe o horário inicial"),
+          end: z.string().min(1, "Informe o horário final"),
+        })
+        .optional(),
+
+      nightRate: numberOptional,
+      monthlyRate: numberOptional,
+      carPrice: numberOptional,
+      motoPrice: numberOptional,
+      truckPrice: numberOptional,
+    })
+    .superRefine((data, ctx) => {
+        const hasNightRate =
+          data.nightRate !== undefined &&
+          data.nightRate !== "" &&
+          data.nightRate !== 0
+
+        const hasNightPeriod =
+          data.nightPeriod &&
+          data.nightPeriod.start !== "" &&
+          data.nightPeriod.end !== ""
+
+        if (hasNightRate && !hasNightPeriod) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Informe o período noturno ao definir a tarifa noturna",
+            path: ["nightPeriod"],
+          })
+        }
+
+        if (hasNightPeriod && !hasNightRate) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Informe a tarifa noturna ao definir o período noturno",
+            path: ["nightRate"],
+          })
+        }
+    })
 })

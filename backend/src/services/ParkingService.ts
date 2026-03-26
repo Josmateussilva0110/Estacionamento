@@ -10,6 +10,7 @@ import { ParkingErrorCode } from "../types/code/parkingCode"
 import { type PaginatedParkingResult } from "../types/parking/PaginatedParkingResult"
 import { ParkingEditDTO } from "../dtos/ParkingEditDTO"
 import { type ParkingResponse } from "../mappers/parking.mapper"
+import { mapAreaTypeToNumber } from "../utils/mapAreaType"
 
 
 class ParkingService {
@@ -28,6 +29,8 @@ class ParkingService {
         }
       }
     }
+
+
     try {
       const parkingId = await db.transaction(async (trx) => {
 
@@ -77,7 +80,7 @@ class ParkingService {
           elderly_spots: data.operations.elderlySpots,
           has_cameras: data.operations.hasCameras,
           has_washing: data.operations.hasWashing,
-          area_type: data.operations.areaType
+          area_type: mapAreaTypeToNumber(data.operations.areaType)
         },
           { trx }
         )
@@ -87,10 +90,12 @@ class ParkingService {
           price_hour: data.prices.priceHour,
           price_extra_hour: data.prices.priceExtraHour,
           daily_rate: data.prices.dailyRate,
-          night_period: {
-            start: data.prices.nightPeriod.start,
-            end: data.prices.nightPeriod.end,
-          },
+          night_period: data.prices.nightPeriod
+            ? {
+                start: data.prices.nightPeriod.start ?? null,
+                end: data.prices.nightPeriod.end ?? null,
+              }
+            : undefined,
           night_rate: data.prices.nightRate,
           monthly_rate: data.prices.monthlyRate,
           car_price: data.prices.carPrice,
@@ -282,14 +287,14 @@ class ParkingService {
         elderly_spots: data.operations.elderlySpots,
         has_cameras: data.operations.hasCameras,
         has_washing: data.operations.hasWashing,
-        area_type: data.operations.areaType,
+        area_type: mapAreaTypeToNumber(data.operations.areaType),
       }, { idField: "parking_id", trx })
 
       await Prices.update(id, {
         price_hour: data.prices.priceHour,
         price_extra_hour: data.prices.priceExtraHour,
         daily_rate: data.prices.dailyRate,
-        night_period: data.prices.nightPeriod ?? null,
+        night_period: data.prices.nightPeriod,
         night_rate: data.prices.nightRate,
         monthly_rate: data.prices.monthlyRate,
         car_price: data.prices.carPrice,
