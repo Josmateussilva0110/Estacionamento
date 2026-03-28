@@ -5,6 +5,8 @@ import session from "express-session"
 import PgSession from "connect-pg-simple"
 import { Pool } from "pg"
 import router from "../src/routes/routes"
+import swaggerUi from "swagger-ui-express"
+import { swaggerSpec } from "./config/swagger"
 
 dotenv.config()
 
@@ -64,6 +66,7 @@ app.get("/", (request: Request, response: Response) => {
 })
 
 app.use("/", router)
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 
 const PORT = 3000
 
