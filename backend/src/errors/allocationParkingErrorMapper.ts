@@ -1,6 +1,6 @@
 import { SpotServiceError } from "../types/allocation/SpotsService"
 import { ParkingErrorCode } from "../types/code/parkingCode"
-import { AllocationErrorCode } from "../types/code/allocation"
+import { AllocationErrorCode } from "../types/code/allocationCode"
 
 export const SpotServiceErrorHttpStatusMap: Record<SpotServiceError, number> = {
   // Parking

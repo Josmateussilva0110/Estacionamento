@@ -1,17 +1,16 @@
 import { Request, Response } from "express"
-import AllocationService from "../services/AllocationService"
-import { allocationErrorHttpStatusMap } from "../errors/allocationErrorHttpMapper" 
-import { SpotServiceErrorHttpStatusMap } from "../errors/allocationParkingErrorMapper"
+import StatsService from "../services/StatsService"
+import { statsErrorHttpStatusMap } from "../errors/statsErrorHttpMapper" 
 import { getHttpStatusFromError } from "../utils/getHttpStatusFromError"
 
-class AllocationController {
+class StatsController {
     async getKpiParking(request: Request, response: Response): Promise<Response> {
-        const { user_id } = request.params
-        const result = await AllocationService.findSpots(user_id)
+        const userId = request.session.user?.id
+        const result = await StatsService.parkingStats(String(userId))
         if (!result.status) {
             const httpStatus = getHttpStatusFromError(
             result.error!.code,
-            SpotServiceErrorHttpStatusMap
+            statsErrorHttpStatusMap
             )
 
             return response.status(httpStatus).json({
@@ -25,4 +24,4 @@ class AllocationController {
 }
 
 
-export default new AllocationController()
+export default new StatsController()

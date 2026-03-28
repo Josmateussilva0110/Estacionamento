@@ -1,4 +1,4 @@
-import { AllocationErrorCode } from "../types/code/allocation" 
+import { AllocationErrorCode } from "../types/code/allocationCode" 
 
 export const allocationErrorHttpStatusMap: Record<AllocationErrorCode, number> = {
   [AllocationErrorCode.ALLOCATION_CREATE_FAILED]: 500, 

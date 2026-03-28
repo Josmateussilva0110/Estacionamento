@@ -2,7 +2,7 @@ import Operations from "../model/Operations"
 import Parking from "../model/Parking"
 import Allocation from "../model/Allocation"
 import { ServiceResult } from "../types/serviceResults/ServiceResult"
-import { AllocationErrorCode } from "../types/code/allocation"
+import { AllocationErrorCode } from "../types/code/allocationCode"
 import { ParkingErrorCode } from "../types/code/parkingCode"
 import { type SpotResponse } from "../mappers/spots.mapper" 
 import { AllocationDetailDTO } from "../dtos/AllocationDetailDTO"
@@ -120,62 +120,56 @@ class AllocationService {
 
             const now = new Date()
             const mapped: AllocationDetailDTO[] = result.rows.map((row) => {
-                const nightPeriod = parseOpeningHours(row.night_period ?? null)
+            const nightPeriod: { start: string; end: string } | null = parseOpeningHours(row.night_period ?? null);
 
-                if (!nightPeriod) {
-                throw new Error("Estacionamento sem período noturno")
-                }
-
-                const calculators = {
-                    hour: () =>
-                        calculateHourlyStayValue({
+            const calculators = {
+                hour: () =>
+                    calculateHourlyStayValue({
                         entryAt: new Date(row.entry_date),
                         exitAt: now,
                         pricePerHour: row.price_per_hour,
                         nightPricePerHour: row.night_price_per_hour,
                         vehicleFixedPrice: row.vehicle_fixed_price,
                         nightPeriod,
-                        }),
-                    
-                    month: () => calculateMonthlyStayValue({
-                        entryAt: new Date(row.entry_date),
-                        exitAt: now,
-                        monthlyRate: row.monthly_rate,
-                        vehicleFixedPrice: row.vehicle_fixed_price
                     }),
-                    day: () =>
-                        calculateDailyStayValue({
+                day: () =>
+                    calculateDailyStayValue({
                         entryAt: new Date(row.entry_date),
                         exitAt: now,
                         dailyRate: row.daily_rate,
                         vehicleFixedPrice: row.vehicle_fixed_price,
-                        }),
-                    } as const
+                    }),
+                month: () =>
+                    calculateMonthlyStayValue({
+                        entryAt: new Date(row.entry_date),
+                        exitAt: now,
+                        monthlyRate: row.monthly_rate,
+                        vehicleFixedPrice: row.vehicle_fixed_price,
+                    }),
+            } as const;
 
-                const calculator = calculators[row.payment_type as keyof typeof calculators]
+            const calculator = calculators[row.payment_type as keyof typeof calculators];
+            if (!calculator) {
+                throw new Error(`Tipo de pagamento inválido: ${row.payment_type}`);
+            }
 
-                if (!calculator) {
-                throw new Error(`Tipo de pagamento inválido: ${row.payment_type}`)
-                }
+            const estimatedCost = calculator();
 
-                const estimatedCost = calculator()
-
-
-                return {
-                    id: row.allocation_id,
-                    clientName: row.client_name,
-                    phone: row.phone,
-                    parkingName: row.parking_name,
-                    plate: row.plate,
-                    brand: row.brand,
-                    vehicleType: row.vehicle_type,
-                    entryDate: row.entry_date,
-                    observations: row.observations,
-                    paymentType: row.payment_type,
-                    currentDuration: row.current_duration,
-                    estimatedCost,
-                }
-            })
+            return {
+                id: row.allocation_id,
+                clientName: row.client_name,
+                phone: row.phone,
+                parkingName: row.parking_name,
+                plate: row.plate,
+                brand: row.brand,
+                vehicleType: row.vehicle_type,
+                entryDate: row.entry_date,
+                observations: row.observations,
+                paymentType: row.payment_type,
+                currentDuration: row.current_duration,
+                estimatedCost,
+            };
+        });
 
             return {status: true, data: {rows: mapped, total: result.total}}
 
