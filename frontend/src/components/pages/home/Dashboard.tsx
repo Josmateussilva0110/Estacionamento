@@ -18,13 +18,43 @@ import { Pie } from "./components/dashboard/Pie"
 import { BarChart } from "./components/dashboard/BarChart"
 import { RecentAllocations } from "./components/dashboard/RecentAllocations"
 import { StatsOverview } from "./components/dashboard/StatsOverview"
+import { requestData } from "../../../services/requestApi"
+import { type KpiParkingsResponse } from "../../../types/stats/kpiParkingResponse"
 
 
 
 export default function ParkingHome() {
   const [now, setNow] = useState<Date>(new Date())
   const [refreshed, setRefreshed] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [kpiParkings, setKpiParkings] = useState<KpiParkingsResponse | null>(null)
   const navigate = useNavigate()
+
+
+  useEffect(() => {
+      async function fetchParkingKpi() {
+          setIsLoading(true)
+
+          const response = await requestData<KpiParkingsResponse>(
+              `/stats/parking`,
+              "GET",
+              {},
+              true
+          )
+
+          console.log(response)
+
+          if (response.success && response.data) {
+              setKpiParkings(response.data)
+          } else {
+              setKpiParkings(null)
+          }
+
+          setIsLoading(false)
+      }
+
+      fetchParkingKpi()
+  }, [])
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000)
@@ -40,10 +70,7 @@ export default function ParkingHome() {
         navigate("/parking/allocation")
   }
 
-  const totalVagas = 200
-  const totalOcupadas = 61
-  const occupancyPct = Math.round((totalOcupadas / totalVagas) * 100)
-
+  
   return (
     <div className="min-h-screen bg-slate-900 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -106,35 +133,57 @@ export default function ParkingHome() {
 
             {/* ── KPI row ── */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mt-5 md:mt-8">
-              <KpiCard
-                icon={Car} iconBg="bg-blue-500/20" iconColor="text-blue-300"
-                label="Vagas Ocupadas" value={totalOcupadas}
-                sub={`${occupancyPct}% de ocupação`} subColor="text-blue-300" trend="activity"
-              />
-              <KpiCard
-                icon={ParkingCircle} iconBg="bg-emerald-500/20" iconColor="text-emerald-300"
-                label="Vagas Livres" value={totalVagas - totalOcupadas}
-                sub={`de ${totalVagas} vagas totais`} subColor="text-emerald-300" trend="activity"
-              />
-              <KpiCard
-                icon={Activity} iconBg="bg-orange-500/20" iconColor="text-orange-300"
-                label="Entradas Hoje" value="212"
-                sub="+8.4% vs. ontem" subColor="text-orange-300" trend="up"
-              />
-              <KpiCard
-                icon={DollarSign} iconBg="bg-violet-500/20" iconColor="text-violet-300"
-                label="Receita do Dia" value="R$ 3.840"
-                sub="Meta: R$ 4.000" subColor="text-violet-300" trend="up"
-              />
+              {isLoading ? (
+                <>
+                  <div className="bg-slate-700/30 rounded-2xl p-6 h-44 animate-pulse" />
+                  <div className="bg-slate-700/30 rounded-2xl p-6 h-44 animate-pulse" />
+                  <div className="bg-slate-700/30 rounded-2xl p-6 h-44 animate-pulse" />
+                  <div className="bg-slate-700/30 rounded-2xl p-6 h-44 animate-pulse" />
+                </>
+              ) : (
+                <>
+                  <KpiCard
+                    icon={Car} iconBg="bg-blue-500/20" iconColor="text-blue-300"
+                    label="Vagas Ocupadas" value={kpiParkings?.kpis.occupied ?? null}
+                    sub={`${kpiParkings?.kpis.occupancyPct ?? "-"}% de ocupação`} subColor="text-blue-300" trend="activity"
+                  />
+                  <KpiCard
+                    icon={ParkingCircle} iconBg="bg-emerald-500/20" iconColor="text-emerald-300"
+                    label="Vagas Livres" value={kpiParkings?.kpis.vacanciesAvailable ?? null}
+                    sub={`de ${kpiParkings?.kpis.totalSpots ?? "-"} vagas totais`} subColor="text-emerald-300" trend="activity"
+                  />
+                  <KpiCard
+                    icon={Activity} iconBg="bg-orange-500/20" iconColor="text-orange-300"
+                    label="Entradas Hoje" value={kpiParkings?.kpis.entriesToday ?? null}
+                    sub="+8.4% vs. ontem" subColor="text-orange-300" trend="up"
+                  />
+                  <KpiCard
+                    icon={DollarSign} iconBg="bg-violet-500/20" iconColor="text-violet-300"
+                    label="Receita do Dia"
+                    value={null}  
+                    valueText={`R$ ${kpiParkings?.totalRevenue ?? "-"}`}
+                    sub="Meta: R$ 4.000"
+                    subColor="text-violet-300"
+                    trend="up"
+                  />
+                </>
+              )}
             </div>
           </div>
         </div>
 
         {/* ── ROW 2: Gauge + Receita por Tipo ─────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Gauge */}
-          <Gauge occupancyPercentage={occupancyPct} totalSpots={totalVagas} occupiedSpots={totalOcupadas}/>
-          <ChargesCard/>
+          {isLoading ? (
+              <div className="bg-slate-700/30 rounded-2xl h-72 animate-pulse col-span-1 lg:col-span-1" />
+            ) : (
+              <Gauge
+                occupancyPercentage={kpiParkings?.kpis.occupancyPct ?? null}
+                totalSpots={kpiParkings?.kpis.totalSpots ?? null}
+                occupiedSpots={kpiParkings?.kpis.occupied ?? null}
+              />
+          )}
+          <ChargesCard />
         </div>
 
         {/* ── ROW 3: Area chart + Pie ──────────────────────────────────────────── */}

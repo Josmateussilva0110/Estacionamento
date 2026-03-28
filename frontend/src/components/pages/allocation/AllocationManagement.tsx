@@ -47,6 +47,7 @@ function AllocationManagement() {
     const { user } = useUser()
     const { setFlashMessage } = useFlashMessage()
     const [isLoading, setIsLoading] = useState(true)
+    const [refreshed, setRefreshed] = useState<boolean>(false)
     const [total, setTotal] = useState(0)
     const [searchTerm, setSearchTerm] = useState("")
     const [filterType, setFilterType] = useState<string>("all")
@@ -98,8 +99,10 @@ function AllocationManagement() {
 
     
     function updateAllocations() {
+        setRefreshed(true)
         fetchAllocations()
         fetchStats()
+        setTimeout(() => setRefreshed(false), 1000)
     }
 
     const [endModal, setEndModal] = useState<{
@@ -241,7 +244,7 @@ function AllocationManagement() {
                                     onClick={() => updateAllocations()}
                                     className="flex items-center gap-2 bg-slate-700/50 hover:bg-slate-700/80 backdrop-blur-xl text-white font-semibold px-5 py-3 rounded-xl transition-all border border-slate-600/50 hover:scale-105"
                                 >
-                                    <RefreshCw size={18} />
+                                    <RefreshCw size={16} className={refreshed ? "animate-spin" : ""} />
                                     Atualizar
                                 </button>
                                 <button
