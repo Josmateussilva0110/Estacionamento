@@ -1,6 +1,6 @@
-import { type KpiParkings } from "./parkings"
+import { type StatsKpiParkingResponse } from "../../mappers/statsParking.mapper"
 
 export interface KpiParkingsResponse {
-    kpis: KpiParkings
+    kpis: StatsKpiParkingResponse
     totalRevenue: number
 }

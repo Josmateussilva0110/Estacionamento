@@ -7,10 +7,9 @@ import { type KpiParkingsResponse } from "../types/stats/parkingStatsResponse"
 
 class StatsService {
 
-    async parkingStats(user_id: string): Promise<ServiceResult<KpiParkingsResponse, StatsErrorCode>> {
+    async parkingStats(user_id: string): Promise<ServiceResult<KpiParkingsResponse | null, StatsErrorCode>> {
       try {
         const statsKpi = await Stats.getKpiParkings(user_id)
-        console.log(statsKpi)
         const allocationData = await Allocation.getAllocationData(user_id)
         if(!statsKpi || allocationData.length === 0) {
             return {
