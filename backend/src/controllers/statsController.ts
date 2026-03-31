@@ -24,8 +24,8 @@ class StatsController {
     }
 
     async getRevenue(request: Request, response: Response): Promise<Response> {
-        const userId = request.params.id 
-        const result = await StatsService.revenueCard(userId)
+        const userId = request.session.user?.id
+        const result = await StatsService.revenueCard(String(userId))
         if(!result.status) {
             const httpStatus = getHttpStatusFromError(result.error!.code, statsErrorHttpStatusMap)
             return response.status(httpStatus).json({

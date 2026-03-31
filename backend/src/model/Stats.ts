@@ -90,7 +90,7 @@ class Stats extends Model<AllocationData> {
             return mapVehicleCount(rows)
 
         } catch(err) {
-            console.log(`Erro ao buscar dados de alocações na tabela ${this.tableName}:, err`)
+            console.log(`Erro ao buscar contagem de veiculos na tabela ${this.tableName}:, err`)
             return []
         }
     }
@@ -99,4 +99,3 @@ class Stats extends Model<AllocationData> {
 
 
 export default new Stats()
-    
