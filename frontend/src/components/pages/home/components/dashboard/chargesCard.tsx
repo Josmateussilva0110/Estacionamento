@@ -77,7 +77,7 @@ export function ChargesCard() {
                     <p className="text-3xl font-bold text-white mb-1">
                       R$ {r.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </p>
-                    <p className="text-xs text-slate-400 mb-4">{r.count} veículos hoje</p>
+                    <p className="text-xs text-slate-400 mb-4">{r.count} veículos</p>
                   </div>
 
                   <div>
