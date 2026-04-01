@@ -2,7 +2,9 @@ import Model from "./Model"
 import db from "../database/connection/connection"
 import { PgRawResult } from "../types/database/BdResult"
 import { type KpiParkings } from "../types/stats/parkings"
+import { type VehicleCount } from "../types/stats/revenue"
 import { type StatsKpiParkingResponse, mapStatsKpiParking } from "../mappers/statsParking.mapper"
+import { type StatsVehicleCount, mapVehicleCount } from "../mappers/vehicleCount.mapper"
 
 export interface AllocationData {
   id?: number
@@ -62,6 +64,34 @@ class Stats extends Model<AllocationData> {
         } catch(err) {
             console.log(`Erro ao buscar dados de alocações na tabela ${this.tableName}:, err`)
             return null
+        }
+    }
+
+    async getVehicles(user_id: string): Promise<StatsVehicleCount[]> {
+        try {
+            const result = await db.raw<PgRawResult<VehicleCount>>(
+            `
+                SELECT a.parking_id, COUNT(*) AS count_vehicles, a.payment_type
+                FROM allocations a
+                inner join parking p
+                    on p.id = a.parking_id
+                WHERE p.created_by = ?
+                group by a.parking_id, a.payment_type;
+            `,
+            [user_id]
+            )
+
+            if(result.rows.length === 0) {
+                return []
+            }
+
+            const rows = result.rows
+
+            return mapVehicleCount(rows)
+
+        } catch(err) {
+            console.log(`Erro ao buscar contagem de veiculos na tabela ${this.tableName}:, err`)
+            return []
         }
     }
 

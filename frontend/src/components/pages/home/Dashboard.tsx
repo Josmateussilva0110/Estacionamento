@@ -42,8 +42,6 @@ export default function ParkingHome() {
               true
           )
 
-          console.log(response)
-
           if (response.success && response.data) {
               setKpiParkings(response.data)
           } else {
