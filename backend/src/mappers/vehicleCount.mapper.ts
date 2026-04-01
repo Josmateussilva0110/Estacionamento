@@ -9,7 +9,7 @@ export interface StatsVehicleCount {
 export function mapVehicleCount(rows: VehicleCount[]): StatsVehicleCount[] {
   return rows.map((row) => ({
     parkingId: row.parking_id,
-    countVehicles: row.count_vehicles,
+    countVehicles: Number(row.count_vehicles),
     paymentType: row.payment_type
   }))
 }

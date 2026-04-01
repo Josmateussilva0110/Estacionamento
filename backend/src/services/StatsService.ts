@@ -35,19 +35,28 @@ class StatsService {
     revenueByType: Record<string, number>,
     totalRevenue: number
   ): RevenueByPaymentTypeDTO[] {
-    return vehicleCount.map((vc) => {
-      const revenue = revenueByType[vc.paymentType] || 0
 
-      return {
-        paymentType: vc.paymentType,
-        revenue: Number(revenue.toFixed(2)),
-        vehicleCount: vc.countVehicles,
-        pct:
-          totalRevenue > 0
+    const grouped: Record<string, RevenueByPaymentTypeDTO> = {}
+
+    for (const vc of vehicleCount) {
+      const type = vc.paymentType
+
+      if (!grouped[type]) {
+        const revenue = revenueByType[type] || 0
+
+        grouped[type] = {
+          paymentType: type,
+          revenue: Number(revenue.toFixed(2)),
+          vehicleCount: 0,
+          pct: totalRevenue > 0
             ? Number(((revenue / totalRevenue) * 100).toFixed(2))
             : 0
+        }
       }
-    })
+      grouped[type].vehicleCount += Number(vc.countVehicles)
+    }
+
+    return Object.values(grouped)
   }
 
   async parkingStats(user_id: string): Promise<ServiceResult<KpiParkingsResponse | null, StatsErrorCode>> {
