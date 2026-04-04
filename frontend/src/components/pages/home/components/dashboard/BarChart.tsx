@@ -1,3 +1,4 @@
+//import { useState, useEffect } from "react"
 import { CalendarDays } from "lucide-react"
 
 import {
@@ -12,6 +13,8 @@ import {
 } from "recharts"
 
 import { CustomTooltip } from "./CustomTooltip"
+//import { requestData } from "../../../../../services/requestApi"
+
 
 interface WeeklyPoint {
   dia: string
@@ -31,6 +34,7 @@ const weeklyFlow: WeeklyPoint[] = [
 ]
 
 export function BarChart() {
+
     return (
         <div className="bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-6">
             <div className="flex items-center justify-between mb-5">
