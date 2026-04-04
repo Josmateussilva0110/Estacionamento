@@ -5,6 +5,7 @@ import { type KpiParkings } from "../types/stats/parkings"
 import { type VehicleCount } from "../types/stats/revenue"
 import { type StatsKpiParkingResponse, mapStatsKpiParking } from "../mappers/statsParking.mapper"
 import { type StatsVehicleCount, mapVehicleCount } from "../mappers/vehicleCount.mapper"
+import { type Occupied } from "../types/stats/occupied"
 
 export interface AllocationData {
   id?: number
@@ -91,6 +92,37 @@ class Stats extends Model<AllocationData> {
 
         } catch(err) {
             console.log(`Erro ao buscar contagem de veiculos na tabela ${this.tableName}:, err`)
+            return []
+        }
+    }
+
+    async getOccupiedParking(user_id: string): Promise<Occupied[]> {
+        try {
+            const result = await db.raw<PgRawResult<Occupied>>(
+            `
+                SELECT 
+                    TO_CHAR(DATE_TRUNC('hour', a.created_at), 'HH24"h"') AS time,
+                    COUNT(*) AS occupied
+                FROM allocations a
+                INNER JOIN parking p
+                    ON p.id = a.parking_id
+                WHERE p.created_by = ?
+                GROUP BY DATE_TRUNC('hour', a.created_at)
+                ORDER BY DATE_TRUNC('hour', a.created_at);
+            `,
+            [user_id]
+            )
+
+            if(result.rows.length === 0) {
+                return []
+            }
+
+            const rows = result.rows
+
+            return rows
+
+        } catch(err) {
+            console.log(`Erro ao buscar contagem de ocupação ${this.tableName}:, err`)
             return []
         }
     }

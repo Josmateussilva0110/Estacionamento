@@ -19,15 +19,12 @@ interface OccupancyPoint {
 }
 
 const occupancyHourly: OccupancyPoint[] = [
-  { time: "00h", ocupados: 10 },
-  { time: "03h", ocupados: 6 },
   { time: "06h", ocupados: 22 },
   { time: "09h", ocupados: 74 },
   { time: "12h", ocupados: 91 },
   { time: "15h", ocupados: 85 },
   { time: "18h", ocupados: 68 },
   { time: "21h", ocupados: 42 },
-  { time: "Agora", ocupados: 61 },
 ]
 
 export function AreaChart() {
