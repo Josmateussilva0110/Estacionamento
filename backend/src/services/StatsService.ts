@@ -6,6 +6,7 @@ import { calculateAllocationValue } from "../utils/calculatePrices"
 import { type KpiParkingsResponse } from "../types/stats/parkingStatsResponse"
 import { type StatsVehicleCount } from "../mappers/vehicleCount.mapper"
 import { type AllocationPrinces } from "../types/allocation/allocationData"
+import { type Occupied } from "../types/stats/occupied"
 import { RevenueByPaymentTypeDTO } from "../dtos/RevenueByPayment"
 
 
@@ -125,6 +126,33 @@ class StatsService {
         error: {
           code: StatsErrorCode.STATS_FETCH_FAILED,
           message: "Erro interno ao buscar Estatísticas de estacionamento",
+        }
+      }
+    }
+  }
+
+  async countOccupied(user_id: string): Promise<ServiceResult<Occupied[], StatsErrorCode>> {
+    try {
+      const occupied = await Stats.getOccupiedParking(user_id)
+      if(occupied.length === 0) {
+        return {
+          status: false,
+          error: {
+            code: StatsErrorCode.PARKING_KPI_NOT_FOUND,
+            message: "Nenhuma estatística do estacionamento"
+          }
+        }
+      }
+
+      return { status: true, data: occupied}
+
+    } catch(error) {
+      console.error("StatsService.countOccupied: ", error)
+      return {
+        status: false,
+        error: {
+          code: StatsErrorCode.STATS_FETCH_FAILED,
+          message: "Erro interno ao buscar ocupção de estacionamento",
         }
       }
     }
