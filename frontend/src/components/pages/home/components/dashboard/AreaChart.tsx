@@ -31,6 +31,17 @@ export function AreaChart() {
     fetchOccupied()
   }, [])
 
+  const normalizedOccupied = occupied?.length
+    ? (() => {
+        const max = Math.max(...occupied.map(o => Number(o.occupied)))
+        return occupied.map(o => ({
+          ...o,
+          occupiedRaw: Number(o.occupied), 
+          occupied: Math.round((Number(o.occupied) / max) * 100),
+        }))
+      })()
+    : []
+
   return (
     <div className="lg:col-span-2 bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 p-6">
       <div className="flex items-center justify-between mb-5">
@@ -46,7 +57,7 @@ export function AreaChart() {
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={200}>
-          <Chart data={occupied ?? []}>
+          <Chart data={normalizedOccupied ?? []}>
             <defs>
               <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
@@ -55,11 +66,22 @@ export function AreaChart() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
             <XAxis dataKey="time" stroke="#475569" tick={{ fontSize: 10, fill: "#94a3b8" }} />
-            <YAxis stroke="#475569" tick={{ fontSize: 10, fill: "#94a3b8" }} unit="%" />
+            <YAxis
+              stroke="#475569"
+              tick={{ fontSize: 10, fill: "#94a3b8" }}
+              unit="%"
+              domain={[0, 100]}
+              ticks={[0, 50, 100]}
+            />
             <Tooltip content={<CustomTooltip />} />
             <Area
-              type="monotone" dataKey="occupied" name="Ocupação %"
-              stroke="#3b82f6" fill="url(#gradBlue)" strokeWidth={2} dot={false}
+              type="monotone"
+              dataKey="occupied"
+              name="Ocupação"
+              stroke="#3b82f6"
+              fill="url(#gradBlue)"
+              strokeWidth={2}
+              dot={false}
             />
           </Chart>
         </ResponsiveContainer>
