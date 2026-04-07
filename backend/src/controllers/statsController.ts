@@ -52,7 +52,7 @@ class StatsController {
     }
 
     async getRevenueByDay(request: Request, response: Response): Promise<Response> {
-        const userId = request.params.id
+        const userId = request.session.user?.id
         const result = await StatsService.revenueByDay(String(userId))
         if(!result.status) {
             const httpStatus = getHttpStatusFromError(result.error!.code, statsErrorHttpStatusMap)

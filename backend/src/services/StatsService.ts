@@ -7,6 +7,7 @@ import { type KpiParkingsResponse } from "../types/stats/parkingStatsResponse"
 import { type StatsVehicleCount } from "../mappers/vehicleCount.mapper"
 import { type AllocationPrinces } from "../types/allocation/allocationData"
 import { type Occupied } from "../types/stats/occupied"
+import { type RevenueGroupDay } from "../types/stats/revenueGroupDay"
 import { RevenueByPaymentTypeDTO } from "../dtos/RevenueByPayment"
 
 
@@ -242,7 +243,7 @@ class StatsService {
     }
   }
 
-  async revenueByDay(user_id: string) {
+  async revenueByDay(user_id: string): Promise<ServiceResult<RevenueGroupDay[], StatsErrorCode>> {
     try {
       const allocationData = await Allocation.getAllocationData(user_id)
       const occupied = await Stats.getOccupiedParking(user_id)
@@ -258,7 +259,6 @@ class StatsService {
       }
 
       const revenueByDay = this.groupRevenueByWeekDay(allocationData, occupied)
-      console.log(revenueByDay)
 
       return {
         status: true,
