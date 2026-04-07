@@ -7,6 +7,7 @@ import { type KpiParkingsResponse } from "../types/stats/parkingStatsResponse"
 import { type StatsVehicleCount } from "../mappers/vehicleCount.mapper"
 import { type AllocationPrinces } from "../types/allocation/allocationData"
 import { type Occupied } from "../types/stats/occupied"
+import { type RevenueGroupDay } from "../types/stats/revenueGroupDay"
 import { RevenueByPaymentTypeDTO } from "../dtos/RevenueByPayment"
 
 
@@ -29,6 +30,88 @@ class StatsService {
     }
 
     return { revenueByType, totalRevenue }
+  }
+
+  private formatHourBrazil(dateString: string): string {
+    const date = new Date(dateString)
+    
+    const hour = date.getUTCHours() - 3
+    
+    const adjustedHour = (hour + 24) % 24
+
+    return `${adjustedHour}h`
+  }
+
+  private groupOccupiedByHour(occupiedData: Occupied[]) {
+    const grouped: Record<string, number> = {}
+
+    for (const item of occupiedData) {
+      const time = this.formatHourBrazil(item.time)
+      const occupiedValue = Number(item.occupied) || 0
+
+      if (!grouped[time]) {
+        grouped[time] = 0
+      }
+
+      grouped[time] += occupiedValue
+    }
+
+    return Object.entries(grouped)
+      .map(([time, occupied]) => ({
+        time,
+        occupied
+      }))
+      .sort((a, b) => {
+        const hourA = Number(a.time.replace("h", ""))
+        const hourB = Number(b.time.replace("h", ""))
+        return hourA - hourB
+      })
+  }
+
+  private getWeekDay(date: Date): string {
+    const days = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+    return days[date.getDay()]
+  }
+
+  private groupRevenueByWeekDay(allocationData: AllocationPrinces[], occupiedData: Occupied[]) {
+    const revenueByDay: Record<string, number> = {}
+    const occupiedByDay: Record<string, number> = {}
+
+    // 🔹 Agrupar revenue
+    for (const allocation of allocationData) {
+      const value = calculateAllocationValue(allocation)
+      const day = this.getWeekDay(new Date(allocation.entry_date))
+
+      if (!revenueByDay[day]) {
+        revenueByDay[day] = 0
+      }
+
+      revenueByDay[day] += value
+    }
+
+
+    for (const item of occupiedData) {
+      const day = this.getWeekDay(new Date(item.time))
+      const occupiedValue = Number(item.occupied) || 0
+
+      if (!occupiedByDay[day]) {
+        occupiedByDay[day] = 0
+      }
+
+      occupiedByDay[day] += occupiedValue
+    }
+
+  
+    const allDays = new Set([
+      ...Object.keys(revenueByDay),
+      ...Object.keys(occupiedByDay),
+    ])
+
+    return Array.from(allDays).map((day) => ({
+      day,
+      revenue: Number((revenueByDay[day] || 0).toFixed(2)),
+      occupied: occupiedByDay[day] || 0,
+    }))
   }
 
   private buildRevenueDTO(
@@ -144,7 +227,9 @@ class StatsService {
         }
       }
 
-      return { status: true, data: occupied}
+      const groupOccupied = this.groupOccupiedByHour(occupied) 
+
+      return { status: true, data: groupOccupied}
 
     } catch(error) {
       console.error("StatsService.countOccupied: ", error)
@@ -152,7 +237,41 @@ class StatsService {
         status: false,
         error: {
           code: StatsErrorCode.STATS_FETCH_FAILED,
-          message: "Erro interno ao buscar ocupção de estacionamento",
+          message: "Erro interno ao buscar ocupação de estacionamento",
+        }
+      }
+    }
+  }
+
+  async revenueByDay(user_id: string): Promise<ServiceResult<RevenueGroupDay[], StatsErrorCode>> {
+    try {
+      const allocationData = await Allocation.getAllocationData(user_id)
+      const occupied = await Stats.getOccupiedParking(user_id)
+
+      if (allocationData.length === 0 || occupied.length === 0) {
+        return {
+          status: false,
+          error: {
+            code: StatsErrorCode.PARKING_KPI_NOT_FOUND,
+            message: "Nenhuma estatística do estacionamento"
+          }
+        }
+      }
+
+      const revenueByDay = this.groupRevenueByWeekDay(allocationData, occupied)
+
+      return {
+        status: true,
+        data: revenueByDay
+      }
+
+    } catch (error) {
+      console.error("StatsService.revenueByDay: ", error)
+      return {
+        status: false,
+        error: {
+          code: StatsErrorCode.STATS_FETCH_FAILED,
+          message: "Erro interno ao buscar faturamento por dia de estacionamento",
         }
       }
     }

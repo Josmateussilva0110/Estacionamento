@@ -101,14 +101,14 @@ class Stats extends Model<AllocationData> {
             const result = await db.raw<PgRawResult<Occupied>>(
             `
                 SELECT 
-                    TO_CHAR(DATE_TRUNC('hour', a.created_at), 'HH24"h"') AS time,
+                    a.created_at AS time,
                     COUNT(*) AS occupied
                 FROM allocations a
                 INNER JOIN parking p
                     ON p.id = a.parking_id
                 WHERE p.created_by = ?
-                GROUP BY DATE_TRUNC('hour', a.created_at)
-                ORDER BY DATE_TRUNC('hour', a.created_at);
+                GROUP BY a.created_at
+                ORDER BY a.created_at;
             `,
             [user_id]
             )
