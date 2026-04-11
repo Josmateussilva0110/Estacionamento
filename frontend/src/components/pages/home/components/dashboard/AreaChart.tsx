@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { Clock } from "lucide-react"
-
 import {
   AreaChart as Chart,
   Area,
@@ -10,14 +9,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts"
-
 import { CustomTooltip } from "./CustomTooltip"
 import { requestData } from "../../../../../services/requestApi"
 import { type Occupied } from "../../../../../types/stats/occupied"
 
-
 export function AreaChart() {
-
   const [occupied, setOccupied] = useState<Occupied[] | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -36,7 +32,7 @@ export function AreaChart() {
         const max = Math.max(...occupied.map(o => Number(o.occupied)))
         return occupied.map(o => ({
           ...o,
-          occupiedRaw: Number(o.occupied), 
+          occupiedRaw: Number(o.occupied),
           occupied: Math.round((Number(o.occupied) / max) * 100),
         }))
       })()
@@ -55,9 +51,14 @@ export function AreaChart() {
         <div className="flex items-center justify-center h-[200px]">
           <div className="w-6 h-6 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin" />
         </div>
+      ) : !occupied || occupied.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[200px] gap-2">
+          <Clock className="w-8 h-8 text-slate-600" />
+          <p className="text-slate-500 text-xs">Nenhuma ocupação registrada</p>
+        </div>
       ) : (
         <ResponsiveContainer width="100%" height={200}>
-          <Chart data={normalizedOccupied ?? []}>
+          <Chart data={normalizedOccupied}>
             <defs>
               <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />

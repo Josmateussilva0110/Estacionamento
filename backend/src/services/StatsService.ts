@@ -8,6 +8,8 @@ import { type StatsVehicleCount } from "../mappers/vehicleCount.mapper"
 import { type AllocationPrinces } from "../types/allocation/allocationData"
 import { type Occupied } from "../types/stats/occupied"
 import { type RevenueGroupDay } from "../types/stats/revenueGroupDay"
+import { type CountVehicleType } from "../types/stats/countVehicleType"
+import { type CountVehicleTypeResponse } from "../types/stats/countVehicleTypeResponse"
 import { RevenueByPaymentTypeDTO } from "../dtos/RevenueByPayment"
 
 
@@ -124,6 +126,7 @@ class StatsService {
 
     for (const vc of vehicleCount) {
       const type = vc.paymentType
+      const vehicle = vc.vehicleType
 
       if (!grouped[type]) {
         const revenue = revenueByType[type] || 0
@@ -132,6 +135,7 @@ class StatsService {
           paymentType: type,
           revenue: Number(revenue.toFixed(2)),
           vehicleCount: 0,
+          vehicleType: vehicle,
           pct: totalRevenue > 0
             ? Number(((revenue / totalRevenue) * 100).toFixed(2))
             : 0
@@ -141,6 +145,31 @@ class StatsService {
     }
 
     return Object.values(grouped)
+  }
+
+  private groupVehicleCountByType(data: StatsVehicleCount[]): CountVehicleTypeResponse {
+    const grouped: Record<string, number> = {}
+    let total: number = 0
+
+    for (const item of data) {
+      const type = item.vehicleType
+      const count = item.countVehicles
+
+      if (!grouped[type]) {
+        grouped[type] = 0
+      }
+
+      grouped[type] += count
+      total += count
+    }
+
+    return {
+      total,
+      data: Object.entries(grouped).map(([vehicleType, countVehicles]) => ({
+        vehicleType,
+        countVehicles
+      }))
+    }
   }
 
   async parkingStats(user_id: string): Promise<ServiceResult<KpiParkingsResponse | null, StatsErrorCode>> {
@@ -272,6 +301,40 @@ class StatsService {
         error: {
           code: StatsErrorCode.STATS_FETCH_FAILED,
           message: "Erro interno ao buscar faturamento por dia de estacionamento",
+        }
+      }
+    }
+  }
+
+
+  async countVehicleType(user_id: string): Promise<ServiceResult<CountVehicleTypeResponse, StatsErrorCode>> {
+    try {
+      const vehicleCount = await Stats.getVehicles(user_id)
+
+      if (vehicleCount.length === 0) {
+        return {
+          status: false,
+          error: {
+            code: StatsErrorCode.PARKING_KPI_NOT_FOUND,
+            message: "Nenhuma estatística do estacionamento"
+          }
+        }
+      }
+
+      const grouped = this.groupVehicleCountByType(vehicleCount)
+
+      return {
+        status: true,
+        data: grouped
+      }
+
+    } catch (error) {
+      console.error("StatsService.countVehicleType: ", error)
+      return {
+        status: false,
+        error: {
+          code: StatsErrorCode.STATS_FETCH_FAILED,
+          message: "Erro interno ao buscar conatgem de veiculos por tipo",
         }
       }
     }

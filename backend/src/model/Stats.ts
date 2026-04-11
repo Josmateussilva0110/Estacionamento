@@ -72,12 +72,18 @@ class Stats extends Model<AllocationData> {
         try {
             const result = await db.raw<PgRawResult<VehicleCount>>(
             `
-                SELECT a.parking_id, COUNT(*) AS count_vehicles, a.payment_type
+                SELECT a.parking_id, COUNT(*) AS count_vehicles, a.payment_type,
+                case 
+                    when a.vehicle_type = 1 then 'Carro'
+                    when a.vehicle_type = 2 then 'Moto'
+                    when a.vehicle_type = 3 then 'Caminhonete'
+                    else 'PCD / Idoso'
+                end as vehicle_type
                 FROM allocations a
                 inner join parking p
                     on p.id = a.parking_id
                 WHERE p.created_by = ?
-                group by a.parking_id, a.payment_type;
+                group by a.parking_id, a.payment_type, vehicle_type;
             `,
             [user_id]
             )
