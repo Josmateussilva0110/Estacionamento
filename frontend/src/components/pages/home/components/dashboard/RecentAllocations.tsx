@@ -7,9 +7,7 @@ interface RecentAllocation {
   plate: string
   client: string
   type: VehicleType
-  parking: string
   time: string
-  cost: number
   status: AllocationStatus
 }
 
@@ -19,11 +17,11 @@ interface VehicleIconProps {
 }
 
 const recentAllocations: RecentAllocation[] = [
-  { plate: "ABC-1234", client: "Carlos Silva", type: "carro", parking: "Setor A", time: "2 min", cost: 12.5, status: "ativo" },
-  { plate: "DEF-5678", client: "Ana Souza", type: "moto", parking: "Setor B", time: "18 min", cost: 6.0, status: "ativo" },
-  { plate: "GHI-9012", client: "Pedro Lima", type: "carro", parking: "Setor C", time: "45 min", cost: 28.0, status: "ativo" },
-  { plate: "JKL-3456", client: "Maria Costa", type: "caminhonete", parking: "Setor A", time: "1h 10m", cost: 42.0, status: "ativo" },
-  { plate: "MNO-7890", client: "João Pereira", type: "moto", parking: "Setor D", time: "2h 05m", cost: 18.0, status: "ativo" },
+  { plate: "ABC-1234", client: "Carlos Silva", type: "carro", time: "2 min", status: "ativo" },
+  { plate: "DEF-5678", client: "Ana Souza", type: "moto", time: "18 min",status: "ativo" },
+  { plate: "GHI-9012", client: "Pedro Lima", type: "carro", time: "45 min", status: "ativo" },
+  { plate: "JKL-3456", client: "Maria Costa", type: "caminhonete", time: "1h 10m", status: "ativo" },
+  { plate: "MNO-7890", client: "João Pereira", type: "moto", time: "2h 05m", status: "ativo" },
 ]
 
 const vehicleTypeBadge: Record<VehicleType, string> = {
@@ -85,13 +83,11 @@ export function RecentAllocations() {
                     </div>
                     <p className="text-sm font-semibold text-slate-200 truncate">{a.client}</p>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">{a.parking}</p>
                 </div>
               </div>
 
               {/* Right: cost + time */}
               <div className="text-right shrink-0">
-                <p className="text-sm font-bold text-emerald-400">R$ {a.cost.toFixed(2)}</p>
                 <p className="text-xs text-orange-400 flex items-center justify-end gap-1 mt-0.5">
                   <Clock className="w-3 h-3" />
                   {a.time}

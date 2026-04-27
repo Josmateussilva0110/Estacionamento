@@ -17,7 +17,6 @@ import { AreaChart } from "./components/dashboard/AreaChart"
 import { Pie } from "./components/dashboard/Pie"
 import { BarChart } from "./components/dashboard/BarChart"
 import { RecentAllocations } from "./components/dashboard/RecentAllocations"
-import { StatsOverview } from "./components/dashboard/StatsOverview"
 import { requestData } from "../../../services/requestApi"
 import { type KpiParkingsResponse } from "../../../types/stats/kpiParkingResponse"
 
@@ -195,17 +194,6 @@ export default function ParkingHome() {
           <BarChart/>
           <RecentAllocations/>
         </div>
-
-        {/* ── ROW 5: Quick stats bar ───────────────────────────────────────────── */}
-        <StatsOverview
-          avgPerHour={27}
-          peakPercentage={95}
-          peakHour="12h"
-          activeSubscribers={34}
-          exitsToday={208}
-          revenueToday={3840}
-          revenueGrowth={12}
-        />
       </div>
     </div>
   )
