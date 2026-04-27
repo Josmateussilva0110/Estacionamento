@@ -4,7 +4,8 @@ export interface RecentsAllocationsResponse {
   plate: string
   clientName: string  
   vehicleType: string
-  time: string
+  time: number
+  date: string
 }
 
 export function mapRecentsAllocations(rows: RecentsAllocations[]): RecentsAllocationsResponse[] {
@@ -12,6 +13,7 @@ export function mapRecentsAllocations(rows: RecentsAllocations[]): RecentsAlloca
     plate: row.plate,
     clientName: row.client_name,
     vehicleType: row.vehicle_type,
-    time: row.time
+    time: row.time,
+    date: row.date
   }))
 }

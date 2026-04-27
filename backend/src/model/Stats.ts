@@ -148,7 +148,8 @@ class Stats extends Model<AllocationData> {
                         when a.vehicle_type = 3 then 'caminhonete'
                         else 'PCD / Idoso'
                     end as vehicle_type,
-                    FLOOR(EXTRACT(EPOCH FROM (NOW() - a.entry_date)) / 60)::int as time
+                    FLOOR(EXTRACT(EPOCH FROM (NOW() - a.entry_date)) / 60)::int as time,
+                    a.created_at as date
                 from allocations a
                 inner join parking p
                     on p.id = a.parking_id
@@ -157,7 +158,8 @@ class Stats extends Model<AllocationData> {
                 inner join vehicles v
                     on v.id = a.vehicle_id
                 where p.created_by = ?
-                
+                order by a.created_at desc
+                limit 3
             `,
             [user_id]
             )
