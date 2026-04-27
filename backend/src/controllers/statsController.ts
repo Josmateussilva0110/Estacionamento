@@ -78,6 +78,20 @@ class StatsController {
 
         return response.status(200).json({success: true, data: result.data})
     }
+
+    async getRecentsAllocations(request: Request, response: Response): Promise<Response> {
+        const userId = request.session.user?.id
+        const result = await StatsService.recents(String(userId))
+        if(!result.status) {
+            const httpStatus = getHttpStatusFromError(result.error!.code, statsErrorHttpStatusMap)
+            return response.status(httpStatus).json({
+            success: false,
+            message: result.error?.message,
+            })
+        }
+
+        return response.status(200).json({success: true, data: result.data})
+    }
 }
 
 

@@ -1,14 +1,12 @@
 import { Clock, ArrowRight, Bike, Truck, Car } from "lucide-react"
 
 type VehicleType = "carro" | "moto" | "caminhonete" | "pcd" | "elderly"
-type AllocationStatus = "ativo" | "encerrado"
 
 interface RecentAllocation {
   plate: string
   client: string
   type: VehicleType
   time: string
-  status: AllocationStatus
 }
 
 interface VehicleIconProps {
@@ -17,11 +15,11 @@ interface VehicleIconProps {
 }
 
 const recentAllocations: RecentAllocation[] = [
-  { plate: "ABC-1234", client: "Carlos Silva", type: "carro", time: "2 min", status: "ativo" },
-  { plate: "DEF-5678", client: "Ana Souza", type: "moto", time: "18 min",status: "ativo" },
-  { plate: "GHI-9012", client: "Pedro Lima", type: "carro", time: "45 min", status: "ativo" },
-  { plate: "JKL-3456", client: "Maria Costa", type: "caminhonete", time: "1h 10m", status: "ativo" },
-  { plate: "MNO-7890", client: "João Pereira", type: "moto", time: "2h 05m", status: "ativo" },
+  { plate: "ABC-1234", client: "Carlos Silva", type: "carro", time: "2 min"},
+  { plate: "DEF-5678", client: "Ana Souza", type: "moto", time: "18 min" },
+  { plate: "GHI-9012", client: "Pedro Lima", type: "carro", time: "45 min"},
+  { plate: "JKL-3456", client: "Maria Costa", type: "caminhonete", time: "1h 10m"},
+  { plate: "MNO-7890", client: "João Pereira", type: "moto", time: "2h 05m"},
 ]
 
 const vehicleTypeBadge: Record<VehicleType, string> = {
