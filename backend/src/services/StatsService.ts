@@ -8,8 +8,8 @@ import { type StatsVehicleCount } from "../mappers/vehicleCount.mapper"
 import { type AllocationPrinces } from "../types/allocation/allocationData"
 import { type Occupied } from "../types/stats/occupied"
 import { type RevenueGroupDay } from "../types/stats/revenueGroupDay"
-import { type CountVehicleType } from "../types/stats/countVehicleType"
 import { type CountVehicleTypeResponse } from "../types/stats/countVehicleTypeResponse"
+import { type RecentsAllocationsResponse } from "../mappers/recentsAllocations.mapper"
 import { RevenueByPaymentTypeDTO } from "../dtos/RevenueByPayment"
 
 
@@ -335,6 +335,37 @@ class StatsService {
         error: {
           code: StatsErrorCode.STATS_FETCH_FAILED,
           message: "Erro interno ao buscar conatgem de veiculos por tipo",
+        }
+      }
+    }
+  }
+
+  async recents(user_id: string): Promise<ServiceResult<RecentsAllocationsResponse[], StatsErrorCode>> {
+    try {
+      const recentsAllocations = await Stats.getRecentsAllocations(user_id)
+
+      if (recentsAllocations.length === 0) {
+        return {
+          status: false,
+          error: {
+            code: StatsErrorCode.PARKING_KPI_NOT_FOUND,
+            message: "Nenhuma estatística do estacionamento"
+          }
+        }
+      }
+
+      return {
+        status: true,
+        data: recentsAllocations
+      }
+
+    } catch (error) {
+      console.error("StatsService.recents: ", error)
+      return {
+        status: false,
+        error: {
+          code: StatsErrorCode.STATS_FETCH_FAILED,
+          message: "Erro interno ao buscar alocações recentes",
         }
       }
     }

@@ -5,7 +5,9 @@ import { type KpiParkings } from "../types/stats/parkings"
 import { type VehicleCount } from "../types/stats/revenue"
 import { type StatsKpiParkingResponse, mapStatsKpiParking } from "../mappers/statsParking.mapper"
 import { type StatsVehicleCount, mapVehicleCount } from "../mappers/vehicleCount.mapper"
+import { type RecentsAllocationsResponse, mapRecentsAllocations } from "../mappers/recentsAllocations.mapper"
 import { type Occupied } from "../types/stats/occupied"
+import { type RecentsAllocations } from "../types/stats/recentsAllocations"
 
 export interface AllocationData {
   id?: number
@@ -129,6 +131,49 @@ class Stats extends Model<AllocationData> {
 
         } catch(err) {
             console.log(`Erro ao buscar contagem de ocupação ${this.tableName}:, err`)
+            return []
+        }
+    }
+
+    async getRecentsAllocations(user_id: string): Promise<RecentsAllocationsResponse[]> {
+        try {
+            const result = await db.raw<PgRawResult<RecentsAllocations>>(
+            `
+                SELECT
+                    c.username as client_name,
+                    v.plate as plate,
+                    case 
+                        when a.vehicle_type = 1 then 'carro'
+                        when a.vehicle_type = 2 then 'moto'
+                        when a.vehicle_type = 3 then 'caminhonete'
+                        else 'PCD / Idoso'
+                    end as vehicle_type,
+                    FLOOR(EXTRACT(EPOCH FROM (NOW() - a.entry_date)) / 60)::int as time,
+                    a.created_at as date
+                from allocations a
+                inner join parking p
+                    on p.id = a.parking_id
+                inner join clients c 
+                    on c.id = a.client_id
+                inner join vehicles v
+                    on v.id = a.vehicle_id
+                where p.created_by = ?
+                order by a.created_at desc
+                limit 3
+            `,
+            [user_id]
+            )
+
+            if(result.rows.length === 0) {
+                return []
+            }
+
+            const rows = result.rows
+
+            return mapRecentsAllocations(rows)
+
+        } catch(err) {
+            console.log(`Erro ao buscar alocações recentes na tabela ${this.tableName}:, err`)
             return []
         }
     }
